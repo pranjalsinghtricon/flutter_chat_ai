@@ -25,58 +25,90 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Icon(Icons.grid_view, color: Colors.grey),
-              ),
-              // Text field
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _controller,
-                          maxLength: 2000,
-                          maxLines: null,
-                          onChanged: (_) {
-                            setState(() {});
-                          },
-                          onSubmitted: (_) => _send(),
-                          decoration: const InputDecoration(
-                            hintText: 'Ask Elysia anything',
-                            counterText: '',
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_forward, color: Colors.grey.shade700),
-                        onPressed: _send,
-                      ),
-                    ],
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _controller,
+                  maxLength: 2000,
+                  maxLines: null,
+                  onChanged: (_) => setState(() {}),
+                  onSubmitted: (_) => _send(),
+                  decoration: const InputDecoration(
+                    hintText: 'Ask Elysia anything',
+                    counterText: '',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
-              ),
-            ],
+                Row(
+                  children: [
+                    // Left clickable icon
+                    IconButton(
+                      onPressed: () {
+                        // Your custom action (e.g. open quick prompts)
+                      },
+                      icon: const Icon(Icons.grid_view),
+                      color: Colors.grey,
+                      padding: const EdgeInsets.all(12),
+                      constraints: const BoxConstraints(),
+                    ),
+
+                    // Text field
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        maxLength: 2000,
+                        maxLines: null,
+                        onChanged: (_) => setState(() {}),
+                        onSubmitted: (_) => _send(),
+                        decoration: const InputDecoration(
+                          hintText: 'Ask Elysia anything',
+                          counterText: '',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+
+                    // Right arrow button
+                    IconButton(
+                      onPressed: _send,
+                      icon: const Icon(Icons.arrow_forward),
+                      color: Colors.teal, // adjust to match your app theme
+                      padding: const EdgeInsets.all(12),
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+
           const SizedBox(height: 4),
-          // Character count
+
+          // Character counter below input
           Padding(
-            padding: const EdgeInsets.only(left: 36.0),
+            padding: const EdgeInsets.only(left: 12.0),
             child: Text(
               '${_controller.text.length}/2000',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Text(
+              'Elysia responses may be inaccurate. Know more about how your data is processed here.',
+              style: TextStyle(
+                  fontSize: 12, color: Colors.grey
+              ),
+            ),
+          )
         ],
       ),
     );
