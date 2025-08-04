@@ -51,12 +51,12 @@ class WelcomeMessage extends StatelessWidget {
           const Text(
             "Good afternoon.",
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               color: Colors.teal,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 5),
           const Text(
             "How can I assist you today?",
             style: TextStyle(
@@ -64,19 +64,20 @@ class WelcomeMessage extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 24),
-
-          // Suggested prompts
+          const SizedBox(height: 5),
           const SuggestedPrompt("How will One Informa improve career mobility within Informa?"),
           const SuggestedPrompt("Generate 5 catchy titles for a new journal in neuroscience"),
           const SuggestedPrompt("Draft email to suppliers about new payment terms"),
           const SuggestedPrompt("How will One Informa be measured?"),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
 
-          const Text(
-            "🛡️ Your personal and company data are protected in this chat",
-            style: TextStyle(fontSize: 12, color: Colors.grey),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+            child: const Text(
+              "🛡️ Your personal and company data are protected in this chat",
+              style: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w500),
+            ),
           ),
         ],
       ),
@@ -101,7 +102,7 @@ class SuggestedPrompt extends ConsumerWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white70,
             border: Border.all(color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(8),
           ),
@@ -112,7 +113,7 @@ class SuggestedPrompt extends ConsumerWidget {
               Expanded(
                 child: Text(
                   text,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight:FontWeight.w500),
                 ),
               ),
             ],
