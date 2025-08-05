@@ -35,19 +35,32 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
               children: [
                 Container(
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
-                  child: const Text(
-                    'Ask Elysia anything',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
+                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      maxHeight: 120,
+                    ),
+                    child: Scrollbar(
+                      child: TextField(
+                        controller: _controller,
+                        maxLength: 2000,
+                        maxLines: null,
+                        onChanged: (_) => setState(() {}),
+                        onSubmitted: (_) => _send(),
+                        decoration: const InputDecoration(
+                          hintText: 'Ask Elysia anything',
+                          counterText: '',
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                        style: const TextStyle(fontSize: 14),
+                      ),
                     ),
                   ),
+
                 ),
                 Row(
-
                   children: [
-
                     IconButton(
                       onPressed: () {
 
@@ -58,21 +71,21 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       constraints: const BoxConstraints(),
                     ),
 
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        maxLength: 2000,
-                        maxLines: null,
-                        onChanged: (_) => setState(() {}),
-                        onSubmitted: (_) => _send(),
-                        decoration: const InputDecoration(
-                          // hintText: 'Ask Elysia anything',
-                          counterText: '',
-                          border: InputBorder.none,
-
-                        ),
-                      ),
-                    ),
+                    // Expanded(
+                    //   child: TextField(
+                    //     controller: _controller,
+                    //     maxLength: 2000,
+                    //     maxLines: null,
+                    //     onChanged: (_) => setState(() {}),
+                    //     onSubmitted: (_) => _send(),
+                    //     decoration: const InputDecoration(
+                    //       // hintText: 'Ask Elysia anything',
+                    //       counterText: '',
+                    //       border: InputBorder.none,
+                    //
+                    //     ),
+                    //   ),
+                    // ),
 
                     Text(
                       '${_controller.text.length}/2000',
