@@ -21,9 +21,9 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.all(8.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+
         children: [
           Container(
             decoration: BoxDecoration(
@@ -33,33 +33,31 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
             ),
             child: Column(
               children: [
-                TextField(
-                  controller: _controller,
-                  maxLength: 2000,
-                  maxLines: null,
-                  onChanged: (_) => setState(() {}),
-                  onSubmitted: (_) => _send(),
-                  decoration: const InputDecoration(
-                    hintText: 'Ask Elysia anything',
-                    counterText: '',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
+                  child: const Text(
+                    'Ask Elysia anything',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
                 Row(
+
                   children: [
-                    // Left clickable icon
+
                     IconButton(
                       onPressed: () {
-                        // Your custom action (e.g. open quick prompts)
+
                       },
                       icon: const Icon(Icons.grid_view),
                       color: Colors.grey,
-                      padding: const EdgeInsets.all(12),
+
                       constraints: const BoxConstraints(),
                     ),
 
-                    // Text field
                     Expanded(
                       child: TextField(
                         controller: _controller,
@@ -68,21 +66,26 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                         onChanged: (_) => setState(() {}),
                         onSubmitted: (_) => _send(),
                         decoration: const InputDecoration(
-                          hintText: 'Ask Elysia anything',
+                          // hintText: 'Ask Elysia anything',
                           counterText: '',
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 14),
+
                         ),
                       ),
+                    ),
+
+                    Text(
+                      '${_controller.text.length}/2000',
+                      style: const TextStyle(fontSize: 12, color: Colors.blue),
                     ),
 
                     // Right arrow button
                     IconButton(
                       onPressed: _send,
                       icon: const Icon(Icons.arrow_forward),
-                      color: Colors.teal, // adjust to match your app theme
-                      padding: const EdgeInsets.all(12),
+                      color: Colors.teal,
                       constraints: const BoxConstraints(),
+                      padding: EdgeInsets.zero,
                     ),
                   ],
                 ),
@@ -90,18 +93,10 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
             ),
           ),
 
-          const SizedBox(height: 4),
+           SizedBox(height: 4),
 
-          // Character counter below input
           Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Text(
-              '${_controller.text.length}/2000',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
+            padding:  EdgeInsets.only(top: 5),
             child: Text(
               'Elysia responses may be inaccurate. Know more about how your data is processed here.',
               style: TextStyle(
