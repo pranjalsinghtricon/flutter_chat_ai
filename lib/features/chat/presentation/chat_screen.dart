@@ -14,9 +14,95 @@ class ChatScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Elysia"),
+        elevation: 0,
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        title: Builder(
+          builder: (context) {
+            return SizedBox(
+              width: double.infinity,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Text(
+                    "Elysia",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
+                    ),
+                  ),
+
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _AppBarIconButton(
+                          icon: Icons.menu,
+                          onTap: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _AppBarIconButton(
+                          icon: Icons.chat_bubble_outline,
+                          onTap: () {
+                            // New chat logic
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        _AppBarIconButton(
+                          icon: Icons.history,
+                          onTap: () {
+                            // History logic
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            "AR",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.pink,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
-      drawer: const AppDrawer(),
+
+      drawer:  AppDrawer(),
       body: Column(
         children: [
           Expanded(
@@ -171,4 +257,31 @@ class AppDrawer extends StatelessWidget {
     );
   }
 }
+
+class _AppBarIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _AppBarIconButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.grey.shade200,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(icon, color: Colors.blue),
+        ),
+      ),
+    );
+  }
+}
+
 
