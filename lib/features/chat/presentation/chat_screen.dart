@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
+import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
@@ -66,20 +68,36 @@ class ChatScreen extends ConsumerWidget {
                     alignment: Alignment.centerRight,
                     child: Stack(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.blue),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            "AR",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                        CustomTextDropdown(
+                          buttonText: 'AR',
+                          items: [
+                            CustomDropdownItem(
+                              icon: Icons.settings,
+                              iconColor: Colors.blue,
+                              label: 'View Settings',
+                              onSelected: () {
+                                // Do something!
+                              },
                             ),
-                          ),
+                            CustomDropdownItem(
+                              icon: Icons.notifications,
+                              iconColor: Colors.red,
+                              label: 'Notifications',
+                              onSelected: () {
+                                // Do something!
+                              },
+                            ),
+                            CustomDropdownItem(
+                              icon: Icons.logout,
+                              iconColor: Colors.black54,
+                              label: 'Log Out',
+                              onSelected: () {
+                                // Do something!
+                              },
+                            ),
+                          ],
                         ),
+
                         Positioned(
                           top: 0,
                           right: 0,
