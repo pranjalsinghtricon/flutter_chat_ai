@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
+import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
+import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,14 +64,59 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      onPressed: () {
-
-                      },
-                      icon: const Icon(Icons.grid_view),
-                      color: Colors.grey,
-
-                      constraints: const BoxConstraints(),
+                    CustomIconDropdown(
+                      icon: Icons.grid_view,
+                      iconColor: Colors.grey,
+                      items: [
+                        CustomDropdownItem(
+                          icon: Icons.lock_outline, // or Icons.security
+                          iconColor: Colors.black54,
+                          label: 'Private chat',
+                          onSelected: () {
+                            // Handle private chat
+                          },
+                        ),
+                        CustomDropdownItem(
+                          icon: Icons.attach_file,
+                          iconColor: Colors.black54,
+                          label: 'Attach file',
+                          onSelected: () {
+                            // Handle attach file
+                          },
+                        ),
+                        CustomDropdownItem(
+                          icon: Icons.source, // or use Icons.insert_drive_file
+                          iconColor: Colors.black54,
+                          label: 'Add sources',
+                          onSelected: () {
+                            // Handle add sources
+                          },
+                        ),
+                        CustomDropdownItem(
+                          icon: Icons.bookmark_border, // or Icons.save_alt
+                          iconColor: Colors.black54,
+                          label: 'Saved prompts',
+                          onSelected: () {
+                            // Handle saved prompts
+                          },
+                        ),
+                        CustomDropdownItem(
+                          icon: Icons.autorenew, // rotating arrows
+                          iconColor: Colors.black54,
+                          label: 'Change Model',
+                          onSelected: () {
+                            // Handle change model
+                          },
+                        ),
+                        CustomDropdownItem(
+                          icon: Icons.language,
+                          iconColor: Colors.black54,
+                          label: 'Change Language',
+                          onSelected: () {
+                            // Handle change language
+                          },
+                        ),
+                      ],
                     ),
 
                     // Expanded(
@@ -90,6 +138,14 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     Text(
                       '${_controller.text.length}/2000',
                       style: const TextStyle(fontSize: 12, color: Colors.blue),
+                    ),
+                    CustomIconButton(
+                      svgAsset: 'assets/icons/like.svg',
+                      svgColor: Colors.blue,
+                      toolTip: 'Like',
+                      onPressed: () {
+                        print('Liked!');
+                      },
                     ),
 
                     // Right arrow button
