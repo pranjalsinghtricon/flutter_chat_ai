@@ -13,7 +13,10 @@ class ChatApp extends StatelessWidget {
 
       debugShowCheckedModeBanner: false,
       title: 'ChatGPT ',
-      theme: ThemeData.light(),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white, // <-- Background color for whole app
+      ),
       home: ChatScreen(),
     );
   }
