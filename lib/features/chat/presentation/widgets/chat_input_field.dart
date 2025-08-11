@@ -119,26 +119,13 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ],
                     ),
 
-                    // Expanded(
-                    //   child: TextField(
-                    //     controller: _controller,
-                    //     maxLength: 2000,
-                    //     maxLines: null,
-                    //     onChanged: (_) => setState(() {}),
-                    //     onSubmitted: (_) => _send(),
-                    //     decoration: const InputDecoration(
-                    //       // hintText: 'Ask Elysia anything',
-                    //       counterText: '',
-                    //       border: InputBorder.none,
-                    //
-                    //     ),
-                    //   ),
-                    // ),
+                    SizedBox(width: 8),
 
                     Text(
                       '${_controller.text.length}/2000',
                       style: const TextStyle(fontSize: 12, color: Colors.blue),
                     ),
+
                     CustomIconButton(
                       svgAsset: 'assets/icons/like.svg',
                       svgColor: Colors.blue,
@@ -148,7 +135,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       },
                     ),
 
-                    // Right arrow button
+                    Spacer(), // pushes the arrow to the far right
+
                     IconButton(
                       onPressed: _send,
                       icon: const Icon(Icons.arrow_forward),
@@ -157,7 +145,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       padding: EdgeInsets.zero,
                     ),
                   ],
-                ),
+                )
+
               ],
             ),
           ),
