@@ -17,8 +17,8 @@ class MessageBubble extends StatelessWidget {
           children: [
             // Initials box
             Container(
-              width: 32,
-              height: 32,
+              width: 36,
+              height: 36,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Colors.white,

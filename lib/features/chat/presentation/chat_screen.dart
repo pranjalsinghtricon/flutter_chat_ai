@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/common_ui_components/buttons/custom_appbar_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -46,7 +46,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     size: 30,
                     iconColor: Colors.blue,
                     backgroundColor: Colors.white,
-                    tooltip: "Open Elysia",
+                    // tooltip: "Open Elysia",
                     onPressed: () {
                       print("Elysia logo clicked!");
                     },
@@ -56,24 +56,23 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _AppBarIconButton(
-                          icon: Icons.menu,
-                          onTap: () {
-                            Scaffold.of(context).openDrawer();
+                        CustomAppbarIconButton(
+                          assetPath: 'assets/icons/icon-new-topic.svg',
+                          size: 30,
+                          iconColor: Colors.blue,
+                          backgroundColor: Colors.white,
+                          onPressed: () {
+                            print("Elysia logo clicked!");
                           },
                         ),
-                        const SizedBox(width: 8),
-                        _AppBarIconButton(
-                          icon: Icons.chat_bubble_outline,
-                          onTap: () {
-                            // New chat logic
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        _AppBarIconButton(
-                          icon: Icons.history,
-                          onTap: () {
-                            // History logic
+                        SizedBox(width: 10,),
+                        CustomAppbarIconButton(
+                          assetPath: 'assets/icons/icon-history.svg',
+                          size: 30,
+                          iconColor: Colors.blue,
+                          backgroundColor: Colors.white,
+                          onPressed: () {
+                            print("Elysia logo clicked!");
                           },
                         ),
                       ],
@@ -298,29 +297,3 @@ class AppDrawer extends StatelessWidget {
   }
 }
 
-class _AppBarIconButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _AppBarIconButton({
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.grey.shade200,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Icon(icon, color: Colors.blue),
-        ),
-      ),
-    );
-  }
-}
