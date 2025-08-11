@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-
-class ChatScreen extends ConsumerWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends ConsumerState<ChatScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
+
+    // Auto-scroll to bottom when new message is added
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -26,15 +41,16 @@ class ChatScreen extends ConsumerWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  const Text(
-                    "Elysia",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue,
-                    ),
+                  CustomSvgIconButton(
+                    assetPath: 'assets/logo/Elysia-logo.svg',
+                    size: 30,
+                    iconColor: Colors.blue,
+                    backgroundColor: Colors.white,
+                    tooltip: "Open Elysia",
+                    onPressed: () {
+                      print("Elysia logo clicked!");
+                    },
                   ),
-
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Row(
@@ -63,7 +79,6 @@ class ChatScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-
                   Align(
                     alignment: Alignment.centerRight,
                     child: Stack(
@@ -97,7 +112,6 @@ class ChatScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-
                         Positioned(
                           top: 0,
                           right: 0,
@@ -119,23 +133,22 @@ class ChatScreen extends ConsumerWidget {
           },
         ),
       ),
-
-      drawer:  AppDrawer(),
+      drawer: AppDrawer(),
       body: Column(
         children: [
           Expanded(
             child: messages.isEmpty
                 ? const WelcomeMessage()
                 : ListView.builder(
-              reverse: true,
+              controller: _scrollController,
               itemCount: messages.length,
               itemBuilder: (context, index) {
-                final msg = messages[messages.length - 1 - index];
+                final msg = messages[index];
                 return MessageBubble(message: msg);
               },
             ),
           ),
-           ChatInputField(),
+          ChatInputField(),
         ],
       ),
     );
@@ -169,18 +182,23 @@ class WelcomeMessage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 5),
-          const SuggestedPrompt("How will One Informa improve career mobility within Informa?"),
-          const SuggestedPrompt("Generate 5 catchy titles for a new journal in neuroscience"),
-          const SuggestedPrompt("Draft email to suppliers about new payment terms"),
+          const SuggestedPrompt(
+              "How will One Informa improve career mobility within Informa?"),
+          const SuggestedPrompt(
+              "Generate 5 catchy titles for a new journal in neuroscience"),
+          const SuggestedPrompt(
+              "Draft email to suppliers about new payment terms"),
           const SuggestedPrompt("How will One Informa be measured?"),
-
           const SizedBox(height: 8),
-
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+            padding:
+            const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
             child: const Text(
               "🛡️ Your personal and company data are protected in this chat",
-              style: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -204,7 +222,8 @@ class SuggestedPrompt extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+          padding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           decoration: BoxDecoration(
             color: Colors.white70,
             border: Border.all(color: Colors.grey.shade300),
@@ -217,7 +236,10 @@ class SuggestedPrompt extends ConsumerWidget {
               Expanded(
                 child: Text(
                   text,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight:FontWeight.w500),
+                  style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -226,7 +248,6 @@ class SuggestedPrompt extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 class AppDrawer extends StatelessWidget {
@@ -241,7 +262,8 @@ class AppDrawer extends StatelessWidget {
             const DrawerHeader(
               child: Text(
                 'Elysia AI',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
             ListTile(
@@ -289,7 +311,8 @@ class _AppBarIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.grey.shade200,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6)),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
@@ -301,5 +324,3 @@ class _AppBarIconButton extends StatelessWidget {
     );
   }
 }
-
-
