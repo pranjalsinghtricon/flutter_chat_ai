@@ -4,6 +4,7 @@ import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_but
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/profile_page/profile_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -85,6 +86,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         CustomTextDropdown(
                           buttonText: 'AR',
                           items: [
+                            CustomDropdownItem(
+                              icon: Icons.person,
+                              iconColor: Colors.teal,
+                              label: 'Profile',
+                              onSelected: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfileScreen(), // Replace with your profile screen widget
+                                  ),
+                                );
+                              },
+                            ),
                             CustomDropdownItem(
                               icon: Icons.settings,
                               iconColor: Colors.blue,
