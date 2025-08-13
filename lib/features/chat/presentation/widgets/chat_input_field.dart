@@ -135,7 +135,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       },
                     ),
 
-                    Spacer(), // pushes the arrow to the far right
+                    Spacer(),
 
                     IconButton(
                       onPressed: _send,

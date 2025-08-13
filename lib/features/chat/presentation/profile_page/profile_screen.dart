@@ -48,9 +48,6 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // Details Section
-            // _buildDetailsCard(),
-
 
             CustomProfilePageCard(
               heading: "Details",
@@ -82,9 +79,6 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-
-
 
             CustomProfilePageCard(
               heading: "Details",
