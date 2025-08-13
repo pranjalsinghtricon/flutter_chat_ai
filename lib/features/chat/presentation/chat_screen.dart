@@ -45,6 +45,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   CustomSvgIconButton(
                     assetPath: 'assets/logo/Elysia-logo.svg',
                     size: 30,
+                    // iconColor: Colors.blue,
+                    backgroundColor: Colors.white,
+                    // tooltip: "Open Elysia",
                     onPressed: () {
                       print("Elysia logo clicked!");
                     },
@@ -144,24 +147,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
       drawer: AppDrawer(),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: messages.isEmpty
-                  ? const WelcomeMessage()
-                  : ListView.builder(
-                controller: _scrollController,
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  final msg = messages[index];
-                  return MessageBubble(message: msg);
-                },
-              ),
+      body: Column(
+        children: [
+          Expanded(
+            child: messages.isEmpty
+                ? const WelcomeMessage()
+                : ListView.builder(
+              controller: _scrollController,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                return MessageBubble(message: msg);
+              },
             ),
-            ChatInputField(),
-          ],
-        ),
+          ),
+          ChatInputField(),
+        ],
       ),
     );
   }

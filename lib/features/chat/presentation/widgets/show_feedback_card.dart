@@ -63,6 +63,8 @@ class ShowFeedbackCard extends StatelessWidget {
                 children: [
                   CustomSvgIconButton(
                     assetPath: 'assets/logo/Elysia-brain.svg',
+                    // iconColor: Colors.blue,
+                    // backgroundColor: Colors.white,
                     size: 30, // Smaller size like in screenshot
                     // backgroundColor: Colors.white,
                     onPressed: () {
