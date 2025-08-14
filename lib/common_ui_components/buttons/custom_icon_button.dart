@@ -7,11 +7,11 @@ class CustomIconButton extends StatelessWidget {
   final String? svgAsset;
   final Color? svgColor;
   final Color? backgroundColor;
-  final String toolTip;
+  final String? toolTip;
   final bool isDense;
 
   const CustomIconButton({
-    Key? key,
+    super.key,
     this.onPressed,
     this.icon,
     this.svgAsset,
@@ -19,8 +19,7 @@ class CustomIconButton extends StatelessWidget {
     this.backgroundColor,
     required this.toolTip,
     this.isDense = false,
-  })  : assert(icon != null || svgAsset != null, 'Provide either icon or svgAsset'),
-        super(key: key);
+  })  : assert(icon != null || svgAsset != null, 'Provide either icon or svgAsset');
 
   @override
   Widget build(BuildContext context) {

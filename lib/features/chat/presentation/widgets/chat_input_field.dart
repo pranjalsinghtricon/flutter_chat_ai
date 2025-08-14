@@ -65,11 +65,15 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 Row(
                   children: [
                     CustomIconDropdown(
-                      icon: Icons.grid_view,
-                      iconColor: Colors.grey,
+                      // icon: Icons.grid_view,
+                      // iconColor: Colors.grey,
+                      assetPath: 'assets/icons/icon-chat-options.svg',
+                      assetSize: 20,
+                      iconColor: Colors.black54,
                       items: [
                         CustomDropdownItem(
-                          icon: Icons.lock_outline, // or Icons.security
+                        assetPath: 'assets/icons/icon-private-chat.svg' ,
+                          assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Private chat',
                           onSelected: () {
@@ -77,43 +81,47 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                           },
                         ),
                         CustomDropdownItem(
-                          icon: Icons.attach_file,
-                          iconColor: Colors.black54,
+                          assetPath: 'assets/icons/icon-paperclip.svg',
+                          assetSize: 20,
                           label: 'Attach file',
                           onSelected: () {
-                            // Handle attach file
+                            print("Attach file");
                           },
                         ),
                         CustomDropdownItem(
-                          icon: Icons.source, // or use Icons.insert_drive_file
+                          assetPath: 'assets/icons/icon-google-document.svg' ,
+                          assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Add sources',
                           onSelected: () {
-                            // Handle add sources
+                            // Handle private chat
                           },
                         ),
                         CustomDropdownItem(
-                          icon: Icons.bookmark_border, // or Icons.save_alt
+                          assetPath: 'assets/icons/icon-google-bookmark.svg' ,
+                          assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Saved prompts',
                           onSelected: () {
-                            // Handle saved prompts
+                            // Handle private chat
                           },
                         ),
                         CustomDropdownItem(
-                          icon: Icons.autorenew, // rotating arrows
+                          assetPath: 'assets/icons/icon-change-model.svg' ,
+                          assetSize: 20,
                           iconColor: Colors.black54,
-                          label: 'Change Model',
+                          label: 'Change model',
                           onSelected: () {
-                            // Handle change model
+                            // Handle private chat
                           },
                         ),
                         CustomDropdownItem(
-                          icon: Icons.language,
+                          assetPath: 'assets/icons/icon-language.svg' ,
+                          assetSize: 20,
                           iconColor: Colors.black54,
-                          label: 'Change Language',
+                          label: 'Change language',
                           onSelected: () {
-                            // Handle change language
+                            // Handle private chat
                           },
                         ),
                       ],
@@ -137,13 +145,20 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
 
                     Spacer(),
 
-                    IconButton(
+
+                    CustomIconButton(
+                      svgAsset: 'assets/icons/icon-send.svg',
+                      svgColor: Colors.teal,
+                      toolTip: 'Send',
                       onPressed: _send,
-                      icon: const Icon(Icons.arrow_forward),
-                      color: Colors.teal,
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
                     ),
+                    // IconButton(
+                    //   onPressed: _send,
+                    //   icon: const Icon(Icons.arrow_forward),
+                    //   color: Colors.teal,
+                    //   constraints: const BoxConstraints(),
+                    //   padding: EdgeInsets.zero,
+                    // ),
                   ],
                 )
 

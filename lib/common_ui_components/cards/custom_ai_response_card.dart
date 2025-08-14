@@ -116,7 +116,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                         ),
                         CustomIconButton(
                           icon: Icons.copy,
-                          svgColor: Colors.black,
+                          svgColor: Colors.grey,
                           toolTip: 'Copy',
                           onPressed: () {},
                           isDense: true,

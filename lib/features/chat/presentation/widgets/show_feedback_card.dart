@@ -31,7 +31,6 @@ class ShowFeedbackCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Header Row (Title + Close Button)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -49,11 +48,6 @@ class ShowFeedbackCard extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// Divider
-            // Divider(height: 1, color: Colors.grey.shade300),
-
-            /// Feedback Text
              Row(
                crossAxisAlignment: CrossAxisAlignment.start,
                children: [
@@ -80,8 +74,6 @@ class ShowFeedbackCard extends StatelessWidget {
              ),
             SizedBox(height: 12),
 
-
-            /// Feedback Input
             TextField(
               maxLines: 3,
               decoration: InputDecoration(
@@ -95,7 +87,6 @@ class ShowFeedbackCard extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            /// Submit Button
             ElevatedButton(
               onPressed: onClose,
               style: ElevatedButton.styleFrom(
