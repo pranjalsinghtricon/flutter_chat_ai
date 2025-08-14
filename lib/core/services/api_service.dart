@@ -7,7 +7,7 @@ final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
 class ApiService {
   final String baseUrl = 'https://api.openai.com/v1/chat/completions';
-  final String apiKey = 'YOUR_API_KEY'; // Replace with your OpenAI key
+  final String apiKey = 'YOUR_API_KEY';
 
   Future<String> sendPrompt(String prompt) async {
     final response = await http.post(

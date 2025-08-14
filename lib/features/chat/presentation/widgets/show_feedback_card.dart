@@ -49,12 +49,12 @@ class ShowFeedbackCard extends StatelessWidget {
               ],
             ),
              Row(
-               crossAxisAlignment: CrossAxisAlignment.start,
+               crossAxisAlignment: CrossAxisAlignment.center,
                children: [
                  Align(
                    alignment: Alignment.centerLeft,
                    child: SvgPicture.asset(
-                     'assets/logo/Elysia-brain.svg',
+                     'assets/logo/icon-elysia-brain.svg',
                      width: 25,
                      height: 25,
                    ),
