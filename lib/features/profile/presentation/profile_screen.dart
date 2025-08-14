@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/cards/custom_user_profile_card.dart';
 import 'package:flutter_chat_ai/common_ui_components/row/custom_row_layout.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/profile_page/widgets/skills_section.dart';
+import 'package:flutter_chat_ai/features/profile/presentation/widgets/skills_section.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

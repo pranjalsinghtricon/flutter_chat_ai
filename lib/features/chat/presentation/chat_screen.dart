@@ -6,7 +6,7 @@ import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.d
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/common_ui_components/expandable_tile/custom_expandable_tile.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/profile_page/profile_screen.dart';
+import 'package:flutter_chat_ai/features/profile/presentation/profile_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
