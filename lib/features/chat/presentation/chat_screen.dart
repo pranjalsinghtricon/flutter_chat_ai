@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_appbar_icon_button.dart';
+import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_text_outlined_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
+import 'package:flutter_chat_ai/common_ui_components/expandable_tile/custom_expandable_tile.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/profile_page/profile_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -42,6 +45,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
+
                   CustomSvgIconButton(
                     assetPath: 'assets/logo/Elysia-logo.svg',
                     size: 30,
@@ -49,14 +53,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     backgroundColor: Colors.white,
                     // tooltip: "Open Elysia",
                     onPressed: () {
-                      print("Elysia logo clicked!");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(),
+                        ),
+                      );
                     },
                   ),
+                  // SvgPicture.asset(
+                  //   'assets/logo/Elysia-logo.svg',
+                  //   width: 30,
+                  //   height: 30,
+                  // ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        //don't remove
+                        // Align(
+                        //   alignment: Alignment.centerLeft,
+                        //   child: IconButton(
+                        //     icon: Icon(Icons.menu, color: Colors.blue, size: 30),
+                        //     onPressed: () {
+                        //       Scaffold.of(context).openDrawer();
+                        //     },
+                        //   ),
+                        // ),
+
                         CustomAppbarIconButton(
                           assetPath: 'assets/icons/icon-new-topic.svg',
                           size: 30,
@@ -73,8 +98,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
-                            print("Elysia logo clicked!");
-                          },
+                                  Scaffold.of(context).openDrawer();
+                                },
                         ),
                       ],
                     ),
@@ -94,7 +119,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ProfileScreen(), // Replace with your profile screen widget
+                                    builder: (context) => ProfileScreen(),
                                   ),
                                 );
                               },
@@ -147,23 +172,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
       drawer: AppDrawer(),
-      body: Column(
-        children: [
-          Expanded(
-            child: messages.isEmpty
-                ? const WelcomeMessage()
-                : ListView.builder(
-              controller: _scrollController,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-                return MessageBubble(message: msg);
-              },
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: messages.isEmpty
+                  ? const WelcomeMessage()
+                  : ListView.builder(
+                controller: _scrollController,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final msg = messages[index];
+                  return MessageBubble(message: msg);
+                },
+              ),
             ),
-          ),
-          ChatInputField(),
-        ],
+            ChatInputField(),
+          ],
+        ),
       ),
+
     );
   }
 }
@@ -204,16 +233,30 @@ class WelcomeMessage extends StatelessWidget {
           const SuggestedPrompt("How will One Informa be measured?"),
           const SizedBox(height: 8),
           Padding(
-            padding:
-            const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-            child: const Text(
-              "🛡️ Your personal and company data are protected in this chat",
-              style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500),
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/icon-shield.svg',
+                  width: 25,
+                  height: 25,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    "Your personal and company data are protected in this chat",
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
+          )
+
         ],
       ),
     );
@@ -270,38 +313,95 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: SafeArea(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              child: Text(
-                'Elysia AI',
-                style: TextStyle(
-                    fontSize: 24, fontWeight: FontWeight.bold),
+            // const DrawerHeader(
+            //   child: Text(
+            //     'Elysia AI',
+            //     style: TextStyle(
+            //       fontSize: 24,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
+
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: CustomIconTextOutlinedButton(
+                icon: Icons.add,
+                text: "New Chat",
+                onPressed: () {
+                  print("New Chat Clicked");
+                },
               ),
+            ),
+
+
+            // Chat History Section Heading
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                "Chat History",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),
+              ),
+            ),
+
+            // Expandable Categories
+            CustomExpandableTile(
+              title: "Today",
+              // leadingIcon: Icons.today,
+              items: [
+                "Informa AI assistant Elysia on ...",
+                "Catch up meeting notes",
+                "Draft supplier email",
+              ],
+            ),
+            CustomExpandableTile(
+              title: "Last 7 days",
+              // leadingIcon: Icons.calendar_view_week,
+              items: [
+                "Neuroscience journal titles",
+                "Project kickoff discussion",
+              ],
+            ),
+            CustomExpandableTile(
+              title: "Last 30 days",
+              // leadingIcon: Icons.calendar_month,
+              items: [
+                "Career mobility plan",
+                "Team retrospective",
+                "Monthly review summary",
+              ],
+            ),
+            CustomExpandableTile(
+              title: "Archived Chats",
+              // leadingIcon: Icons.archive,
+              items: [
+                "Old supplier contract discussion",
+                "AI product brainstorming",
+              ],
+            ),
+
+            const Divider(),
+
+            // Settings
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+              },
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
               onTap: () {
                 Navigator.pop(context);
-                // TODO: Navigate to profile screen
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Chat History'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to history screen
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Navigate to settings screen
               },
             ),
           ],
@@ -310,4 +410,5 @@ class AppDrawer extends StatelessWidget {
     );
   }
 }
+
 

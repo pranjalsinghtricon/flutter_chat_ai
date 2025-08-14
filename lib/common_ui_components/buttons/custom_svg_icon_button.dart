@@ -10,14 +10,14 @@ class CustomSvgIconButton extends StatelessWidget {
   final String? tooltip;
 
   const CustomSvgIconButton({
-    Key? key,
+    super.key,
     required this.assetPath,
     this.size = 24,
     this.iconColor,
     this.backgroundColor,
     required this.onPressed,
     this.tooltip,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +39,11 @@ class CustomSvgIconButton extends StatelessWidget {
       );
     }
 
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      icon: iconWidget,
+    return GestureDetector(
+      onTap: onPressed,
+      child: tooltip != null
+          ? Tooltip(message: tooltip!, child: iconWidget)
+          : iconWidget,
     );
   }
 }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_feedback_card.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAiResponseCard extends StatefulWidget {
   final String message;
 
-  const CustomAiResponseCard({Key? key, required this.message})
-      : super(key: key);
+  const CustomAiResponseCard({super.key, required this.message});
 
   @override
   State<CustomAiResponseCard> createState() => _CustomAiResponseCardState();
@@ -30,9 +30,16 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.teal, width: 1),
-            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black26, width: 1),
+            borderRadius: BorderRadius.circular(5),
             color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              )
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,21 +52,19 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: CustomSvgIconButton(
-                        assetPath: 'assets/logo/Elysia-logo.svg',
-                        size: 25,
-                        iconColor: Colors.blue,
-                        backgroundColor: Colors.white,
-                        tooltip: "Open Elysia",
-                        onPressed: () {
-                          print("Elysia logo clicked!");
-                        },
+                      child: SvgPicture.asset(
+                        'assets/logo/Elysia-logo.svg',
+                        width: 25,
+                        height: 25,
                       ),
                     ),
+                    SizedBox(height: 10,),
                     Text(
                       widget.message,
                       style: const TextStyle(
-                          fontSize: 14, color: Colors.black87),
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),
