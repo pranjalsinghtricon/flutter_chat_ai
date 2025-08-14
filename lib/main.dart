@@ -15,7 +15,7 @@ class ChatApp extends StatelessWidget {
       title: 'ChatGPT ',
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.white, // <-- Background color for whole app
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: ChatScreen(),
     );

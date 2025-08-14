@@ -9,13 +9,13 @@ class CustomAppbarIconButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const CustomAppbarIconButton({
-    Key? key,
+    super.key,
     required this.assetPath,
     required this.size,
     required this.iconColor,
     required this.backgroundColor,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
