@@ -50,7 +50,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     assetPath: 'assets/logo/Elysia-logo.svg',
                     size: 30,
                     // iconColor: Colors.blue,
-                    backgroundColor: Colors.white,
+                    backgroundColor: Colors.transparent,
                     // tooltip: "Open Elysia",
                     onPressed: () {
                       Navigator.push(
@@ -84,7 +84,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
                         CustomAppbarIconButton(
                           assetPath: 'assets/icons/icon-new-topic.svg',
-                          size: 30,
+                          size: 25,
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
@@ -94,7 +94,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         SizedBox(width: 10,),
                         CustomAppbarIconButton(
                           assetPath: 'assets/icons/icon-history.svg',
-                          size: 30,
+                          size: 25,
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
@@ -235,7 +235,7 @@ class WelcomeMessage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   'assets/icons/icon-shield.svg',
@@ -287,7 +287,11 @@ class SuggestedPrompt extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.message, size: 18, color: Colors.grey),
+              SvgPicture.asset(
+                'assets/icons/icon-sample-chat.svg',
+                width: 20,
+                height: 20,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -336,9 +340,6 @@ class AppDrawer extends StatelessWidget {
                 },
               ),
             ),
-
-
-            // Chat History Section Heading
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
