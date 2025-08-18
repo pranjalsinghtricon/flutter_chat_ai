@@ -57,8 +57,6 @@ class CustomProfilePageCard extends StatelessWidget {
             ),
 
             const SizedBox(height: 12),
-
-            // The dynamic child widget
             child,
           ],
         ),

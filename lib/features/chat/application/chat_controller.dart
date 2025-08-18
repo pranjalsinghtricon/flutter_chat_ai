@@ -16,35 +16,29 @@ class ChatController extends StateNotifier<List<Message>> {
 
   ChatController(this._apiService) : super([]);
 
-  void sendMessage(String content) async {
+  void sendMessage(String content) {
     final userMessage = Message(
       id: const Uuid().v4(),
       content: content,
       isUser: true,
     );
-
-    // Add user message to state
     state = [...state, userMessage];
 
-    try {
-      final botResponse = await _apiService.sendPrompt(content);
+    final botMessage = Message(
+      id: const Uuid().v4(),
+      content: "",
+      isUser: false,
+    );
+    state = [...state, botMessage];
 
-      final botMessage = Message(
-        id: const Uuid().v4(),
-        content: botResponse,
-        isUser: false,
-      );
-
-      // Add bot response to state
-      state = [...state, botMessage];
-    } catch (e) {
-      final errorMessage = Message(
-        id: const Uuid().v4(),
-        content: 'Error: ${e.toString()}',
-        isUser: false,
-      );
-
-      state = [...state, errorMessage];
-    }
+    _apiService.sendPromptStream(content).listen((chunk) {
+      // Append chunk to last AI message
+      final updatedMessages = [...state];
+      final lastIndex = updatedMessages.length - 1;
+      updatedMessages[lastIndex] =
+          updatedMessages[lastIndex].copyWith(content: updatedMessages[lastIndex].content + chunk);
+      state = updatedMessages;
+    });
   }
 }
+

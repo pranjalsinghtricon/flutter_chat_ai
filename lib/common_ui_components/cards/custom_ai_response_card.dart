@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
-import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
+import 'package:flutter_chat_ai/data/models/message_model.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_feedback_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAiResponseCard extends StatefulWidget {
-  final String message;
+  final Message message;
+  final ValueChanged<Message>? onMessageUpdated;
 
-  const CustomAiResponseCard({super.key, required this.message});
+  const CustomAiResponseCard({
+    super.key,
+    required this.message,
+    this.onMessageUpdated,
+  });
 
   @override
   State<CustomAiResponseCard> createState() => _CustomAiResponseCardState();
@@ -22,11 +27,17 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
     });
   }
 
+  void _copyToClipboard() {
+    // Example: You can use clipboard API
+    // Clipboard.setData(ClipboardData(text: widget.message.content));
+    debugPrint("Copied: ${widget.message.content}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// Main AI Response Container
+
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -37,7 +48,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               )
             ],
           ),
@@ -58,9 +69,9 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                         height: 25,
                       ),
                     ),
-                    SizedBox(height: 10,),
+                    const SizedBox(height: 10),
                     Text(
-                      widget.message,
+                      widget.message.content,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black,
@@ -79,8 +90,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
 
               /// Footer Row
               Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -118,7 +128,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                           icon: Icons.copy,
                           svgColor: Colors.grey,
                           toolTip: 'Copy',
-                          onPressed: () {},
+                          onPressed: _copyToClipboard,
                           isDense: true,
                         ),
                       ],

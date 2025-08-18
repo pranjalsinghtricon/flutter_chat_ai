@@ -8,4 +8,16 @@ class Message {
     required this.content,
     required this.isUser,
   });
+
+  Message copyWith({
+    String? id,
+    String? content,
+    bool? isUser,
+  }) {
+    return Message(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      isUser: isUser ?? this.isUser,
+    );
+  }
 }

@@ -1,34 +1,207 @@
-// lib/core/services/api_service.dart
-import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
 class ApiService {
-  final String baseUrl = 'https://api.openai.com/v1/chat/completions';
-  final String apiKey = 'YOUR_API_KEY';
+  // Simulated streaming API
+  Stream<String> sendPromptStream(String prompt) async* {
+    // Your hardcoded streamed data
 
-  Future<String> sendPrompt(String prompt) async {
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {
-        'Authorization': 'Bearer $apiKey',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        "model": "gpt-3.5-turbo",
-        "messages": [
-          {"role": "user", "content": prompt}
-        ]
-      }),
-    );
+    // final List<String> mockStreamData = [
+    //   '{"type": "answer", "answer": ""}',
+    //   '{"type": "answer", "answer": "\\n\\n# Professional Introduction"}',
+    //   '{"type": "answer", "answer": " Email Template\\n\\nHere"}',
+    //   '{"type": "answer", "answer": "\'s an introduction email you"}',
+    //   '{"type": "answer", "answer": " can use"}',
+    //   '{"type": "answer", "answer": " to reach out to a potential"}',
+    //   '{"type": "answer", "answer": " new customer:"}',
+    //   '{"type": "answer", "answer": "\\n\\n---\\n\\n**"}',
+    //   '{"type": "answer", "answer": "Subject: Introduction an"}',
+    //   '{"type": "answer", "answer": "d Solutions That Could Benefit ["}',
+    //   '{"type": "answer", "answer": "Company Name]**"}',
+    //   '{"type": "answer", "answer": "\\n\\nDear ["}',
+    //   '{"type": "answer", "answer": "Recipient\'s Name],"}',
+    //   '{"type": "answer", "answer": "\\n\\nI hope this email finds you"}',
+    //   '{"type": "answer", "answer": " well.\\n\\nMy name is"}',
+    //   '{"type": "answer", "answer": " [Your Name],"}',
+    //   '{"type": "answer", "answer": " and I am a"}',
+    //   '{"type": "answer", "answer": " [Your Position] at [Your"}',
+    //   '{"type": "answer", "answer": " Company]. I came across ["}',
+    //   '{"type": "answer", "answer": "Company Name] recently"}',
+    //   '{"type": "answer", "answer": " and was particularly impressed by ["}',
+    //   '{"type": "answer", "answer": "something specific"}',
+    //   '{"type": "answer", "answer": " about their business"}',
+    //   '{"type": "answer", "answer": "/recent"}',
+    //   '{"type": "answer", "answer": " achievement/news"}',
+    //   '{"type": "answer", "answer": "].\\n\\nOur"}',
+    //   '{"type": "answer", "answer": " company special"}',
+    //   '{"type": "answer", "answer": "ises in providing"}',
+    //   '{"type": "answer", "answer": " [brief"}',
+    //   '{"type": "answer", "answer": " description of your product/"}',
+    //   '{"type": "answer", "answer": "service category"}',
+    //   '{"type": "answer", "answer": "], which"}',
+    //   '{"type": "answer", "answer": " has helped organisations like [mention"}',
+    //   '{"type": "answer", "answer": " 1-2 similar"}',
+    //   '{"type": "answer", "answer": " companies or industries"}',
+    //   '{"type": "answer", "answer": "] to ["}',
+    //   '{"type": "answer", "answer": "achieve specific benefit,"}',
+    //   '{"type": "answer", "answer": " e.g.,"}',
+    //   '{"type": "answer", "answer": " \\"reduce"}',
+    //   '{"type": "answer", "answer": " operational costs by 20"}',
+    //   '{"type": "answer", "answer": "%\\" or \\"increase"}',
+    //   '{"type": "answer", "answer": " customer engagement by 35"}',
+    //   '{"type": "answer", "answer": "%\\"].\\n\\nOur"}',
+    //   '{"type": "answer", "answer": " core offerings"}',
+    //   '{"type": "answer", "answer": " include:\\n\\n*"}',
+    //   '{"type": "answer", "answer": " **[Product/"}',
+    //   '{"type": "answer", "answer": "Service 1]**:"}',
+    //   '{"type": "answer", "answer": " [Brief description highlighting"}',
+    //   '{"type": "answer", "answer": " key benefit]\\n* **"}',
+    //   '{"type": "answer", "answer": "[Product/Service"}',
+    //   '{"type": "answer", "answer": " 2]**:"}',
+    //   '{"type": "answer", "answer": " [Brief description highlighting"}',
+    //   '{"type": "answer", "answer": " key benefit]"}',
+    //   '{"type": "answer", "answer": "\\n* **[Product"}',
+    //   '{"type": "answer", "answer": "/Service 3"}',
+    //   '{"type": "answer", "answer": "]**: [Brief"}',
+    //   '{"type": "answer", "answer": " description highlighting key benefit"}',
+    //   '{"type": "answer", "answer": "]\\n\\nI believe"}',
+    //   '{"type": "answer", "answer": " our [specific"}',
+    //   '{"type": "answer", "answer": " product] could particularly help"}',
+    //   '{"type": "answer", "answer": " with [specific"}',
+    //   '{"type": "answer", "answer": " challenge or opportunity the"}',
+    //   '{"type": "answer", "answer": " prospect might have]."}',
+    //   '{"type": "answer", "answer": "\\n\\nI\'d welcome"}',
+    //   '{"type": "answer", "answer": " the opportunity to schedule a brief"}',
+    //   '{"type": "answer", "answer": " 15-minute call to"}',
+    //   '{"type": "answer", "answer": " learn more about your current"}',
+    //   '{"type": "answer", "answer": " needs and discuss"}',
+    //   '{"type": "answer", "answer": " how our solutions might"}',
+    //   '{"type": "answer", "answer": " align with your objectives"}',
+    //   '{"type": "answer", "answer": ". Would you be available"}',
+    //   '{"type": "answer", "answer": " next [day]"}',
+    //   '{"type": "answer", "answer": " at [time]"}',
+    //   '{"type": "answer", "answer": " or [alternative day"}',
+    //   '{"type": "answer", "answer": "] at [alternative"}',
+    //   '{"type": "answer", "answer": " time]?"}',
+    //   '{"type": "answer", "answer": "\\n\\nAlternatively, I"}',
+    //   '{"type": "answer", "answer": "\'m happy to share"}',
+    //   '{"type": "answer", "answer": " more information via email if"}',
+    //   '{"type": "answer", "answer": " you prefer.\\n\\nThank"}',
+    //   '{"type": "answer", "answer": " you for your time"}',
+    //   '{"type": "answer", "answer": ", and I look forwar"}',
+    //   '{"type": "answer", "answer": "d to potentially working"}',
+    //   '{"type": "answer", "answer": " together.\\n\\nKin"}',
+    //   '{"type": "answer", "answer": "d regards,\\n\\n[Your Name]"}',
+    //   '{"type": "answer", "answer": "\\n[Your Title"}',
+    //   '{"type": "answer", "answer": "]\\n[Your Company]"}',
+    //   '{"type": "answer", "answer": "\\n[Your Contact Information"}',
+    //   '{"type": "answer", "answer": "]\\n[LinkedIn"}',
+    //   '{"type": "answer", "answer": " Profile/Company"}',
+    //   '{"type": "answer", "answer": " Website]\\n\\n---"}',
+    //   '{"type": "answer", "answer": "\\n\\nFeel free to personal"}',
+    //   '{"type": "answer", "answer": "ise this template by"}',
+    //   '{"type": "answer", "answer": ":\\n\\n1"}',
+    //   '{"type": "answer", "answer": ". Resear"}',
+    //   '{"type": "answer", "answer": "ching the prospect\'s company before"}',
+    //   '{"type": "answer", "answer": " sending to include"}',
+    //   '{"type": "answer", "answer": " relevant details"}',
+    //   '{"type": "answer", "answer": "\\n2. Ment"}',
+    //   '{"type": "answer", "answer": "ioning any mutual connections or refer"}',
+    //   '{"type": "answer", "answer": "rals\\n3"}',
+    //   '{"type": "answer", "answer": ". Refer"}',
+    //   '{"type": "answer", "answer": "encing recent company"}',
+    //   '{"type": "answer", "answer": " news or achievements"}',
+    //   '{"type": "answer", "answer": "\\n4. Tail"}',
+    //   '{"type": "answer", "answer": "oring the product"}',
+    //   '{"type": "answer", "answer": " benefits to address"}',
+    //   '{"type": "answer", "answer": " their specific industry"}',
+    //   '{"type": "answer", "answer": " challenges\\n\\nWoul"}',
+    //   '{"type": "answer", "answer": "d you like me to"}',
+    //   '{"type": "answer", "answer": " custom"}',
+    //   '{"type": "answer", "answer": "ise this template further"}',
+    //   '{"type": "answer", "answer": " for your specific industry"}',
+    //   '{"type": "answer", "answer": " or products"}',
+    //   '{"type": "answer", "answer": "?"}',
+    //   '{"type": "answer", "answer": ""}'
+    // ];
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return data['choices'][0]['message']['content'].trim();
-    } else {
-      return "Error: ${response.body}";
+
+
+  // Future<String> sendPrompt(String prompt) async {
+  //   final response = await http.post(
+  //     Uri.parse(baseUrl),
+  //     headers: {
+  //       'Authorization': 'Bearer $apiKey',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: json.encode({
+  //       "model": "gpt-3.5-turbo",
+  //       "messages": [
+  //         {"role": "user", "content": prompt}
+  //       ]
+  //     }),
+  //   );
+
+    final List<String> mockStreamData = [
+      '{"type": "answer", "answer": ""}',
+      '{"type": "answer", "answer": " \\n\\n"}',
+      '{"type": "answer", "answer": "Here"}',
+      '{"type": "answer", "answer": "\\u2019s"}',
+      '{"type": "answer", "answer": " a"}',
+      '{"type": "answer", "answer": " simple"}',
+      '{"type": "answer", "answer": " Python"}',
+      '{"type": "answer", "answer": " example"}',
+      '{"type": "answer", "answer": " that"}',
+      '{"type": "answer", "answer": " demonstrates"}',
+      '{"type": "answer", "answer": " a"}',
+      '{"type": "answer", "answer": " basic"}',
+      '{"type": "answer", "answer": " program"}',
+      '{"type": "answer", "answer": " to"}',
+      '{"type": "answer", "answer": " calculate"}',
+      '{"type": "answer", "answer": " the"}',
+      '{"type": "answer", "answer": " sum"}',
+      '{"type": "answer", "answer": " of"}',
+      '{"type": "answer", "answer": " two"}',
+      '{"type": "answer", "answer": " numbers"}',
+      '{"type": "answer", "answer": ":\\n\\n"}',
+      '{"type": "answer", "answer": "```"}',
+      '{"type": "answer", "answer": "python"}',
+      '{"type": "answer", "answer": "\\n"}',
+      '{"type": "answer", "answer": "#"}',
+      '{"type": "answer", "answer": " Function"}',
+      '{"type": "answer", "answer": " to"}',
+      '{"type": "answer", "answer": " calculate"}',
+      '{"type": "answer", "answer": " the"}',
+      '{"type": "answer", "answer": " sum"}',
+      '{"type": "answer", "answer": " of"}',
+      '{"type": "answer", "answer": " two"}',
+      '{"type": "answer", "answer": " numbers"}',
+      '{"type": "answer", "answer": "\\n"}',
+      '{"type": "answer", "answer": "def"}',
+      '{"type": "answer", "answer": " calculate"}',
+      '{"type": "answer", "answer": "_sum"}',
+      '{"type": "answer", "answer": "(a"}',
+      '{"type": "answer", "answer": ", b):\\n"}',
+      '{"type": "answer", "answer": "    return a + b\\n\\n"}',
+      '{"type": "answer", "answer": "# Input from the user\\n"}',
+      '{"type": "answer", "answer": "num1 = float(input(\\"Enter the first number: \\"))\\n"}',
+      '{"type": "answer", "answer": "num2 = float(input(\\"Enter the second number: \\"))\\n\\n"}',
+      '{"type": "answer", "answer": "# Calculate the sum\\n"}',
+      '{"type": "answer", "answer": "result = calculate_sum(num1, num2)\\n\\n"}',
+      '{"type": "answer", "answer": "# Display the result\\n"}',
+      '{"type": "answer", "answer": "print(f\\"The sum of {num1} and {num2} is {result}.\\")"}',
+      '{"type": "answer", "answer": "```\\n\\n"}',
+      '{"type": "answer", "answer": "This code takes two numbers as input, calculates their sum, and displays the result."}'
+    ];
+
+    // Simulate delay like real streaming
+    for (final line in mockStreamData) {
+      final decoded = jsonDecode(line);
+      yield decoded["answer"] ?? "";
+      await Future.delayed(const Duration(milliseconds: 50));
     }
   }
 }
