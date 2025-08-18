@@ -6,14 +6,16 @@ import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.d
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/common_ui_components/expandable_tile/custom_expandable_tile.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/private_chat.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/welcome_message_screen.dart';
 import 'package:flutter_chat_ai/features/profile/presentation/profile_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({super.key, this.isPrivate = false});
+  final bool isPrivate;
 
   @override
   ConsumerState<ChatScreen> createState() => _ChatScreenState();
@@ -178,7 +180,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           children: [
             Expanded(
               child: messages.isEmpty
-                  ? const WelcomeMessage()
+                  ? widget.isPrivate
+                  ? const PrivateChatScreen()
+                  : const WelcomeMessageScreen()
                   : ListView.builder(
                 controller: _scrollController,
                 itemCount: messages.length,
@@ -187,125 +191,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   return MessageBubble(message: msg);
                 },
               ),
-            ),
+            ), // stays same for both
+
+
             ChatInputField(),
           ],
         ),
       ),
 
-    );
-  }
-}
-
-class WelcomeMessage extends StatelessWidget {
-  const WelcomeMessage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Good afternoon.",
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.teal,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 5),
-          const Text(
-            "How can I assist you today?",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 5),
-          const SuggestedPrompt(
-              "How will One Informa improve career mobility within Informa?"),
-          const SuggestedPrompt(
-              "Generate 5 catchy titles for a new journal in neuroscience"),
-          const SuggestedPrompt(
-              "Draft email to suppliers about new payment terms"),
-          const SuggestedPrompt("How will One Informa be measured?"),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/icon-shield.svg',
-                  width: 25,
-                  height: 25,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    "Your personal and company data are protected in this chat",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          )
-
-        ],
-      ),
-    );
-  }
-}
-
-class SuggestedPrompt extends ConsumerWidget {
-  final String text;
-  const SuggestedPrompt(this.text, {super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: InkWell(
-        onTap: () {
-          ref.read(chatControllerProvider.notifier).sendMessage(text);
-        },
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          width: double.infinity,
-          padding:
-          const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-          decoration: BoxDecoration(
-            color: Colors.white70,
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              SvgPicture.asset(
-                'assets/icons/icon-sample-chat.svg',
-                width: 20,
-                height: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -320,16 +213,6 @@ class AppDrawer extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            // const DrawerHeader(
-            //   child: Text(
-            //     'Elysia AI',
-            //     style: TextStyle(
-            //       fontSize: 24,
-            //       fontWeight: FontWeight.bold,
-            //     ),
-            //   ),
-            // ),
-
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: CustomIconTextOutlinedButton(

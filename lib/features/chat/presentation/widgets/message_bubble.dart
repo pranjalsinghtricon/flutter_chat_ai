@@ -16,7 +16,14 @@ class MessageBubble extends StatelessWidget {
         message: message.content,
       );
     } else {
-      return CustomAiResponseCard(message: message.content);
+      return CustomAiResponseCard(
+        message: message,
+        onMessageUpdated: (updatedMessage) {
+          // Optional: handle updates if needed, e.g., for streaming
+          // You can call setState in parent or update provider state here
+          debugPrint("Updated message: ${updatedMessage.content}");
+        },
+      );
     }
   }
 }

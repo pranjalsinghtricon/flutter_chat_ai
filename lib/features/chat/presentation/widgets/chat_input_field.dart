@@ -3,6 +3,8 @@ import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/private_chat.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
@@ -77,13 +79,20 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                           iconColor: Colors.black54,
                           label: 'Private chat',
                           onSelected: () {
-                            // Handle private chat
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ChatScreen(isPrivate: true),
+                              ),
+                            );
+
                           },
                         ),
                         CustomDropdownItem(
                           assetPath: 'assets/icons/icon-paperclip.svg',
                           assetSize: 20,
                           label: 'Attach file',
+                          iconColor: Colors.red,
                           onSelected: () {
                             print("Attach file");
                           },
@@ -91,7 +100,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                         CustomDropdownItem(
                           assetPath: 'assets/icons/icon-google-document.svg' ,
                           assetSize: 20,
-                          iconColor: Colors.black54,
+                          iconColor: Colors.red,
                           label: 'Add sources',
                           onSelected: () {
                             // Handle private chat
