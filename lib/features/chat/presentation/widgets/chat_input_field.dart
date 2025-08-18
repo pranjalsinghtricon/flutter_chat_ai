@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
@@ -8,18 +10,34 @@ import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
+  const ChatInputField({super.key});
+
   @override
   ConsumerState<ChatInputField> createState() => _ChatInputFieldState();
 }
 
 class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   final _controller = TextEditingController();
+  File? _attachedFile;   // <- stores attached file
 
   void _send() {
     final text = _controller.text.trim();
-    if (text.isNotEmpty) {
+    if (text.isNotEmpty || _attachedFile != null) {
       ref.read(chatControllerProvider.notifier).sendMessage(text);
       _controller.clear();
+
+      setState(() {
+        _attachedFile = null; // clear file after sending
+      });
+    }
+  }
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _attachedFile = File(result.files.single.path!);
+      });
     }
   }
 
@@ -28,8 +46,11 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: Column(
-
         children: [
+
+
+
+          // ✅ Chat Input Container
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -38,6 +59,42 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
             ),
             child: Column(
               children: [
+                if (_attachedFile != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                    margin: const EdgeInsets.only(left: 2.0, right: 2.0, top: 2.0, bottom: 4.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(6),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.insert_drive_file, color: Colors.teal, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _attachedFile!.path.split('/').last, // file name
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.red, size: 18),
+                          onPressed: () {
+                            setState(() {
+                              _attachedFile = null;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+
+
                 Container(
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
@@ -62,19 +119,17 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ),
                     ),
                   ),
-
                 ),
+
                 Row(
                   children: [
                     CustomIconDropdown(
-                      // icon: Icons.grid_view,
-                      // iconColor: Colors.grey,
                       assetPath: 'assets/icons/icon-chat-options.svg',
                       assetSize: 20,
                       iconColor: Colors.black54,
                       items: [
                         CustomDropdownItem(
-                        assetPath: 'assets/icons/icon-private-chat.svg' ,
+                          assetPath: 'assets/icons/icon-private-chat.svg',
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Private chat',
@@ -85,7 +140,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                                 builder: (context) => const ChatScreen(isPrivate: true),
                               ),
                             );
-
                           },
                         ),
                         CustomDropdownItem(
@@ -93,45 +147,35 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                           assetSize: 20,
                           label: 'Attach file',
                           iconColor: Colors.red,
-                          onSelected: () {
-                            print("Attach file");
-                          },
+                          onSelected: _pickFile,
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-google-document.svg' ,
+                          assetPath: 'assets/icons/icon-google-document.svg',
                           assetSize: 20,
                           iconColor: Colors.red,
                           label: 'Add sources',
-                          onSelected: () {
-                            // Handle private chat
-                          },
+                          onSelected: () {},
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-google-bookmark.svg' ,
+                          assetPath: 'assets/icons/icon-google-bookmark.svg',
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Saved prompts',
-                          onSelected: () {
-                            // Handle private chat
-                          },
+                          onSelected: () {},
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-change-model.svg' ,
+                          assetPath: 'assets/icons/icon-change-model.svg',
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change model',
-                          onSelected: () {
-                            // Handle private chat
-                          },
+                          onSelected: () {},
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-language.svg' ,
+                          assetPath: 'assets/icons/icon-language.svg',
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change language',
-                          onSelected: () {
-                            // Handle private chat
-                          },
+                          onSelected: () {},
                         ),
                       ],
                     ),
@@ -154,41 +198,29 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
 
                     Spacer(),
 
-
                     CustomIconButton(
                       svgAsset: 'assets/icons/icon-send.svg',
                       svgColor: Colors.teal,
                       toolTip: 'Send',
                       onPressed: _send,
                     ),
-                    // IconButton(
-                    //   onPressed: _send,
-                    //   icon: const Icon(Icons.arrow_forward),
-                    //   color: Colors.teal,
-                    //   constraints: const BoxConstraints(),
-                    //   padding: EdgeInsets.zero,
-                    // ),
                   ],
-                )
-
+                ),
               ],
             ),
           ),
 
-           SizedBox(height: 4),
+          SizedBox(height: 4),
 
           Padding(
-            padding:  EdgeInsets.only(top: 5),
+            padding: EdgeInsets.only(top: 5),
             child: Text(
               'Elysia responses may be inaccurate. Know more about how your data is processed here.',
-              style: TextStyle(
-                  fontSize: 12, color: Colors.grey
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           )
         ],
       ),
     );
-
   }
 }
