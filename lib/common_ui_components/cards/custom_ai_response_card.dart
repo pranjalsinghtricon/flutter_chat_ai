@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
+import 'package:flutter_chat_ai/common_ui_components/markdown/custom_markdown_renderer.dart';
 import 'package:flutter_chat_ai/data/models/message_model.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_feedback_card.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -70,13 +71,15 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      widget.message.content,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
+                    CustomMarkdownRenderer(data: widget.message.content),
+
+                    // Text(
+                    //   widget.message.content,
+                    //   style: const TextStyle(
+                    //     fontSize: 14,
+                    //     color: Colors.black,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
