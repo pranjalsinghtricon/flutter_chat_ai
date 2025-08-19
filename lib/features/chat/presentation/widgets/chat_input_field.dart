@@ -7,6 +7,8 @@ import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_icon_dropd
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/private_chat.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language_change_dialog.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
@@ -18,7 +20,7 @@ class ChatInputField extends ConsumerStatefulWidget {
 
 class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   final _controller = TextEditingController();
-  File? _attachedFile;   // <- stores attached file
+  File? _attachedFile;
 
   void _send() {
     final text = _controller.text.trim();
@@ -47,8 +49,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
       padding: EdgeInsets.all(8.0),
       child: Column(
         children: [
-
-
 
           // ✅ Chat Input Container
           Container(
@@ -91,9 +91,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ],
                     ),
                   ),
-
-
-
 
                 Container(
                   alignment: Alignment.centerLeft,
@@ -168,14 +165,19 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change model',
-                          onSelected: () {},
+                          onSelected: () {
+                            showModelChangeDialog(context);
+                          },
                         ),
+
                         CustomDropdownItem(
                           assetPath: 'assets/icons/icon-language.svg',
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change language',
-                          onSelected: () {},
+                          onSelected: () {
+                            showLanguageChangeDialog(context);
+                          },
                         ),
                       ],
                     ),

@@ -90,8 +90,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
-                            print("Elysia logo clicked!");
+                            ref.read(chatControllerProvider.notifier).resetChat();
+                            // Ensure the screen rebuilds from welcome state
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const ChatScreen()),
+                            );
                           },
+
                         ),
                         SizedBox(width: 10,),
                         CustomAppbarIconButton(
@@ -193,7 +199,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ), // stays same for both
 
-
             ChatInputField(),
           ],
         ),
@@ -203,11 +208,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 }
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       child: SafeArea(
         child: ListView(
@@ -219,7 +224,12 @@ class AppDrawer extends StatelessWidget {
                 icon: Icons.add,
                 text: "New Chat",
                 onPressed: () {
-                  print("New Chat Clicked");
+                  ref.read(chatControllerProvider.notifier).resetChat();
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChatScreen()),
+                  );
                 },
               ),
             ),
