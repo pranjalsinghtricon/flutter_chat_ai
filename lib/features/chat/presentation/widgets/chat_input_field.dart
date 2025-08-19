@@ -1,15 +1,16 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_screens/private_chat.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language_change_dialog.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   const ChatInputField({super.key});
@@ -21,6 +22,13 @@ class ChatInputField extends ConsumerStatefulWidget {
 class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   final _controller = TextEditingController();
   File? _attachedFile;
+
+  Future<void> _launchUrl() async {
+    final Uri url = Uri.parse("https://your-link.com"); // replace with your URL
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      throw Exception("Could not launch $url");
+    }
+  }
 
   void _send() {
     final text = _controller.text.trim();
@@ -46,10 +54,9 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-
           // ✅ Chat Input Container
           Container(
             decoration: BoxDecoration(
@@ -94,7 +101,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
 
                 Container(
                   alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(
                       maxHeight: 120,
@@ -169,7 +176,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                             showModelChangeDialog(context);
                           },
                         ),
-
                         CustomDropdownItem(
                           assetPath: 'assets/icons/icon-language.svg',
                           assetSize: 20,
@@ -182,7 +188,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ],
                     ),
 
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
                     Text(
                       '${_controller.text.length}/2000',
@@ -198,7 +204,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       },
                     ),
 
-                    Spacer(),
+                    const Spacer(),
 
                     CustomIconButton(
                       svgAsset: 'assets/icons/icon-send.svg',
@@ -212,15 +218,31 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
             ),
           ),
 
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
 
           Padding(
-            padding: EdgeInsets.only(top: 5),
-            child: Text(
-              'Elysia responses may be inaccurate. Know more about how your data is processed here.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            padding: const EdgeInsets.only(top: 5),
+            child: RichText(
+              text: TextSpan(
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                children: [
+                  const TextSpan(
+                    text:
+                    "Elysia responses may be inaccurate. Know more about how your data is processed ",
+                  ),
+                  TextSpan(
+                    text: "here",
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                    recognizer: TapGestureRecognizer()..onTap = _launchUrl,
+                  ),
+                  const TextSpan(text: "."),
+                ],
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
