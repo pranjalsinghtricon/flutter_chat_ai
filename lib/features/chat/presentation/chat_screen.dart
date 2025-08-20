@@ -47,43 +47,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-
                   CustomSvgIconButton(
                     assetPath: 'assets/logo/Elysia-logo.svg',
                     size: 30,
-                    // iconColor: Colors.blue,
                     backgroundColor: Colors.transparent,
-                    // tooltip: "Open Elysia",
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatScreen(),
+                          builder: (context) => const ChatScreen(),
                         ),
                       );
                     },
                   ),
-                  // SvgPicture.asset(
-                  //   'assets/logo/Elysia-logo.svg',
-                  //   width: 30,
-                  //   height: 30,
-                  // ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        //don't remove
-                        // Align(
-                        //   alignment: Alignment.centerLeft,
-                        //   child: IconButton(
-                        //     icon: Icon(Icons.menu, color: Colors.blue, size: 30),
-                        //     onPressed: () {
-                        //       Scaffold.of(context).openDrawer();
-                        //     },
-                        //   ),
-                        // ),
-
                         CustomAppbarIconButton(
                           assetPath: 'assets/icons/icon-new-topic.svg',
                           size: 25,
@@ -91,23 +72,22 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           backgroundColor: Colors.white,
                           onPressed: () {
                             ref.read(chatControllerProvider.notifier).resetChat();
-                            // Ensure the screen rebuilds from welcome state
+                            ref.read(chatHistoryProvider.notifier).addNewChat("New Conversation");
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (_) => const ChatScreen()),
                             );
                           },
-
                         ),
-                        SizedBox(width: 10,),
+                        const SizedBox(width: 10),
                         CustomAppbarIconButton(
                           assetPath: 'assets/icons/icon-history.svg',
                           size: 25,
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
-                                  Scaffold.of(context).openDrawer();
-                                },
+                            Scaffold.of(context).openDrawer();
+                          },
                         ),
                       ],
                     ),
@@ -136,25 +116,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               icon: Icons.settings,
                               iconColor: Colors.blue,
                               label: 'View Settings',
-                              onSelected: () {
-                                // Do something!
-                              },
+                              onSelected: () {},
                             ),
                             CustomDropdownItem(
                               icon: Icons.notifications,
                               iconColor: Colors.red,
                               label: 'Notifications',
-                              onSelected: () {
-                                // Do something!
-                              },
+                              onSelected: () {},
                             ),
                             CustomDropdownItem(
                               icon: Icons.logout,
                               iconColor: Colors.black54,
                               label: 'Log Out',
-                              onSelected: () {
-                                // Do something!
-                              },
+                              onSelected: () {},
                             ),
                           ],
                         ),
@@ -164,7 +138,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           child: Container(
                             width: 10,
                             height: 10,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.pink,
                               shape: BoxShape.circle,
                             ),
@@ -179,7 +153,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           },
         ),
       ),
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
@@ -197,13 +171,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   return MessageBubble(message: msg);
                 },
               ),
-            ), // stays same for both
-
-            ChatInputField(),
+            ),
+            const ChatInputField(),
           ],
         ),
       ),
-
     );
   }
 }
@@ -213,6 +185,25 @@ class AppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final chats = ref.watch(chatHistoryProvider);
+
+    // Group chats
+    final today = chats.where((chat) =>
+    chat.updatedOn.day == DateTime.now().day &&
+        chat.updatedOn.month == DateTime.now().month &&
+        chat.updatedOn.year == DateTime.now().year).toList();
+
+    final last7Days = chats.where((chat) =>
+    chat.updatedOn.isAfter(DateTime.now().subtract(const Duration(days: 7))) &&
+        chat.updatedOn.isBefore(DateTime.now().subtract(const Duration(days: 1)))).toList();
+
+    final last30Days = chats.where((chat) =>
+    chat.updatedOn.isAfter(DateTime.now().subtract(const Duration(days: 30))) &&
+        !last7Days.contains(chat) &&
+        !today.contains(chat)).toList();
+
+    final archived = chats.where((chat) => chat.isArchived).toList();
+
     return Drawer(
       child: SafeArea(
         child: ListView(
@@ -225,6 +216,7 @@ class AppDrawer extends ConsumerWidget {
                 text: "New Chat",
                 onPressed: () {
                   ref.read(chatControllerProvider.notifier).resetChat();
+                  ref.read(chatHistoryProvider.notifier).addNewChat("New Conversation");
                   Navigator.pop(context);
                   Navigator.pushReplacement(
                     context,
@@ -245,58 +237,33 @@ class AppDrawer extends ConsumerWidget {
               ),
             ),
 
-            // Expandable Categories
             CustomExpandableTile(
               title: "Today",
-              // leadingIcon: Icons.today,
-              items: [
-                "Informa AI assistant Elysia on ...",
-                "Catch up meeting notes",
-                "Draft supplier email",
-              ],
+              items: today.map((chat) => chat.title).toList(),
             ),
             CustomExpandableTile(
               title: "Last 7 days",
-              // leadingIcon: Icons.calendar_view_week,
-              items: [
-                "Neuroscience journal titles",
-                "Project kickoff discussion",
-              ],
+              items: last7Days.map((chat) => chat.title).toList(),
             ),
             CustomExpandableTile(
               title: "Last 30 days",
-              // leadingIcon: Icons.calendar_month,
-              items: [
-                "Career mobility plan",
-                "Team retrospective",
-                "Monthly review summary",
-              ],
+              items: last30Days.map((chat) => chat.title).toList(),
             ),
             CustomExpandableTile(
               title: "Archived Chats",
-              // leadingIcon: Icons.archive,
-              items: [
-                "Old supplier contract discussion",
-                "AI product brainstorming",
-              ],
+              items: archived.map((chat) => chat.title).toList(),
             ),
 
             const Divider(),
-
-            // Settings
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text('Profile'),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
           ],
         ),
@@ -304,5 +271,3 @@ class AppDrawer extends ConsumerWidget {
     );
   }
 }
-
-
