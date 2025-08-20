@@ -238,7 +238,7 @@ class AppDrawer extends ConsumerWidget {
             ),
 
             CustomExpandableTile(
-              title: "Today",
+              title: "Today's chat",
               items: today.map((chat) => chat.title).toList(),
             ),
             CustomExpandableTile(
