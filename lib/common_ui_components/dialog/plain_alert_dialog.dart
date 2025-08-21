@@ -27,8 +27,8 @@ class PlainAlertDialog extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 🔹 Title + Close (X)
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
@@ -46,7 +46,7 @@ class PlainAlertDialog extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            child, // 🔹 Dynamic body
+            child,
           ],
         ),
       ),
