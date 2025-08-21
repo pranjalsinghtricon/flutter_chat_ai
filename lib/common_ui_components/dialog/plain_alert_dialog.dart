@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
 
 class PlainAlertDialog extends StatelessWidget {
   const PlainAlertDialog({
@@ -21,7 +22,7 @@ class PlainAlertDialog extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(16.0)),
       ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-      contentPadding: padding ?? const EdgeInsets.all(16),
+      contentPadding: padding ?? const EdgeInsets.only(left: 16, top: 16, bottom: 16, right: 16),
       content: SizedBox(
         width: MediaQuery.of(context).size.width / 1.1,
         child: Column(
@@ -39,9 +40,12 @@ class PlainAlertDialog extends StatelessWidget {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                CustomIconButton(
+                  icon: Icons.close,
+                  svgColor: Colors.black87,
+                  toolTip: 'Close',
                   onPressed: onClose ?? () => Navigator.of(context).pop(),
+                  isDense: true,
                 ),
               ],
             ),
