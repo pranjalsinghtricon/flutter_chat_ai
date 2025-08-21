@@ -12,11 +12,11 @@ void showLanguageChangeDialog(BuildContext context) {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: SizedBox(
-              width: 30,  // set desired width
-              height: 30, // set desired height
+              width: 30,
+              height: 30,
               child: CircularProgressIndicator(
                 color: ColorConst.primaryColor,
-                strokeWidth: 2, // optional: make the circle thinner
+                strokeWidth: 2,
               ),
             ));
           } else if (snapshot.hasError) {

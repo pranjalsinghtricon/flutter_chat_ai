@@ -48,19 +48,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  CustomSvgIconButton(
-                    assetPath: 'assets/logo/Elysia-logo.svg',
-                    size: 30,
-                    backgroundColor: Colors.transparent,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatScreen(),
-                        ),
-                      );
-                    },
-                  ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Row(
@@ -92,6 +79,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         ),
                       ],
                     ),
+                  ),
+                  CustomSvgIconButton(
+                    assetPath: 'assets/logo/Elysia-logo.svg',
+                    size: 30,
+                    backgroundColor: Colors.transparent,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatScreen(),
+                        ),
+                      );
+                    },
                   ),
                   Align(
                     alignment: Alignment.centerRight,
@@ -213,7 +213,7 @@ class AppDrawer extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: CustomIconTextOutlinedButton(
-                icon: Icons.add,
+                assetPath: 'assets/icons/icon-new-topic.svg',
                 text: "New Chat",
                 onPressed: () {
                   ref.read(chatControllerProvider.notifier).resetChat();

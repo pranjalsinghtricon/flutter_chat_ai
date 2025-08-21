@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/dialog/plain_alert_dialog.dart';
-import 'package:flutter_chat_ai/features/chat/data/language_repository.dart';
 import 'package:flutter_chat_ai/core/constants/color_constants.dart';
 import 'package:flutter_chat_ai/features/chat/data/model_repository.dart';
 

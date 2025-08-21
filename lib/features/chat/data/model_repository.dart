@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import '../data/models/chat_model.dart';
 
 class ModelRepository {
   static const String boxName = "models";
@@ -10,17 +9,20 @@ class ModelRepository {
     final response = await http.get(Uri.parse("http://demo0405258.mockable.io/models"));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)["data"];
-      final models = List<String>.from(data);
+      final List<String> displayNames = (data as List)
+          .map((item) => item["display_name"] as String)
+          .toList();
 
       final box = await Hive.openBox<String>(boxName);
       await box.clear();
-      await box.addAll(models);
+      await box.addAll(displayNames);
 
-      return models;
+      return displayNames;
     } else {
       throw Exception("Failed to load models");
     }
   }
+
 
   Future<List<String>> getLocalModels() async {
     final box = await Hive.openBox<String>(boxName);
