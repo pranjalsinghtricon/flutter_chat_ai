@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_chat_ai/core/constants/color_constants.dart';
 
 class WelcomeMessageScreen extends StatelessWidget {
   const WelcomeMessageScreen({super.key});
@@ -16,8 +17,8 @@ class WelcomeMessageScreen extends StatelessWidget {
           const Text(
             "Good afternoon.",
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.teal,
+              fontSize: 20,
+              color: ColorConst.primaryColor,
               fontWeight: FontWeight.bold,
             ),
           ),
