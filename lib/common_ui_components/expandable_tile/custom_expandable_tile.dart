@@ -33,12 +33,22 @@ class _CustomExpandableTileState extends State<CustomExpandableTile> {
       children: [
         ListTile(
           dense: true,
-          leading: Icon(widget.leadingIcon, color: Colors.blue),
-          title: Text(widget.title,
-              style: const TextStyle(fontWeight: FontWeight.w600)),
-          trailing: Icon(
-            _isExpanded ? Icons.expand_less : Icons.expand_more,
-            color: Colors.grey[600],
+          leading: SizedBox(
+            width: 25,
+            height: 25,
+            child: Center(
+              child: Icon(
+                _isExpanded
+                    ? Icons.expand_more
+                    : Icons.arrow_forward_ios_outlined,
+                size: _isExpanded ? 25 : 15,
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          title: Text(
+            widget.title,
+            style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           onTap: () {
             setState(() {
@@ -46,66 +56,71 @@ class _CustomExpandableTileState extends State<CustomExpandableTile> {
             });
           },
         ),
+
         if (_isExpanded)
           Column(
             children: widget.items.map((chatTitle) {
-              return ListTile(
-                dense: true,
-                contentPadding: const EdgeInsets.only(left: 72, right: 16),
-                title: Text(chatTitle,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87)),
-                trailing: PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.grey),
-                  onSelected: (value) {
-                    if (value == 'Archive') {
-                      // Handle archive
-                      debugPrint("Archive $chatTitle");
-                    } else if (value == 'Rename') {
-                      // Handle rename
-                      debugPrint("Rename $chatTitle");
-                    } else if (value == 'Delete') {
-                      // Handle delete
-                      debugPrint("Delete $chatTitle");
-                    }
+              return Container(
+                color: Colors.white,
+                child: ListTile(
+                  dense: true,
+                  contentPadding: const EdgeInsets.only(left: 22, right: 8),
+                  title: Text(
+                    chatTitle,
+                    style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    color: Colors.white, // ✅ Makes popup menu background pure white
+                    icon: const Icon(Icons.more_horiz, color: Colors.black87),
+                    onSelected: (value) {
+                      if (value == 'Archive') {
+                        debugPrint("Archive $chatTitle");
+                      } else if (value == 'Rename') {
+                        debugPrint("Rename $chatTitle");
+                      } else if (value == 'Delete') {
+                        debugPrint("Delete $chatTitle");
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'Archive',
+                        child: Row(
+                          children: const [
+                            Icon(Icons.archive_outlined, size: 18, color: Colors.black87),
+                            SizedBox(width: 8),
+                            Text('Archive'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'Rename',
+                        child: Row(
+                          children: const [
+                            Icon(Icons.edit_outlined, size: 18, color: Colors.black87),
+                            SizedBox(width: 8),
+                            Text('Rename'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'Delete',
+                        child: Row(
+                          children: const [
+                            Icon(Icons.delete_outline, size: 18, color: Colors.black87),
+                            SizedBox(width: 8),
+                            Text('Delete'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
                   },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'Archive',
-                      child: Row(
-                        children: const [
-                          Icon(Icons.archive_outlined, size: 18, color: Colors.black87),
-                          SizedBox(width: 8),
-                          Text('Archive'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'Rename',
-                      child: Row(
-                        children: const [
-                          Icon(Icons.edit_outlined, size: 18, color: Colors.black87),
-                          SizedBox(width: 8),
-                          Text('Rename'),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'Delete',
-                      child: Row(
-                        children: const [
-                          Icon(Icons.delete_outline, size: 18, color: Colors.black87),
-                          SizedBox(width: 8),
-                          Text('Delete'),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
-                onTap: () {
-                  // TODO: Open the chat
-                  Navigator.pop(context);
-                },
               );
+
+
             }).toList(),
           ),
       ],

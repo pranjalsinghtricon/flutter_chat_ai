@@ -11,7 +11,7 @@ class CustomSearchableDropdown extends ConsumerStatefulWidget {
 
 class _CustomSearchableDropdownState extends ConsumerState<CustomSearchableDropdown> {
   String searchQuery = '';
-  bool isDropdownOpen = false; // dropdown initially closed
+  bool isDropdownOpen = false;
 
   @override
   Widget build(BuildContext context) {
