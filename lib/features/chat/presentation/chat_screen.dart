@@ -59,13 +59,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           iconColor: Colors.blue,
                           backgroundColor: Colors.white,
                           onPressed: () {
+                            final chatHistory = ref.read(chatHistoryProvider);
+                            print('Chat History 1: $chatHistory, length 1: ${chatHistory.length}');
+                            final isOnWelcomeScreen = chatHistory.isEmpty && !widget.isPrivate;
+                            print('Chat History 2: $chatHistory, length 2: ${chatHistory.length}');
+                            if (isOnWelcomeScreen) {
+                              return;
+                            }
+
                             ref.read(chatControllerProvider.notifier).resetChat();
                             ref.read(chatHistoryProvider.notifier).addNewChat("New Conversation");
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ChatScreen()),
-                            );
+
+                            // Only navigate if not already on ChatScreen
+                            if (ModalRoute.of(context)?.settings.name != '/chat') {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  settings: const RouteSettings(name: '/chat'),
+                                  builder: (_) => const ChatScreen(),
+                                ),
+                              );
+                            }
                           },
+
+
                         ),
                         const SizedBox(width: 10),
                         CustomAppbarIconButton(
@@ -239,7 +256,7 @@ class AppDrawer extends ConsumerWidget {
             ),
 
             CustomExpandableTile(
-              title: "Today's chat",
+              title: "Today's",
               items: today.map((chat) => chat.title).toList(),
             ),
             CustomExpandableTile(
