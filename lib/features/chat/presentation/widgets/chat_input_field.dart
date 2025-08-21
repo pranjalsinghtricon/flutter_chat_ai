@@ -9,6 +9,7 @@ import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language_change_dialog.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
+import 'package:flutter_chat_ai/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_chat_ai/core/constants/color_constants.dart';
@@ -142,7 +143,9 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ChatScreen(isPrivate: true),
+                                builder: (context) => const MainLayout(
+                                  child: ChatScreen(isPrivate: true),
+                                ),
                               ),
                             );
                           },

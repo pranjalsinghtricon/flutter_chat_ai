@@ -1,4 +1,7 @@
+// main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/widgets/global_app_drawer.dart';
+import 'package:flutter_chat_ai/widgets/global_appbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -8,13 +11,8 @@ import 'features/chat/data/models/chat_model.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ Initialize Hive
   await Hive.initFlutter();
-
-  // ✅ Register your Hive adapters
   Hive.registerAdapter(ChatHistoryAdapter());
-
-  // ✅ Open your box before runApp
   await Hive.openBox<ChatHistory>("chat_history");
 
   runApp(const ProviderScope(child: ChatApp()));
@@ -32,7 +30,25 @@ class ChatApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const ChatScreen(),
+      home: const MainLayout(child: ChatScreen()),
+    );
+  }
+}
+
+class MainLayout extends ConsumerWidget {
+  final Widget child;
+  const MainLayout({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: GlobalAppBar(),
+      ),
+      drawer: const GlobalAppDrawer(),
+      body: child,
     );
   }
 }
