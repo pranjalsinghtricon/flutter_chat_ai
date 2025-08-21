@@ -7,7 +7,8 @@ class ChatRepository {
   static const String boxName = "chat_history";
 
   Future<List<ChatHistory>> fetchChatsFromApi() async {
-    final response = await http.get(Uri.parse("http://demo6845203.mockable.io/conversation"));
+    // http://demo6845203.mockable.io/conversation
+    final response = await http.get(Uri.parse("http://demo0405258.mockable.io/chat-history"));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)["data"];
 

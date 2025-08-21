@@ -11,6 +11,7 @@ import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_chat_ai/core/constants/color_constants.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   const ChatInputField({super.key});
@@ -188,27 +189,25 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ],
                     ),
 
-                    const SizedBox(width: 8),
+                    const Spacer(),
 
                     Text(
                       '${_controller.text.length}/2000',
-                      style: const TextStyle(fontSize: 12, color: Colors.blue),
+                      style: const TextStyle(fontSize: 12, color: ColorConst.primaryColor),
                     ),
 
-                    CustomIconButton(
-                      svgAsset: 'assets/icons/like.svg',
-                      svgColor: Colors.blue,
-                      toolTip: 'Like',
-                      onPressed: () {
-                        print('Liked!');
-                      },
-                    ),
-
-                    const Spacer(),
+                    // CustomIconButton(
+                    //   svgAsset: 'assets/icons/like.svg',
+                    //   svgColor: Colors.blue,
+                    //   toolTip: 'Like',
+                    //   onPressed: () {
+                    //     print('Liked!');
+                    //   },
+                    // ),
 
                     CustomIconButton(
                       svgAsset: 'assets/icons/icon-send.svg',
-                      svgColor: Colors.teal,
+                      svgColor: ColorConst.primaryColor,
                       toolTip: 'Send',
                       onPressed: _send,
                     ),

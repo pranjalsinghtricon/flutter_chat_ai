@@ -7,9 +7,6 @@ import '../../../core/services/api_service.dart';
 import '../data/chat_repository.dart';
 import '../data/models/chat_model.dart';
 
-/// -------------------------
-/// Providers
-/// -------------------------
 
 // Provider for messages in the current chat session
 final chatControllerProvider =
@@ -23,9 +20,7 @@ StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
       (ref) => ChatHistoryController(ChatRepository()),
 );
 
-/// -------------------------
-/// ChatController (messages in current session)
-/// -------------------------
+
 class ChatController extends StateNotifier<List<Message>> {
   final ApiService _apiService;
 
@@ -63,9 +58,7 @@ class ChatController extends StateNotifier<List<Message>> {
   }
 }
 
-/// -------------------------
-/// ChatHistoryController (conversation list)
-/// -------------------------
+
 class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
   final ChatRepository _repository;
 

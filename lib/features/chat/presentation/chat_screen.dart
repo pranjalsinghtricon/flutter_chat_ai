@@ -36,6 +36,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     });
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -101,7 +102,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           items: [
                             CustomDropdownItem(
                               icon: Icons.person,
-                              iconColor: Colors.teal,
+                              iconColor: Colors.black87,
                               label: 'Profile',
                               onSelected: () {
                                 Navigator.push(
@@ -114,19 +115,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             ),
                             CustomDropdownItem(
                               icon: Icons.settings,
-                              iconColor: Colors.blue,
+                              iconColor: Colors.black87,
                               label: 'View Settings',
                               onSelected: () {},
                             ),
                             CustomDropdownItem(
                               icon: Icons.notifications,
-                              iconColor: Colors.red,
+                              iconColor: Colors.black87,
                               label: 'Notifications',
                               onSelected: () {},
                             ),
                             CustomDropdownItem(
                               icon: Icons.logout,
-                              iconColor: Colors.black54,
+                              iconColor: Colors.black87,
                               label: 'Log Out',
                               onSelected: () {},
                             ),
