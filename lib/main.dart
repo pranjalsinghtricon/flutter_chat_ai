@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/widgets/global_app_drawer.dart';
 import 'package:flutter_chat_ai/widgets/global_appbar.dart';
