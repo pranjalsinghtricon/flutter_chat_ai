@@ -7,7 +7,7 @@ import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/screens/chat_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language_change_dialog.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
 import 'package:flutter_chat_ai/main.dart';

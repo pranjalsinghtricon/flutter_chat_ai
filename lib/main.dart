@@ -4,7 +4,7 @@ import 'package:flutter_chat_ai/widgets/global_appbar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'features/chat/presentation/chat_screen.dart';
+import 'features/chat/presentation/screens/chat_screen.dart';
 import 'features/chat/data/models/chat_model.dart';
 
 void main() async {

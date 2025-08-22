@@ -6,8 +6,8 @@ import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_but
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
-import 'package:flutter_chat_ai/features/profile/presentation/profile_screen.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/screens/chat_screen.dart';
+import 'package:flutter_chat_ai/features/profile/presentation/screens/profile_screen.dart';
 
 class GlobalAppBar extends ConsumerWidget {
   const GlobalAppBar({super.key});

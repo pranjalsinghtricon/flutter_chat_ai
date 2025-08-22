@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_text_outlined_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/expandable_tile/custom_expandable_tile.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
-import 'package:flutter_chat_ai/features/chat/presentation/chat_screen.dart';
+import 'package:flutter_chat_ai/features/chat/presentation/screens/chat_screen.dart';
 
 class GlobalAppDrawer extends ConsumerWidget {
   const GlobalAppDrawer({super.key});
