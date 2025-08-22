@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
+import 'package:flutter_chat_ai/core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ShowFeedbackCard extends StatelessWidget {
@@ -90,12 +91,13 @@ class ShowFeedbackCard extends StatelessWidget {
             ElevatedButton(
               onPressed: onClose,
               style: ElevatedButton.styleFrom(
+                backgroundColor: ColorConst.primaryColor,
                 minimumSize: const Size(double.infinity, 40),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: const Text("Submit"),
+              child: const Text("Submit", style: TextStyle(color: Colors.white),),
             ),
           ],
         ),
