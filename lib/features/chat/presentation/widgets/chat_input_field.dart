@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -25,8 +26,12 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   final _controller = TextEditingController();
   File? _attachedFile;
 
+  /// Track file status
+  String _fileStatus = "none";
+  // values: none, uploading, uploaded, done
+
   Future<void> _launchUrl() async {
-    final Uri url = Uri.parse("https://your-link.com"); // replace with your URL
+    final Uri url = Uri.parse("https://your-link.com");
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception("Could not launch $url");
     }
@@ -39,7 +44,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
       _controller.clear();
 
       setState(() {
-        _attachedFile = null; // clear file after sending
+        _attachedFile = null;
+        _fileStatus = "none";
       });
     }
   }
@@ -49,8 +55,57 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
     if (result != null && result.files.single.path != null) {
       setState(() {
         _attachedFile = File(result.files.single.path!);
+        _fileStatus = "uploading";
+      });
+
+      // Simulate file upload delay
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        setState(() {
+          _fileStatus = "uploaded";
+        });
+
+        // After 1 second, switch to done
+        Future.delayed(const Duration(seconds: 1), () {
+          if (!mounted) return;
+          setState(() {
+            _fileStatus = "done";
+          });
+        });
       });
     }
+  }
+
+  Widget _buildFileStatusWidget() {
+    Widget icon;
+    switch (_fileStatus) {
+      case "uploading":
+        icon = const Icon(Icons.hourglass_top, color: Colors.grey, size: 18);
+        break;
+      case "uploaded":
+        icon = const Icon(Icons.check_circle, color: Colors.green, size: 18);
+        break;
+      case "done":
+        icon = GestureDetector(
+          onTap: () {
+            setState(() {
+              _attachedFile = null;
+              _fileStatus = "none";
+            });
+          },
+          child: const Icon(Icons.close, color: Colors.red, size: 18),
+        );
+        break;
+      default:
+        icon = const Icon(Icons.insert_drive_file, color: Colors.teal, size: 20);
+    }
+
+    // 🔑 Wrap in fixed box so height never changes
+    return SizedBox(
+      width: 24,
+      height: 24,
+      child: Center(child: icon),
+    );
   }
 
   @override
@@ -59,7 +114,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          // ✅ Chat Input Container
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -70,44 +124,40 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
               children: [
                 if (_attachedFile != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                    margin: const EdgeInsets.only(left: 2.0, right: 2.0, top: 2.0, bottom: 4.0),
+                    height: 42,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    margin: const EdgeInsets.only(
+                        left: 2.0, right: 2.0, top: 2.0, bottom: 4.0),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(6),
                       color: Colors.white,
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(Icons.insert_drive_file, color: Colors.teal, size: 20),
+                        const Icon(Icons.insert_drive_file,
+                            color: Colors.teal, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            _attachedFile!.path.split('/').last, // file name
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            _attachedFile!.path.split('/').last,
+                            style: const TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const Icon(Icons.check_circle, color: Colors.green, size: 18),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                          onPressed: () {
-                            setState(() {
-                              _attachedFile = null;
-                            });
-                          },
-                        ),
+                        _buildFileStatusWidget(),
                       ],
                     ),
                   ),
 
                 Container(
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 4.0, horizontal: 14.0),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxHeight: 120,
-                    ),
+                    constraints: const BoxConstraints(maxHeight: 120),
                     child: Scrollbar(
                       child: TextField(
                         controller: _controller,
@@ -137,7 +187,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                         CustomDropdownItem(
                           assetPath: 'assets/icons/icon-private-chat.svg',
                           assetSize: 20,
-                          iconColor: Colors.black54,
                           label: 'Private chat',
                           onSelected: () {
                             Navigator.push(
@@ -196,17 +245,9 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
 
                     Text(
                       '${_controller.text.length}/2000',
-                      style: const TextStyle(fontSize: 12, color: ColorConst.primaryColor),
+                      style: const TextStyle(
+                          fontSize: 12, color: ColorConst.primaryColor),
                     ),
-
-                    // CustomIconButton(
-                    //   svgAsset: 'assets/icons/like.svg',
-                    //   svgColor: Colors.blue,
-                    //   toolTip: 'Like',
-                    //   onPressed: () {
-                    //     print('Liked!');
-                    //   },
-                    // ),
 
                     CustomIconButton(
                       svgAsset: 'assets/icons/icon-send.svg',
