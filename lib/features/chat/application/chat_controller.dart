@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/services/api_service.dart';
-import '../data/chat_repository.dart';
+import '../data/repositories/chat_repository.dart';
 import '../data/models/chat_model.dart';
 
 

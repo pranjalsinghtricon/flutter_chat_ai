@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import '../data/models/chat_model.dart';
+import '../models/chat_model.dart';
 
 class ChatRepository {
   static const String boxName = "chat_history";
