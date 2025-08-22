@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // 👈 needed for Clipboard
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/markdown/custom_markdown_renderer.dart';
 import 'package:flutter_chat_ai/data/models/chat_model/message_model.dart';
@@ -29,16 +30,20 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
   }
 
   void _copyToClipboard() {
-    // Example: You can use clipboard API
-    // Clipboard.setData(ClipboardData(text: widget.message.content));
-    debugPrint("Copied: ${widget.message.content}");
+    Clipboard.setData(ClipboardData(text: widget.message.content));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Copied to clipboard"),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -72,14 +77,6 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                     ),
                     const SizedBox(height: 10),
                     CustomMarkdownRenderer(data: widget.message.content),
-
-                    // Text(
-                    //   widget.message.content,
-                    //   style: const TextStyle(
-                    //     fontSize: 14,
-                    //     color: Colors.black,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -149,7 +146,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                           backgroundPadding: EdgeInsets.zero,
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
