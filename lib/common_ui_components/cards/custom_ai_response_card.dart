@@ -105,6 +105,8 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                       isDense: true,
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Padding(
                           padding: EdgeInsets.only(right: 8.0),
@@ -119,6 +121,10 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                           toolTip: 'Like',
                           onPressed: _toggleFeedback,
                           isDense: true,
+                          iconSize: 18,
+                          tapTargetSize: const Size(18, 18),
+                          padding: EdgeInsets.zero,
+                          backgroundPadding: EdgeInsets.zero,
                         ),
                         CustomIconButton(
                           icon: Icons.thumb_down_alt_outlined,
@@ -126,6 +132,10 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                           toolTip: 'Dislike',
                           onPressed: _toggleFeedback,
                           isDense: true,
+                          iconSize: 18,
+                          tapTargetSize: const Size(18, 18),
+                          padding: EdgeInsets.zero,
+                          backgroundPadding: EdgeInsets.zero,
                         ),
                         CustomIconButton(
                           icon: Icons.copy,
@@ -133,9 +143,13 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                           toolTip: 'Copy',
                           onPressed: _copyToClipboard,
                           isDense: true,
+                          iconSize: 18,
+                          tapTargetSize: const Size(18, 18),
+                          padding: EdgeInsets.zero,
+                          backgroundPadding: EdgeInsets.zero,
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),

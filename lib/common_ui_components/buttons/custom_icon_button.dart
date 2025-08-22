@@ -7,8 +7,16 @@ class CustomIconButton extends StatelessWidget {
   final String? svgAsset;
   final Color? svgColor;
   final Color? backgroundColor;
-  final String? toolTip;
+  final String toolTip;
   final bool isDense;
+
+  final double iconSize;
+
+  final Size? tapTargetSize;
+
+  final EdgeInsetsGeometry padding;
+
+  final EdgeInsetsGeometry backgroundPadding;
 
   const CustomIconButton({
     super.key,
@@ -19,7 +27,11 @@ class CustomIconButton extends StatelessWidget {
     this.backgroundColor,
     required this.toolTip,
     this.isDense = false,
-  })  : assert(icon != null || svgAsset != null, 'Provide either icon or svgAsset');
+    this.iconSize = 20,
+    this.tapTargetSize,
+    this.padding = EdgeInsets.zero,
+    this.backgroundPadding = EdgeInsets.zero,
+  }) : assert(icon != null || svgAsset != null, 'Provide either icon or svgAsset');
 
   @override
   Widget build(BuildContext context) {
@@ -27,21 +39,32 @@ class CustomIconButton extends StatelessWidget {
         ? SvgPicture.asset(
       svgAsset!,
       color: svgColor,
-      width: 20,
-      height: 20,
+      width: iconSize,
+      height: iconSize,
     )
-        : Icon(icon, size: 20, color: svgColor);
+        : Icon(icon, size: iconSize, color: svgColor);
+
+    final BoxConstraints constraints = isDense
+        ? BoxConstraints.tightFor(
+      width: (tapTargetSize?.width ?? iconSize),
+      height: (tapTargetSize?.height ?? iconSize),
+    )
+        : const BoxConstraints(minWidth: 12, minHeight: 12); // Material default
 
     return Tooltip(
       message: toolTip,
       child: IconButton(
-        padding: EdgeInsets.zero,
-        constraints: isDense ? const BoxConstraints() : null,
         onPressed: onPressed,
+        padding: padding, // zero by default
+        constraints: constraints,
+        splashRadius: isDense ? (iconSize * 0.7) : null,
+        visualDensity: isDense
+            ? const VisualDensity(horizontal: -4, vertical: -4)
+            : VisualDensity.standard,
         icon: backgroundColor == null
             ? displayedIcon
             : Container(
-          padding: const EdgeInsets.all(8),
+          padding: backgroundPadding, // zero by default
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: backgroundColor,
