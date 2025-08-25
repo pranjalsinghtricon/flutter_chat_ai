@@ -22,7 +22,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
 
-    // Auto-scroll to bottom when new messages arrive
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -34,26 +33,34 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Chat messages
+            // Messages + Input scroll together
             Expanded(
-              child: messages.isEmpty
-                  ? (widget.isPrivate
-                  ? const PrivateChatScreen()
-                  : const WelcomeMessageScreen())
-                  : ListView.builder(
-                controller: _scrollController,
-                itemCount: messages.length,
-                itemBuilder: (context, index) =>
-                    MessageBubble(message: messages[index]),
-              ),
-            ),
+              child: SingleChildScrollView(
+                reverse: true, // 👈 keeps bottom visible when keyboard opens
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom, // shift input
+                ),
+                child: Column(
+                  children: [
+                    // Chat messages
+                    messages.isEmpty
+                        ? (widget.isPrivate
+                        ? const PrivateChatScreen()
+                        : const WelcomeMessageScreen())
+                        : ListView.builder(
+                      controller: _scrollController,
+                      shrinkWrap: true, // 👈 important inside Column
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) =>
+                          MessageBubble(message: messages[index]),
+                    ),
 
-            // Input field always stays above keyboard
-            Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom, // 👈 shifts up
+                    // Input field
+                    const ChatInputField(),
+                  ],
+                ),
               ),
-              child: const ChatInputField(),
             ),
           ],
         ),
