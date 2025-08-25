@@ -1,41 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_model.dart';
+part of 'message_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class ChatHistoryAdapter extends TypeAdapter<ChatHistory> {
+class MessageAdapter extends TypeAdapter<Message> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
-  ChatHistory read(BinaryReader reader) {
+  Message read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return ChatHistory(
-      sessionId: fields[0] as String,
-      title: fields[1] as String,
-      updatedOn: fields[2] as DateTime,
-      isArchived: fields[3] as bool,
+    return Message(
+      id: fields[0] as String,
+      sessionId: fields[1] as String,
+      content: fields[2] as String,
+      isUser: fields[3] as bool,
+      createdAt: fields[4] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, ChatHistory obj) {
+  void write(BinaryWriter writer, Message obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.sessionId)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.sessionId)
       ..writeByte(2)
-      ..write(obj.updatedOn)
+      ..write(obj.content)
       ..writeByte(3)
-      ..write(obj.isArchived);
+      ..write(obj.isUser)
+      ..writeByte(4)
+      ..write(obj.createdAt);
   }
 
   @override
@@ -44,7 +47,7 @@ class ChatHistoryAdapter extends TypeAdapter<ChatHistory> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is ChatHistoryAdapter &&
+          other is MessageAdapter &&
               runtimeType == other.runtimeType &&
               typeId == other.typeId;
 }
