@@ -1,11 +1,13 @@
-// chat_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/screens/private_chat.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/screens/welcome_message_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_chat_ai/features/chat/data/models/message_model.dart';
+
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, this.isPrivate = false});
@@ -22,7 +24,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
 
-    // Auto-scroll to bottom when new message is added
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -35,16 +36,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         children: [
           Expanded(
             child: messages.isEmpty
-                ? widget.isPrivate
-                ? const PrivateChatScreen()
-                : const WelcomeMessageScreen()
+                ? (widget.isPrivate ? const PrivateChatScreen() : const WelcomeMessageScreen())
                 : ListView.builder(
               controller: _scrollController,
               itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-                return MessageBubble(message: msg);
-              },
+              itemBuilder: (context, index) => MessageBubble(message: messages[index]),
             ),
           ),
           const ChatInputField(),

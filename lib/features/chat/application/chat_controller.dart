@@ -1,90 +1,140 @@
-// lib/features/chat/application/chat_controller.dart
-import 'package:flutter_chat_ai/data/models/chat_model/message_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../core/services/api_service.dart';
-import '../data/repositories/chat_repository.dart';
 import '../data/models/chat_model.dart';
+import '../data/models/message_model.dart';
+import '../data/repositories/chat_repository.dart';
 
+final chatRepositoryProvider =
+Provider<ChatRepository>((ref) => ChatRepository());
+final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
-// Provider for messages in the current chat session
+/// Holds the in-memory messages for the *currently open* session.
 final chatControllerProvider =
 StateNotifierProvider<ChatController, List<Message>>(
-      (ref) => ChatController(ref.watch(apiServiceProvider)),
+      (ref) =>
+      ChatController(ref.read(apiServiceProvider), ref.read(chatRepositoryProvider)),
 );
 
-// Provider for conversation history (sidebar)
+/// Sidebar chat list (Today / Last 7 days / Last 30 days / Archived)
 final chatHistoryProvider =
 StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
-      (ref) => ChatHistoryController(ChatRepository()),
+      (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
 );
 
-
 class ChatController extends StateNotifier<List<Message>> {
-  final ApiService _apiService;
+  final ApiService _api;
+  final ChatRepository _repo;
 
-  ChatController(this._apiService) : super([]);
+  String? _currentSessionId;
+  String? get currentSessionId => _currentSessionId;
 
-  void sendMessage(String content) {
-    final userMessage = Message(
+  ChatController(this._api, this._repo) : super([]);
+
+  Future<String> startNewChat({String initialTitle = 'New Conversation'}) async {
+    _currentSessionId = const Uuid().v4();
+    final history = ChatHistory(
+      sessionId: _currentSessionId!,
+      title: initialTitle,
+      updatedOn: DateTime.now(),
+      isArchived: false,
+    );
+    await _repo.upsertHistory(history);
+    state = [];
+    return _currentSessionId!;
+  }
+
+  Future<void> loadSession(String sessionId) async {
+    _currentSessionId = sessionId;
+    state = await _repo.getMessages(sessionId);
+  }
+
+  void resetChatViewOnly() {
+    state = [];
+  }
+
+  Future<void> sendMessage(String content) async {
+    final text = content.trim();
+    if (text.isEmpty) return;
+
+    _currentSessionId ??= await startNewChat(initialTitle: _titleFrom(text));
+
+    final userMsg = Message(
       id: const Uuid().v4(),
-      content: content,
+      sessionId: _currentSessionId!,
+      content: text,
       isUser: true,
+      createdAt: DateTime.now(),
     );
-    state = [...state, userMessage];
+    state = [...state, userMsg];
+    await _repo.addMessage(userMsg);
 
-    final botMessage = Message(
-      id: const Uuid().v4(),
-      content: "",
+    final botId = const Uuid().v4();
+    var botMsg = Message(
+      id: botId,
+      sessionId: _currentSessionId!,
+      content: '',
       isUser: false,
+      createdAt: DateTime.now(),
     );
-    state = [...state, botMessage];
+    state = [...state, botMsg];
+    await _repo.addMessage(botMsg);
 
-    _apiService.sendPromptStream(content).listen((chunk) {
-      // Append chunk to last AI message
-      final updatedMessages = [...state];
-      final lastIndex = updatedMessages.length - 1;
-      updatedMessages[lastIndex] = updatedMessages[lastIndex].copyWith(
-        content: updatedMessages[lastIndex].content + chunk,
-      );
-      state = updatedMessages;
+    final updatedHistory = ChatHistory(
+      sessionId: _currentSessionId!,
+      title: _titleFrom(text),
+      updatedOn: DateTime.now(),
+      isArchived: false,
+    );
+    await _repo.upsertHistory(updatedHistory);
+
+    _api.sendPromptStream(text, sessionId: _currentSessionId!).listen((chunk) async {
+      botMsg = botMsg.copyWith(content: botMsg.content + chunk);
+
+      final copy = [...state];
+      final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+      if (lastIndex != -1) {
+        copy[lastIndex] = botMsg;
+        state = copy;
+      }
+
+      await _repo.replaceMessages(_currentSessionId!, state);
     });
   }
 
-  /// Reset the chat to an empty state (fresh Welcome screen)
-  void resetChat() {
-    state = [];
+  String _titleFrom(String text) {
+    final t = text.replaceAll('\n', ' ').trim();
+    return t.length <= 40 ? t : '${t.substring(0, 37)}...';
   }
 }
 
-
 class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
-  final ChatRepository _repository;
-
-  ChatHistoryController(this._repository) : super([]) {
+  final ChatRepository _repo;
+  ChatHistoryController(this._repo) : super([]) {
     loadChats();
   }
 
-  /// Load from API or local Hive
   Future<void> loadChats() async {
     try {
-      final chats = await _repository.fetchChatsFromApi();
-      state = chats;
+      state = await _repo.fetchChatsFromApi();
     } catch (_) {
-      final localChats = await _repository.getLocalChats();
-      state = localChats;
+      state = await _repo.getLocalChats();
     }
   }
 
-  /// Add a new chat (when user clicks "New Chat")
-  Future<void> addNewChat(String title) async {
-    final chat = ChatHistory(
-      sessionId: const Uuid().v4(),
-      title: title,
-      updatedOn: DateTime.now(),
-    );
-    await _repository.addChat(chat);
-    state = [...state, chat];
+  Future<void> archiveChat(String sessionId, {bool archived = true}) async {
+    await _repo.archiveChat(sessionId, archived: archived);
+    await loadChats();
+  }
+
+  Future<void> renameChat(String sessionId, String newTitle) async {
+    await _repo.renameChat(sessionId, newTitle);
+    await loadChats();
+  }
+
+  Future<void> deleteChat(String sessionId) async {
+    await _repo.deleteChat(sessionId);
+    await loadChats();
   }
 }

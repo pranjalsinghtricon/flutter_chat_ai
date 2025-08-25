@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_chat_ai/main.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_appbar_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
 import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown.dart';
@@ -33,23 +33,19 @@ class GlobalAppBar extends ConsumerWidget {
                     size: 25,
                     iconColor: Colors.blue,
                     backgroundColor: Colors.white,
-                    onPressed: () {
-                      final chatHistory = ref.read(chatHistoryProvider);
-                      final isOnWelcomeScreen =
-                          chatHistory.isEmpty;
+                    onPressed: () async {
+                      final controller =
+                      ref.read(chatControllerProvider.notifier);
 
-                      if (isOnWelcomeScreen) return;
-
-                      ref.read(chatControllerProvider.notifier).resetChat();
-                      ref.read(chatHistoryProvider.notifier)
-                          .addNewChat("New Conversation");
+                      await controller.startNewChat(initialTitle: "New Conversation");
 
                       if (ModalRoute.of(context)?.settings.name != '/chat') {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             settings: const RouteSettings(name: '/chat'),
-                            builder: (_) => const MainLayout(child: ChatScreen()),
+                            builder: (_) =>
+                            const MainLayout(child: ChatScreen()),
                           ),
                         );
                       }

@@ -1,30 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CustomExpandableTile extends StatefulWidget {
+import '../../../features/chat/application/chat_controller.dart';
+import '../../../features/chat/data/models/chat_model.dart';
+
+class CustomExpandableTile extends ConsumerStatefulWidget {
   final String title;
-  final IconData? leadingIcon;
-  final List<String> items;
+  final List<ChatHistory> items;
+  final void Function(ChatHistory) onTapItem;
   final bool initiallyExpanded;
 
   const CustomExpandableTile({
     super.key,
     required this.title,
-    this.leadingIcon,
     required this.items,
+    required this.onTapItem,
     this.initiallyExpanded = false,
   });
 
   @override
-  State<CustomExpandableTile> createState() => _CustomExpandableTileState();
+  ConsumerState<CustomExpandableTile> createState() => _CustomExpandableTileState();
 }
 
-class _CustomExpandableTileState extends State<CustomExpandableTile> {
+class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
   bool _isExpanded = false;
 
   @override
   void initState() {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
+  }
+
+  Future<void> _renameDialog(ChatHistory chat) async {
+    final controller = TextEditingController(text: chat.title);
+    final newTitle = await showDialog<String?>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Rename chat'),
+        content: TextField(controller: controller, autofocus: true),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, null), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Save')),
+        ],
+      ),
+    );
+    if (newTitle != null && newTitle.isNotEmpty) {
+      await ref.read(chatHistoryProvider.notifier).renameChat(chat.sessionId, newTitle);
+    }
   }
 
   @override
@@ -37,90 +59,66 @@ class _CustomExpandableTileState extends State<CustomExpandableTile> {
             width: 25,
             height: 25,
             child: Center(
-              child: Icon(
-                _isExpanded
-                    ? Icons.expand_more
-                    : Icons.arrow_forward_ios_outlined,
-                size: _isExpanded ? 25 : 15,
-                color: Colors.grey[600],
-              ),
+              child: Icon(_isExpanded ? Icons.expand_more : Icons.arrow_forward_ios_outlined,
+                  size: _isExpanded ? 25 : 15, color: Colors.grey[600]),
             ),
           ),
-          title: Text(
-            widget.title,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          onTap: () {
-            setState(() {
-              _isExpanded = !_isExpanded;
-            });
-          },
+          title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
         ),
-
         if (_isExpanded)
           Column(
-            children: widget.items.map((chatTitle) {
+            children: widget.items.map((chat) {
               return Container(
                 color: Colors.white,
                 child: ListTile(
                   dense: true,
                   contentPadding: const EdgeInsets.only(left: 22, right: 8),
-                  title: Text(
-                    chatTitle,
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
+                  title: Text(chat.title, style: const TextStyle(fontSize: 14, color: Colors.black87), overflow: TextOverflow.ellipsis),
                   trailing: PopupMenuButton<String>(
-                    color: Colors.white, // ✅ Makes popup menu background pure white
+                    color: Colors.white,
                     icon: const Icon(Icons.more_horiz, color: Colors.black87),
-                    onSelected: (value) {
+                    onSelected: (value) async {
                       if (value == 'Archive') {
-                        debugPrint("Archive $chatTitle");
+                        await ref.read(chatHistoryProvider.notifier).archiveChat(chat.sessionId, archived: true);
+                      } else if (value == 'Unarchive') {
+                        await ref.read(chatHistoryProvider.notifier).archiveChat(chat.sessionId, archived: false);
                       } else if (value == 'Rename') {
-                        debugPrint("Rename $chatTitle");
+                        await _renameDialog(chat);
                       } else if (value == 'Delete') {
-                        debugPrint("Delete $chatTitle");
+                        await ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
                       }
                     },
                     itemBuilder: (context) => [
                       PopupMenuItem(
-                        value: 'Archive',
-                        child: Row(
-                          children: const [
-                            Icon(Icons.archive_outlined, size: 18, color: Colors.black87),
-                            SizedBox(width: 8),
-                            Text('Archive'),
-                          ],
-                        ),
+                        value: chat.isArchived ? 'Unarchive' : 'Archive',
+                        child: Row(children: [
+                          Icon(chat.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined, size: 18, color: Colors.black87),
+                          const SizedBox(width: 8),
+                          Text(chat.isArchived ? 'Unarchive' : 'Archive'),
+                        ]),
                       ),
                       PopupMenuItem(
                         value: 'Rename',
-                        child: Row(
-                          children: const [
-                            Icon(Icons.edit_outlined, size: 18, color: Colors.black87),
-                            SizedBox(width: 8),
-                            Text('Rename'),
-                          ],
-                        ),
+                        child: Row(children: const [
+                          Icon(Icons.edit_outlined, size: 18, color: Colors.black87),
+                          SizedBox(width: 8),
+                          Text('Rename'),
+                        ]),
                       ),
                       PopupMenuItem(
                         value: 'Delete',
-                        child: Row(
-                          children: const [
-                            Icon(Icons.delete_outline, size: 18, color: Colors.black87),
-                            SizedBox(width: 8),
-                            Text('Delete'),
-                          ],
-                        ),
+                        child: Row(children: const [
+                          Icon(Icons.delete_outline, size: 18, color: Colors.black87),
+                          SizedBox(width: 8),
+                          Text('Delete'),
+                        ]),
                       ),
                     ],
                   ),
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
+                  onTap: () => widget.onTapItem(chat),
                 ),
               );
-
-
             }).toList(),
           ),
       ],
