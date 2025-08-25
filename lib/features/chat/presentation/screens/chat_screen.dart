@@ -5,7 +5,6 @@ import 'package:flutter_chat_ai/features/chat/presentation/screens/welcome_messa
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_chat_ai/features/chat/data/models/message_model.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, this.isPrivate = false});
@@ -31,38 +30,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Messages + Input scroll together
-            Expanded(
-              child: SingleChildScrollView(
-                reverse: true, // 👈 keeps bottom visible when keyboard opens
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom, // shift input
-                ),
-                child: Column(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque, // ensures taps are detected anywhere
+          onTap: () => FocusScope.of(context).unfocus(), //dismiss keyboard
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(8.0),
                   children: [
-                    // Chat messages
-                    messages.isEmpty
-                        ? (widget.isPrivate
-                        ? const PrivateChatScreen()
-                        : const WelcomeMessageScreen())
-                        : ListView.builder(
-                      controller: _scrollController,
-                      shrinkWrap: true, // 👈 important inside Column
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) =>
-                          MessageBubble(message: messages[index]),
-                    ),
-
-                    // Input field
-                    const ChatInputField(),
+                    if (messages.isEmpty && !widget.isPrivate)
+                      const WelcomeMessageScreen(),
+                    if (messages.isEmpty && widget.isPrivate)
+                      const PrivateChatScreen(),
+                    if (messages.isNotEmpty)
+                      ...messages.map(
+                            (msg) => MessageBubble(message: msg),
+                      ),
                   ],
                 ),
               ),
-            ),
-          ],
+              const ChatInputField(),
+            ],
+          ),
         ),
       ),
     );
