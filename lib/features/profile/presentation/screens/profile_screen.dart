@@ -14,6 +14,35 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment:  CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  "My Profile",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.black26),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+                    alignment: Alignment.centerLeft,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Back to Chat", style: TextStyle(color: Colors.black87, fontSize: 12),),
+                ),
+              ],
+            ),
+
             const Text(
               "Manage your info, privacy and security settings to make Elysia work better for you",
               style: TextStyle(fontSize: 14, color: Colors.black54),
@@ -150,24 +179,24 @@ class ProfileScreen extends StatelessWidget {
   //   );
   // }
 
-
-  static Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(label,
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(value, style: TextStyle(fontSize: 14)),
-          ),
-        ],
-      ),
-    );
-  }
+  //
+  // static Widget _buildDetailRow(String label, String value) {
+  //   return Padding(
+  //     padding: EdgeInsets.symmetric(vertical: 4.0),
+  //     child: Row(
+  //       children: [
+  //         Expanded(
+  //           flex: 2,
+  //           child: Text(label,
+  //               style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+  //         ),
+  //         Expanded(
+  //           flex: 3,
+  //           child: Text(value, style: TextStyle(fontSize: 14)),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
 }
