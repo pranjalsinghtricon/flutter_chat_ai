@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CustomRowLayout extends StatelessWidget {
   final String label;
   final String value;
-  final VoidCallback? onTap; // for clickable rows (like Social Networks)
+  final VoidCallback? onTap; // for clickable rows (like Opt-In / Social)
 
   const CustomRowLayout({
     Key? key,
