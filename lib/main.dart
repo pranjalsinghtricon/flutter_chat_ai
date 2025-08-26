@@ -12,12 +12,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
+  // Register Adapters
   Hive.registerAdapter(ChatHistoryAdapter());
   Hive.registerAdapter(MessageAdapter());
 
+  // Chat related boxes
   await Hive.openBox<ChatHistory>('chat_history');
   // Messages are stored per session in boxes named: messages_<sessionId>
-  // Open lazily on demand.
+
+  // Profile box for editable sections
+  await Hive.openBox<String>('profileBox');
 
   runApp(const ProviderScope(child: ChatApp()));
 }
