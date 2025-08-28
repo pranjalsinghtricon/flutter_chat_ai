@@ -6,6 +6,7 @@ import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/screens/chat_screen.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_language_change_dialog.dart';
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_model_change_dialog.dart';
+import 'package:flutter_chat_ai/infrastructure/consts/asset_consts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/color_constants.dart';
 import '../../../../common_ui_components/buttons/custom_icon_button.dart';
@@ -80,7 +81,11 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         );
         break;
       default:
-        icon = const Icon(Icons.insert_drive_file, color: Colors.teal, size: 20);
+        icon = const Icon(
+          Icons.insert_drive_file,
+          color: Colors.teal,
+          size: 20,
+        );
     }
 
     return SizedBox(width: 24, height: 24, child: Center(child: icon));
@@ -104,7 +109,12 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                   Container(
                     height: 42,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    margin: const EdgeInsets.only(left: 2.0, right: 2.0, top: 2.0, bottom: 4.0),
+                    margin: const EdgeInsets.only(
+                      left: 2.0,
+                      right: 2.0,
+                      top: 2.0,
+                      bottom: 4.0,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(6),
@@ -113,12 +123,19 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(Icons.insert_drive_file, color: Colors.teal, size: 20),
+                        const Icon(
+                          Icons.insert_drive_file,
+                          color: Colors.teal,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _attachedFile!.path.split('/').last,
-                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -128,7 +145,10 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                   ),
                 Container(
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 14.0),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4.0,
+                    horizontal: 14.0,
+                  ),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 120),
                     child: Scrollbar(
@@ -152,53 +172,55 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 Row(
                   children: [
                     CustomIconDropdown(
-                      assetPath: 'assets/icons/icon-chat-options.svg',
+                      assetPath: AssetConsts.iconChatOptions,
                       assetSize: 20,
                       iconColor: Colors.black54,
                       items: [
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-private-chat.svg',
+                          assetPath: AssetConsts.iconPrivateChat,
                           assetSize: 20,
                           label: 'Private chat',
                           onSelected: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const MainLayout(child: ChatScreen(isPrivate: true)),
+                                builder: (context) => const MainLayout(
+                                  child: ChatScreen(isPrivate: true),
+                                ),
                               ),
                             );
                           },
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-paperclip.svg',
+                          assetPath: AssetConsts.iconPaperclip,
                           assetSize: 20,
                           label: 'Attach file',
                           iconColor: Colors.red,
                           onSelected: _pickFile,
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-google-document.svg',
+                          assetPath: AssetConsts.iconGoogleDocument,
                           assetSize: 20,
                           iconColor: Colors.red,
                           label: 'Add sources',
                           onSelected: () {},
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-google-bookmark.svg',
+                          assetPath: AssetConsts.iconGoogleBookmark,
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Saved prompts',
                           onSelected: () {},
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-change-model.svg',
+                          assetPath: AssetConsts.iconChangeModel,
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change model',
                           onSelected: () => showModelChangeDialog(context),
                         ),
                         CustomDropdownItem(
-                          assetPath: 'assets/icons/icon-language.svg',
+                          assetPath: AssetConsts.iconLanguage,
                           assetSize: 20,
                           iconColor: Colors.black54,
                           label: 'Change language',
@@ -207,9 +229,15 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ],
                     ),
                     const Spacer(),
-                    Text('${_controller.text.length}/2000', style: const TextStyle(fontSize: 12, color: ColorConst.primaryColor)),
+                    Text(
+                      '${_controller.text.length}/2000',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: ColorConst.primaryColor,
+                      ),
+                    ),
                     CustomIconButton(
-                      svgAsset: 'assets/icons/icon-send.svg',
+                      svgAsset: AssetConsts.iconSend,
                       svgColor: ColorConst.primaryColor,
                       toolTip: 'Send',
                       onPressed: _send,
@@ -226,10 +254,16 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
               text: TextSpan(
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
                 children: [
-                  const TextSpan(text: 'Elysia responses may be inaccurate. Know more about how your data is processed '),
+                  const TextSpan(
+                    text:
+                        'Elysia responses may be inaccurate. Know more about how your data is processed ',
+                  ),
                   TextSpan(
                     text: 'here',
-                    style: const TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
                     recognizer: TapGestureRecognizer()..onTap = _launchUrl,
                   ),
                   const TextSpan(text: '.'),
