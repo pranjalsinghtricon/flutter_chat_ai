@@ -22,6 +22,8 @@ void main() async {
 
   // Profile box for editable sections
   await Hive.openBox<String>('profileBox');
+  await Hive.openBox<String>('skillBox');
+
 
   runApp(const ProviderScope(child: ChatApp()));
 }
