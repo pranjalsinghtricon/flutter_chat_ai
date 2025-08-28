@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 
-// Hardcoded for now, later from API
+// Hardcoded skills initially (later could come from API)
 final availableSkillsProvider = StateProvider<List<String>>((ref) => [
   "End-to-end Automation",
   "TypeScript",
@@ -24,4 +25,15 @@ final availableSkillsProvider = StateProvider<List<String>>((ref) => [
   "Jenkins"
 ]);
 
-final selectedSkillsProvider = StateProvider<List<String>>((ref) => []);
+/// Load selected skills from Hive (persisted storage)
+final selectedSkillsProvider = StateProvider<List<String>>((ref) {
+  final box = Hive.box<String>('skillBox'); // ✅ using skillBox instead of profileBox
+  final saved = box.get('skills');
+  if (saved != null && saved.isNotEmpty) {
+    return saved.split(",");
+  }
+  return [];
+});
+
+/// Controls edit mode
+final isEditModeProvider = StateProvider<bool>((ref) => false);
