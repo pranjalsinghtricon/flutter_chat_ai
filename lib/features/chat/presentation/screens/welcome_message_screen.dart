@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
+import 'package:flutter_chat_ai/infrastructure/consts/asset_consts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -38,15 +39,24 @@ class WelcomeMessageScreen extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SvgPicture.asset('assets/icons/icon-shield.svg', width: 25, height: 25),
+                SvgPicture.asset(
+                  AssetConsts.iconShield,
+                  width: 25,
+                  height: 25,
+                ),
                 const SizedBox(width: 6),
                 const Expanded(
                   child: Text(
                     'Your personal and company data are protected in this chat',
-                    style: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
+
             ),
           )
         ],
@@ -76,15 +86,24 @@ class _SuggestedPrompt extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              SvgPicture.asset('assets/icons/icon-sample-chat.svg', width: 20, height: 20),
+              SvgPicture.asset(
+                AssetConsts.iconSampleChat,
+                width: 20,
+                height: 20,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   text,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
+
           ),
         ),
       ),

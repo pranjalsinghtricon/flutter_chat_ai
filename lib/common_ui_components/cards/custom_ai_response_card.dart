@@ -4,6 +4,7 @@ import 'package:flutter_chat_ai/common_ui_components/buttons/custom_icon_button.
 import 'package:flutter_chat_ai/common_ui_components/markdown/custom_markdown_renderer.dart';
 import 'package:flutter_chat_ai/features/chat/data/models/message_model.dart'; // ✅ FIXED import
 import 'package:flutter_chat_ai/features/chat/presentation/widgets/show_feedback_card.dart';
+import 'package:flutter_chat_ai/infrastructure/consts/asset_consts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAiResponseCard extends StatefulWidget {
@@ -70,7 +71,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: SvgPicture.asset(
-                        'assets/logo/Elysia-logo.svg',
+                        AssetConsts.elysiaLogo,
                         width: 25,
                         height: 25,
                       ),

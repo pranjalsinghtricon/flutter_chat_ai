@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-
 import '../../../core/services/api_service.dart';
 import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
