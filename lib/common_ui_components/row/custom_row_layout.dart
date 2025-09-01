@@ -29,7 +29,7 @@ class CustomRowLayout extends StatelessWidget {
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
-                  color: Colors.black87,
+                  // color: Colors.black87,
                 ),
               ),
             ),
@@ -43,7 +43,7 @@ class CustomRowLayout extends StatelessWidget {
                       value,
                       style: const TextStyle(
                         fontSize: 14,
-                        color: Colors.black87,
+                        // color: Colors.black87,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),

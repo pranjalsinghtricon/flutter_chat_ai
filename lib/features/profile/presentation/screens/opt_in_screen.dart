@@ -28,7 +28,7 @@ class _OptInScreenState extends State<OptInScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    // color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 OutlinedButton(
@@ -47,13 +47,13 @@ class _OptInScreenState extends State<OptInScreen> {
                 ),
               ],
             ),
-            const Text(
+             Text(
               "To allow Elysia searching information about yourself, toggle on the Opt-In function. "
                   "This will allow Elysia to provide accurate information about you using internal sources "
                   "(like information uploaded to Elysia) or external sources (such as your LinkedIn account). "
                   "If you do not Opt-In your name will generally not appear in Elysia’s outputs. "
                   "You can Opt-Out from this feature at anytime.",
-              style: TextStyle(fontSize: 14, color: Colors.black87),
+              style: TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 20),
             const Text(

@@ -52,7 +52,7 @@ class _CustomProfilePageCardState extends ConsumerState<CustomProfilePageCard> {
         : null;
 
     return Card(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       shape: RoundedRectangleBorder(
         side: const BorderSide(color: Colors.blue, width: 1),
         borderRadius: BorderRadius.circular(8),
@@ -101,7 +101,7 @@ class _CustomProfilePageCardState extends ConsumerState<CustomProfilePageCard> {
                     widget.subheading,
                     style: const TextStyle(
                       fontSize: 13,
-                      color: Colors.black87,
+                      // color: Colors.
                     ),
                   ),
                 ),

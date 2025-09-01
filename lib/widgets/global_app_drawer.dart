@@ -94,8 +94,8 @@ class GlobalAppDrawer extends ConsumerWidget {
                       'Chat History',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black54),
+                          fontSize: 16
+                      ),
                     ),
                   ),
                   CustomExpandableTile(

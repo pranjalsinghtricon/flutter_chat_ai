@@ -17,6 +17,7 @@ class CustomIconTextOutlinedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final borderColor = Theme.of(context).colorScheme.outline;
     Widget iconWidget;
     if (icon != null) {
       iconWidget = Icon(icon, size: 20, color: Colors.black87);
@@ -40,7 +41,7 @@ class CustomIconTextOutlinedButton extends StatelessWidget {
 
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: Colors.black26),
+        side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(6),
         ),
@@ -50,9 +51,9 @@ class CustomIconTextOutlinedButton extends StatelessWidget {
       icon: iconWidget,
       label: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
-          color: Colors.black87,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
       onPressed: onPressed,

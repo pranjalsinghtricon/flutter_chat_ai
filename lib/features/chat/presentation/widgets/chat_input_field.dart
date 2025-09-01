@@ -226,13 +226,13 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ),
                     ),
                     const Spacer(),
-                    Text(
+                  _controller.text.length > 0 ?  Text(
                       '${_controller.text.length}/2000',
                       style: const TextStyle(
                         fontSize: 12,
                         color: ColorConst.primaryColor,
                       ),
-                    ),
+                    ) : SizedBox.shrink(),
                     CustomIconButton(
                       svgAsset: AssetConsts.iconSend,
                       svgColor: ColorConst.primaryColor,
