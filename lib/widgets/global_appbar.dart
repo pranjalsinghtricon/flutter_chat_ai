@@ -85,33 +85,32 @@ class GlobalAppBar extends ConsumerWidget {
                 items: [
                   CustomDropdownItem(
                     icon: Icons.person,
-                    iconColor: Colors.black87,
+                    iconColor: Theme.of(context).colorScheme.onSurface, // ✅ Icon color from theme
                     label: 'Profile',
                     onSelected: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                          const MainLayout(child: ProfileScreen()),
+                          builder: (_) => const MainLayout(child: ProfileScreen()),
                         ),
                       );
                     },
                   ),
                   CustomDropdownItem(
                     icon: Icons.settings,
-                    iconColor: Colors.black87,
+                    iconColor: Theme.of(context).colorScheme.onSurface,
                     label: 'View Settings',
                     onSelected: () {},
                   ),
                   CustomDropdownItem(
                     icon: Icons.notifications,
-                    iconColor: Colors.black87,
+                    iconColor: Theme.of(context).colorScheme.onSurface,
                     label: 'Notifications',
                     onSelected: () {},
                   ),
                   CustomDropdownItem(
                     icon: Icons.logout,
-                    iconColor: Colors.black87,
+                    iconColor: Theme.of(context).colorScheme.onSurface,
                     label: 'Log Out',
                     onSelected: () {},
                   ),

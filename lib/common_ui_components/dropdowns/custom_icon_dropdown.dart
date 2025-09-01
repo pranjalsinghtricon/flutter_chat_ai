@@ -4,7 +4,6 @@ import 'custom_dropdown_item.dart';
 
 class CustomIconDropdown extends StatelessWidget {
   final IconData? icon;
-  final Color? iconColor;
   final String? assetPath;
   final double assetSize;
   final List<CustomDropdownItem> items;
@@ -12,7 +11,6 @@ class CustomIconDropdown extends StatelessWidget {
   const CustomIconDropdown({
     Key? key,
     this.icon,
-    this.iconColor,
     this.assetPath,
     this.assetSize = 24,
     required this.items,
@@ -22,11 +20,12 @@ class CustomIconDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = Theme.of(context).colorScheme.onSurface;
+    final textColor = Theme.of(context).colorScheme.secondary;
+
     return PopupMenuButton<int>(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      color: Theme.of(context).colorScheme.background,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       itemBuilder: (context) => List.generate(items.length, (index) {
         final item = items[index];
         return PopupMenuItem(
@@ -39,42 +38,50 @@ class CustomIconDropdown extends StatelessWidget {
                   item.assetPath!,
                   width: item.assetSize,
                   height: item.assetSize,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
                 )
                     : Image.asset(
                   item.assetPath!,
                   width: item.assetSize,
                   height: item.assetSize,
                 )
-              else
-                Icon(item.icon, color: item.iconColor),
-
+              else if (item.icon != null)
+                Icon(
+                  item.icon,
+                  size: item.assetSize,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               const SizedBox(width: 10),
-              Text(item.label),
+              Text(
+                item.label,
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         );
       }),
-      onSelected: (index) {
-        items[index].onSelected();
-      },
-      child: IconButton(
-        icon: assetPath != null
-            ? (assetPath!.endsWith('.svg')
-            ? SvgPicture.asset(
-          assetPath!,
-          width: assetSize,
-          height: assetSize,
-        )
-            : Image.asset(
-          assetPath!,
-          width: assetSize,
-          height: assetSize,
-        ))
-            : Icon(icon, color: iconColor, size: assetSize),
-        onPressed: null,
-        constraints: const BoxConstraints(),
-        padding: EdgeInsets.zero,
-      ),
+      onSelected: (index) => items[index].onSelected(),
+      child: assetPath != null
+          ? (assetPath!.endsWith('.svg')
+          ? SvgPicture.asset(
+        assetPath!,
+        width: assetSize,
+        height: assetSize,
+        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+      )
+          : Image.asset(
+        assetPath!,
+        width: assetSize,
+        height: assetSize,
+      ))
+          : Icon(icon, color: iconColor, size: assetSize),
     );
   }
 }

@@ -74,6 +74,10 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                         AssetConsts.elysiaLogo,
                         width: 25,
                         height: 25,
+                        colorFilter: ColorFilter.mode(
+                          Theme.of(context).colorScheme.onSurface,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),

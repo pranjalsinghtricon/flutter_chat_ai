@@ -43,6 +43,10 @@ class WelcomeMessageScreen extends StatelessWidget {
                   AssetConsts.iconShield,
                   width: 25,
                   height: 25,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 const SizedBox(width: 6),
                 const Expanded(
@@ -50,7 +54,6 @@ class WelcomeMessageScreen extends StatelessWidget {
                     'Your personal and company data are protected in this chat',
                     style: TextStyle(
                       fontSize: 13,
-                      color: Colors.black,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -86,18 +89,27 @@ class _SuggestedPrompt extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              SvgPicture.asset(
-                AssetConsts.iconSampleChat,
-                width: 20,
-                height: 20,
+              // SvgPicture.asset(
+              //   AssetConsts.iconSampleChat,
+              //   width: 20,
+              //   height: 20,
+              // ),
+            SvgPicture.asset(
+              AssetConsts.iconSampleChat,
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.onSurface,
+                BlendMode.srcIn,
               ),
-              const SizedBox(width: 12),
+            ),
+            const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   text,
                   style: const TextStyle(
                     fontSize: 14,
-                    color: Colors.black87,
+                    // color: Colors.black87,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
