@@ -26,7 +26,10 @@ class CustomIconTextOutlinedButton extends StatelessWidget {
           assetPath!,
           width: 20,
           height: 20,
-          color: Colors.black87, // Optional: apply color filter if needed
+          colorFilter: ColorFilter.mode(
+            Theme.of(context).colorScheme.onSurface,
+            BlendMode.srcIn,
+          ),
         );
       } else {
         iconWidget = Image.asset(assetPath!, width: 20, height: 20);

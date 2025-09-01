@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_ai/infrastructure/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -8,38 +9,35 @@ import 'features/chat/data/models/message_model.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
 
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
-  // Register Adapters
   Hive.registerAdapter(ChatHistoryAdapter());
   Hive.registerAdapter(MessageAdapter());
 
-  // Chat related boxes
   await Hive.openBox<ChatHistory>('chat_history');
-  // Messages are stored per session in boxes named: messages_<sessionId>
-
-  // Profile box for editable sections
   await Hive.openBox<String>('profileBox');
   await Hive.openBox<String>('skillBox');
-
 
   runApp(const ProviderScope(child: ChatApp()));
 }
 
-class ChatApp extends StatelessWidget {
+class ChatApp extends ConsumerWidget {
   const ChatApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Elysia',
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.white,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode, // toggle
       home: const MainLayout(child: ChatScreen()),
     );
   }

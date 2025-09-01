@@ -8,7 +8,7 @@ class CustomDropdownItem {
   final String label;
   final VoidCallback onSelected;
 
-  CustomDropdownItem({
+   CustomDropdownItem({
     this.icon,
     this.iconColor,
     this.assetPath,

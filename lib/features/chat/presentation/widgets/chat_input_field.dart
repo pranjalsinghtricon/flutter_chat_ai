@@ -171,62 +171,59 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 ),
                 Row(
                   children: [
-                    CustomIconDropdown(
-                      assetPath: AssetConsts.iconChatOptions,
-                      assetSize: 20,
-                      iconColor: Colors.black54,
-                      items: [
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconPrivateChat,
-                          assetSize: 20,
-                          label: 'Private chat',
-                          onSelected: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MainLayout(
-                                  child: ChatScreen(isPrivate: true),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14.0),
+                      child: CustomIconDropdown(
+                        assetPath: AssetConsts.iconChatOptions,
+                        assetSize: 20,
+                        items: [
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconPrivateChat,
+                            assetSize: 20,
+                            label: 'Private chat',
+                            onSelected: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MainLayout(
+                                    child: ChatScreen(isPrivate: true),
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconPaperclip,
-                          assetSize: 20,
-                          label: 'Attach file',
-                          iconColor: Colors.red,
-                          onSelected: _pickFile,
-                        ),
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconGoogleDocument,
-                          assetSize: 20,
-                          iconColor: Colors.red,
-                          label: 'Add sources',
-                          onSelected: () {},
-                        ),
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconGoogleBookmark,
-                          assetSize: 20,
-                          iconColor: Colors.black54,
-                          label: 'Saved prompts',
-                          onSelected: () {},
-                        ),
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconChangeModel,
-                          assetSize: 20,
-                          iconColor: Colors.black54,
-                          label: 'Change model',
-                          onSelected: () => showModelChangeDialog(context),
-                        ),
-                        CustomDropdownItem(
-                          assetPath: AssetConsts.iconLanguage,
-                          assetSize: 20,
-                          iconColor: Colors.black54,
-                          label: 'Change language',
-                          onSelected: () => showLanguageChangeDialog(context),
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconPaperclip,
+                            assetSize: 20,
+                            label: 'Attach file',
+                            onSelected: _pickFile,
+                          ),
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconGoogleDocument,
+                            assetSize: 20,
+                            label: 'Add sources',
+                            onSelected: () {},
+                          ),
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconGoogleBookmark,
+                            assetSize: 20,
+                            label: 'Saved prompts',
+                            onSelected: () {},
+                          ),
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconChangeModel,
+                            assetSize: 20,
+                            label: 'Change model',
+                            onSelected: () => showModelChangeDialog(context),
+                          ),
+                          CustomDropdownItem(
+                            assetPath: AssetConsts.iconLanguage,
+                            assetSize: 20,
+                            label: 'Change language',
+                            onSelected: () => showLanguageChangeDialog(context),
+                          ),
+                        ],
+                      ),
                     ),
                     const Spacer(),
                     Text(
@@ -256,7 +253,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 children: [
                   const TextSpan(
                     text:
-                        'Elysia responses may be inaccurate. Know more about how your data is processed ',
+                    'Elysia responses may be inaccurate. Know more about how your data is processed ',
                   ),
                   TextSpan(
                     text: 'here',
