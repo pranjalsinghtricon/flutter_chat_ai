@@ -70,14 +70,14 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
           Column(
             children: widget.items.map((chat) {
               return Container(
-                color: Colors.white,
-                child: ListTile(
+                color: Theme.of(context).colorScheme.surface,
+              child: ListTile(
                   dense: true,
                   contentPadding: const EdgeInsets.only(left: 22, right: 8),
-                  title: Text(chat.title, style: const TextStyle(fontSize: 14, color: Colors.black87), overflow: TextOverflow.ellipsis),
+                  title: Text(chat.title, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
                   trailing: PopupMenuButton<String>(
-                    color: Colors.white,
-                    icon: const Icon(Icons.more_horiz, color: Colors.black87),
+                    // color: Colors.white,
+                    icon:  Icon(Icons.more_horiz, color: Theme.of(context).colorScheme.onSurface),
                     onSelected: (value) async {
                       if (value == 'Archive') {
                         await ref.read(chatHistoryProvider.notifier).archiveChat(chat.sessionId, archived: true);
@@ -93,23 +93,23 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                       PopupMenuItem(
                         value: chat.isArchived ? 'Unarchive' : 'Archive',
                         child: Row(children: [
-                          Icon(chat.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined, size: 18, color: Colors.black87),
+                          Icon(chat.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined, size: 18, color:  Theme.of(context).colorScheme.onSurface),
                           const SizedBox(width: 8),
                           Text(chat.isArchived ? 'Unarchive' : 'Archive'),
                         ]),
                       ),
                       PopupMenuItem(
                         value: 'Rename',
-                        child: Row(children: const [
-                          Icon(Icons.edit_outlined, size: 18, color: Colors.black87),
+                        child: Row(children:  [
+                          Icon(Icons.edit_outlined, size: 18, color: Theme.of(context).colorScheme.onSurface,),
                           SizedBox(width: 8),
                           Text('Rename'),
                         ]),
                       ),
                       PopupMenuItem(
                         value: 'Delete',
-                        child: Row(children: const [
-                          Icon(Icons.delete_outline, size: 18, color: Colors.black87),
+                        child: Row(children:  [
+                          Icon(Icons.delete_outline, size: 18, color:  Theme.of(context).colorScheme.onSurface,),
                           SizedBox(width: 8),
                           Text('Delete'),
                         ]),

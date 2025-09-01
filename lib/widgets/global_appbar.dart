@@ -16,7 +16,7 @@ class GlobalAppBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       automaticallyImplyLeading: false,
       title: SizedBox(
         width: double.infinity,
@@ -85,7 +85,7 @@ class GlobalAppBar extends ConsumerWidget {
                 items: [
                   CustomDropdownItem(
                     icon: Icons.person,
-                    iconColor: Theme.of(context).colorScheme.onSurface, // ✅ Icon color from theme
+                    iconColor: Theme.of(context).colorScheme.onSurface,
                     label: 'Profile',
                     onSelected: () {
                       Navigator.push(

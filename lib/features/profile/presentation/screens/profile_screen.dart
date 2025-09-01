@@ -21,12 +21,12 @@ class ProfileScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment:  CrossAxisAlignment.center,
               children: [
-                const Text(
+                 Text(
                   "My Profile",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 OutlinedButton(
@@ -46,9 +46,9 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
 
-            const Text(
+             Text(
               "Manage your info, privacy and security settings to make Elysia work better for you",
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primaryContainer),
             ),
             const SizedBox(height: 12),
 
