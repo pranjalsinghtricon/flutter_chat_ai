@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
@@ -27,6 +27,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   File? _attachedFile;
   String _fileStatus = 'none';
 
+  final ImagePicker _picker = ImagePicker();
+
   Future<void> _launchUrl() async {
     final url = Uri.parse('https://your-link.com');
     await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -44,13 +46,35 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
     }
   }
 
-  Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
-    if (result != null && result.files.single.path != null) {
+  /// Pick from gallery (Photos)
+  Future<void> _pickImageFromGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
       setState(() {
-        _attachedFile = File(result.files.single.path!);
+        _attachedFile = File(pickedFile.path);
         _fileStatus = 'uploading';
       });
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (!mounted) return;
+        setState(() => _fileStatus = 'uploaded');
+        Future.delayed(const Duration(seconds: 1), () {
+          if (!mounted) return;
+          setState(() => _fileStatus = 'done');
+        });
+      });
+    }
+  }
+
+  /// Capture new photo with camera
+  Future<void> _captureImageFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      setState(() {
+        _attachedFile = File(pickedFile.path);
+        _fileStatus = 'uploading';
+      });
+
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() => _fileStatus = 'uploaded');
@@ -81,13 +105,9 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         );
         break;
       default:
-        icon = const Icon(
-          Icons.insert_drive_file,
-          color: Colors.teal,
-          size: 20,
-        );
+        icon = const Icon(Icons.insert_drive_file,
+            color: Colors.teal, size: 20);
     }
-
     return SizedBox(width: 24, height: 24, child: Center(child: icon));
   }
 
@@ -110,11 +130,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     height: 42,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     margin: const EdgeInsets.only(
-                      left: 2.0,
-                      right: 2.0,
-                      top: 2.0,
-                      bottom: 4.0,
-                    ),
+                        left: 2.0, right: 2.0, top: 2.0, bottom: 4.0),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(6),
@@ -123,19 +139,14 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Icon(
-                          Icons.insert_drive_file,
-                          color: Colors.teal,
-                          size: 20,
-                        ),
+                        const Icon(Icons.insert_drive_file,
+                            color: Colors.teal, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             _attachedFile!.path.split('/').last,
                             style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
+                                fontSize: 14, fontWeight: FontWeight.w500),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -146,9 +157,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 Container(
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 14.0,
-                  ),
+                      vertical: 4.0, horizontal: 14.0),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 120),
                     child: Scrollbar(
@@ -195,8 +204,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                           CustomDropdownItem(
                             assetPath: AssetConsts.iconPaperclip,
                             assetSize: 20,
-                            label: 'Attach file',
-                            onSelected: _pickFile,
+                            label: 'Attach photo',
+                            onSelected: _pickImageFromGallery,
                           ),
                           CustomDropdownItem(
                             assetPath: AssetConsts.iconGoogleDocument,
@@ -214,25 +223,35 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                             assetPath: AssetConsts.iconChangeModel,
                             assetSize: 20,
                             label: 'Change model',
-                            onSelected: () => showModelChangeDialog(context),
+                            onSelected: () =>
+                                showModelChangeDialog(context),
                           ),
                           CustomDropdownItem(
                             assetPath: AssetConsts.iconLanguage,
                             assetSize: 20,
                             label: 'Change language',
-                            onSelected: () => showLanguageChangeDialog(context),
+                            onSelected: () =>
+                                showLanguageChangeDialog(context),
                           ),
                         ],
                       ),
                     ),
                     const Spacer(),
-                  _controller.text.length > 0 ?  Text(
+                    _controller.text.length > 0 ?  Text(
                       '${_controller.text.length}/2000',
                       style: const TextStyle(
                         fontSize: 12,
                         color: ColorConst.primaryColor,
                       ),
                     ) : SizedBox.shrink(),
+                    // Camera
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt,
+                          color: ColorConst.primaryColor),
+                      tooltip: "Open Camera",
+                      onPressed: _captureImageFromCamera,
+                    ),
+                    // Send button
                     CustomIconButton(
                       svgAsset: AssetConsts.iconSend,
                       svgColor: ColorConst.primaryColor,
@@ -252,15 +271,13 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
                 children: [
                   const TextSpan(
-                    text:
-                    'Elysia responses may be inaccurate. Know more about how your data is processed ',
-                  ),
+                      text:
+                      'Elysia responses may be inaccurate. Know more about how your data is processed '),
                   TextSpan(
                     text: 'here',
                     style: const TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline),
                     recognizer: TapGestureRecognizer()..onTap = _launchUrl,
                   ),
                   const TextSpan(text: '.'),
