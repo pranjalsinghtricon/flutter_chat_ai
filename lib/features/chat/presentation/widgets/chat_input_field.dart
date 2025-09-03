@@ -237,26 +237,33 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       ),
                     ),
                     const Spacer(),
-                    _controller.text.length > 0 ?  Text(
-                      '${_controller.text.length}/2000',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: ColorConst.primaryColor,
-                      ),
-                    ) : SizedBox.shrink(),
-                    // Camera
-                    IconButton(
-                      icon: const Icon(Icons.camera_alt,
-                          color: ColorConst.primaryColor),
-                      tooltip: "Open Camera",
-                      onPressed: _captureImageFromCamera,
-                    ),
-                    // Send button
-                    CustomIconButton(
-                      svgAsset: AssetConsts.iconSend,
-                      svgColor: ColorConst.primaryColor,
-                      toolTip: 'Send',
-                      onPressed: _send,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_controller.text.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: Text(
+                              '${_controller.text.length}/2000',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: ColorConst.primaryColor,
+                              ),
+                            ),
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.camera_alt,
+                              color: ColorConst.primaryColor),
+                          tooltip: "Open Camera",
+                          onPressed: _captureImageFromCamera,
+                        ),
+                        CustomIconButton(
+                          svgAsset: AssetConsts.iconSend,
+                          svgColor: ColorConst.primaryColor,
+                          toolTip: 'Send',
+                          onPressed: _send,
+                        ),
+                      ],
                     ),
                   ],
                 ),
