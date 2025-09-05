@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/common_ui_components/dialog/plain_alert_dialog.dart';
-import 'package:flutter_chat_ai/core/constants/color_constants.dart';
-import 'package:flutter_chat_ai/features/chat/data/repositories/ai_model_repository.dart';
+import 'package:elysia/common_ui_components/dialog/plain_alert_dialog.dart';
+import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/features/chat/data/repositories/ai_model_repository.dart';
 
 void showModelChangeDialog(BuildContext context) {
   showDialog(

@@ -1,5 +1,5 @@
+import 'package:elysia/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/common_ui_components/dropdowns/custom_dropdown_item.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomTextDropdown extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/features/chat/application/chat_controller.dart';
-import 'package:flutter_chat_ai/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/features/chat/application/chat_controller.dart';
+import 'package:elysia/infrastructure/consts/asset_consts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';

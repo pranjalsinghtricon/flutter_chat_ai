@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/common_ui_components/buttons/custom_svg_icon_button.dart';
-import 'package:flutter_chat_ai/core/constants/color_constants.dart';
+import 'package:elysia/core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ShowFeedbackCard extends StatelessWidget {

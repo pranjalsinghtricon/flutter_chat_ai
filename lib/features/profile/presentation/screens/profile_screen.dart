@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/common_ui_components/cards/custom_user_profile_card.dart';
-import 'package:flutter_chat_ai/common_ui_components/row/custom_row_layout.dart';
-import 'package:flutter_chat_ai/features/profile/presentation/screens/opt_in_screen.dart';
-import 'package:flutter_chat_ai/features/profile/presentation/screens/social_network_screen.dart';
-import 'package:flutter_chat_ai/features/profile/presentation/widgets/skills_section.dart';
-import 'package:flutter_chat_ai/main.dart';
+import 'package:elysia/common_ui_components/cards/custom_user_profile_card.dart';
+import 'package:elysia/common_ui_components/row/custom_row_layout.dart';
+import 'package:elysia/features/profile/presentation/screens/opt_in_screen.dart';
+import 'package:elysia/features/profile/presentation/screens/social_network_screen.dart';
+import 'package:elysia/features/profile/presentation/widgets/skills_section.dart';
+import 'package:elysia/main.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

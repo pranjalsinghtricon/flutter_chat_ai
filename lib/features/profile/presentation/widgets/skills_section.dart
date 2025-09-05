@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/common_ui_components/chip/custom_chip.dart';
-import 'package:flutter_chat_ai/common_ui_components/searchable_dropdown/custom_searchable_multiselect_dropdown.dart';
-import 'package:flutter_chat_ai/providers/skill_provider.dart';
+import 'package:elysia/common_ui_components/chip/custom_chip.dart';
+import 'package:elysia/common_ui_components/searchable_dropdown/custom_searchable_multiselect_dropdown.dart';
+import 'package:elysia/providers/skill_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 

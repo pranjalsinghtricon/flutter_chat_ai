@@ -1,6 +1,6 @@
+import 'package:elysia/providers/skill_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_chat_ai/providers/skill_provider.dart';
 
 class CustomChip extends ConsumerWidget {
   final String label;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/features/profile/application/profile_controller.dart';
+import 'package:elysia/features/profile/application/profile_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 

@@ -1,9 +1,8 @@
+import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
+import 'package:elysia/infrastructure/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/infrastructure/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'features/chat/presentation/screens/chat_screen.dart';
 import 'features/chat/data/models/chat_model.dart';
 import 'features/chat/data/models/message_model.dart';
 import 'widgets/global_appbar.dart';
@@ -37,7 +36,7 @@ class ChatApp extends ConsumerWidget {
       title: 'Elysia',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode, // toggle
+      themeMode: themeMode,
       home: const MainLayout(child: ChatScreen()),
     );
   }

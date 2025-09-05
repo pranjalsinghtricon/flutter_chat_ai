@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ai/providers/skill_provider.dart';
+import 'package:elysia/providers/skill_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CustomSearchableDropdown extends ConsumerStatefulWidget {
