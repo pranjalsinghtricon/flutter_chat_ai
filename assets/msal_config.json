@@ -1,0 +1,20 @@
+{
+  "client_id": "2653a923-5d3a-47c3-bd01-49217fb38c8f",
+  "redirect_uri": "msauth.com.tricon.elysia://auth",
+  "account_mode": "SINGLE",
+  "broker_redirect_uri_registered": true,
+  "authorities": [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "AzureADMyOrg",
+        "tenant_id": "6ba04439-8b0e-43ee-ad26-c2ac9ef9e765"
+      },
+      "authority_url": "https://login.microsoftonline.com/6ba04439-8b0e-43ee-ad26-c2ac9ef9e765"
+    }
+  ],
+  "logging": {
+    "pii_enabled": true,
+    "log_level": "VERBOSE"
+  }
+}

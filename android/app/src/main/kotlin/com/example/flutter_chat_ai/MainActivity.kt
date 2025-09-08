@@ -1,4 +1,4 @@
-package com.example.flutter_chat_ai
+package com.tricon.elysia
 
 import io.flutter.embedding.android.FlutterActivity
 
