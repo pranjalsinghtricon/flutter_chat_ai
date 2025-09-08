@@ -1,19 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../../../core/services/api_service.dart';
 import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 
 final chatRepositoryProvider =
 Provider<ChatRepository>((ref) => ChatRepository());
-final apiServiceProvider = Provider<ApiService>((ref) => ApiService());
 
 /// Holds the in-memory messages for the *currently open* session.
 final chatControllerProvider =
 StateNotifierProvider<ChatController, List<Message>>(
       (ref) =>
-      ChatController(ref.read(apiServiceProvider), ref.read(chatRepositoryProvider)),
+      ChatController(ref.read(chatRepositoryProvider)),
 );
 
 /// Sidebar chat list (Today / Last 7 days / Last 30 days / Archived)
@@ -23,13 +21,12 @@ StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
 );
 
 class ChatController extends StateNotifier<List<Message>> {
-  final ApiService _api;
   final ChatRepository _repo;
 
   String? _currentSessionId;
   String? get currentSessionId => _currentSessionId;
 
-  ChatController(this._api, this._repo) : super([]);
+  ChatController(this._repo) : super([]);
 
   Future<String> startNewChat({String initialTitle = 'New Conversation'}) async {
     _currentSessionId = const Uuid().v4();
@@ -88,7 +85,10 @@ class ChatController extends StateNotifier<List<Message>> {
     );
     await _repo.upsertHistory(updatedHistory);
 
-    _api.sendPromptStream(text, sessionId: _currentSessionId!).listen((chunk) async {
+    // Stream from REPOSITORY
+    _repo
+        .sendPromptStream(prompt: text, sessionId: _currentSessionId!)
+        .listen((chunk) async {
       botMsg = botMsg.copyWith(content: botMsg.content + chunk);
 
       final copy = [...state];

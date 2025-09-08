@@ -52,7 +52,7 @@ class ChatApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: const LoginPage(),
+      home: const MainLayout(child: ChatScreen()),
     );
   }
 }
