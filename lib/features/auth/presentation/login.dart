@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,6 +19,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void initState() {
     super.initState();
     developer.log('🔄 LoginPage initialized', name: 'LoginPage');
+    developer.log('The code is compiled in DEBUG mode till here', name: 'LoginPage');
   }
 
   @override
@@ -25,11 +29,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     developer.log('🎨 Building LoginPage - Auth State: ${authState.isLoggedIn ? "Logged In" : "Logged Out"}', name: 'LoginPage');
 
     // Navigate to chat screen if already logged in
+    developer.log(
+      '🔄 LoginPage initialized | isLoggedIn: ${authState.isLoggedIn} | userInfo: ${jsonEncode(authState.userInfo)}',
+      name: 'LoginPage',
+    );
     if (authState.isLoggedIn && authState.userInfo != null) {
       developer.log('✅ User already logged in, navigating to chat...', name: 'LoginPage');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const ChatScreen()),
+          MaterialPageRoute(builder: (context) => const MainLayout(child: ChatScreen()),),
         );
       });
     }

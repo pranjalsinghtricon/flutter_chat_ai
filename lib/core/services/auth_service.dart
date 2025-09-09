@@ -26,7 +26,7 @@ class AuthService {
       developer.log('🔧 Initializing AadOAuth...', name: 'AuthService');
 
       final config = Config(
-        tenant: "common",
+        tenant: "6ba04439-8b0e-43ee-ad26-c2ac9ef9e765", // or triconinfotech.onmicrosoft.com
         clientId: "2653a923-5d3a-47c3-bd01-49217fb38c8f",
         scope: "openid profile offline_access User.Read",
         redirectUri: "msauth.com.tricon.elysia://auth",
