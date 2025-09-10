@@ -8,8 +8,10 @@ class AssetConsts {
   // ---------------- ICONS ----------------
   static const _iconsPath = 'assets/icons';
   static const iconArchive = '$_iconsPath/icon-archive.svg';
+  static const iconAiImages = '$_iconsPath/icon-ai-image.svg';
   static const iconChangeModel = '$_iconsPath/icon-change-model.svg';
   static const iconChatOptions = '$_iconsPath/icon-chat-options.svg';
+  static const iconCareerCoach = '$_iconsPath/career-coach.svg';
   static const iconCopy = '$_iconsPath/icon-copy.svg';
   static const iconDislike = '$_iconsPath/icon-dislike.svg';
   static const iconDislikeUnselected = '$_iconsPath/icon-dislike-unselected.svg';
@@ -19,6 +21,8 @@ class AssetConsts {
   static const iconInfo = '$_iconsPath/icon-info.svg';
   static const iconLanguage = '$_iconsPath/icon-language.svg';
   static const iconLike = '$_iconsPath/icon-like.svg';
+  static const iconPapagalo = '$_iconsPath/icon-papagalo.svg';
+  static const iconMoreApp = '$_iconsPath/icon-more-app.svg';
   static const iconLikeUnselected = '$_iconsPath/icon-like-unselected.svg';
   static const iconNewTopic = '$_iconsPath/icon-new-topic.svg';
   static const iconPaperclip = '$_iconsPath/icon-paperclip.svg';

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
@@ -19,25 +18,23 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void initState() {
     super.initState();
     developer.log('🔄 LoginPage initialized', name: 'LoginPage');
-    developer.log('The code is compiled in DEBUG mode till here', name: 'LoginPage');
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
-    developer.log('🎨 Building LoginPage - Auth State: ${authState.isLoggedIn ? "Logged In" : "Logged Out"}', name: 'LoginPage');
-
-    // Navigate to chat screen if already logged in
     developer.log(
-      '🔄 LoginPage initialized | isLoggedIn: ${authState.isLoggedIn} | userInfo: ${jsonEncode(authState.userInfo)}',
+      '🎨 Building LoginPage - Auth State: ${authState.isLoggedIn ? "Logged In" : "Logged Out"}',
       name: 'LoginPage',
     );
+
     if (authState.isLoggedIn && authState.userInfo != null) {
-      developer.log('✅ User already logged in, navigating to chat...', name: 'LoginPage');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainLayout(child: ChatScreen()),),
+          MaterialPageRoute(
+            builder: (context) => const MainLayout(child: ChatScreen()),
+          ),
         );
       });
     }
@@ -54,12 +51,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // App Logo/Title
-            const Icon(
-              Icons.login,
-              size: 100,
-              color: Colors.blue,
-            ),
+            const Icon(Icons.login, size: 100, color: Colors.blue),
             const SizedBox(height: 32),
 
             const Text(
@@ -73,16 +65,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             const SizedBox(height: 16),
 
             const Text(
-              'Sign in with your Microsoft account to continue',
+              'Sign in with your Microsoft account (via Cognito)',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 48),
 
-            // Debug Info
+            // Error UI
             if (authState.error != null) ...[
               Container(
                 width: double.infinity,
@@ -104,10 +93,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      authState.error!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
+                    Text(authState.error!, style: const TextStyle(color: Colors.red)),
                     const SizedBox(height: 8),
                     TextButton(
                       onPressed: () {
@@ -120,7 +106,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ],
 
-            // Initialization Status
+            // Amplify Initialization Status
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -141,10 +127,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   const SizedBox(width: 8),
                   Text(
                     authState.isInitialized
-                        ? 'MSAL Initialized Successfully'
-                        : 'Initializing MSAL...',
+                        ? 'Amplify Auth Ready'
+                        : 'Initializing Amplify...',
                     style: TextStyle(
-                      color: authState.isInitialized ? Colors.green.shade700 : Colors.orange.shade700,
+                      color: authState.isInitialized
+                          ? Colors.green.shade700
+                          : Colors.orange.shade700,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -152,7 +140,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ),
 
-            // User Info (if logged in)
+            // User Info
             if (authState.isLoggedIn && authState.userInfo != null) ...[
               Container(
                 width: double.infinity,
@@ -176,7 +164,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     const SizedBox(height: 4),
                     Text('ID: ${authState.userInfo!['id'] ?? 'N/A'}'),
                     Text('Username: ${authState.userInfo!['username'] ?? 'N/A'}'),
-                    Text('Name: ${authState.userInfo!['name'] ?? 'N/A'}'),
                   ],
                 ),
               ),
@@ -219,7 +206,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     : const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.microwave),
+                    Icon(Icons.login),
                     SizedBox(width: 8),
                     Text(
                       'Sign in with Microsoft',
@@ -232,7 +219,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
             const SizedBox(height: 16),
 
-            // Sign Out Button (if logged in)
+            // Sign Out Button
             if (authState.isLoggedIn) ...[
               SizedBox(
                 width: double.infinity,
@@ -260,14 +247,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ],
 
             const SizedBox(height: 32),
-
-            // Debug Info
             Text(
               'Debug Mode: Detailed logs in console',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ],
         ),

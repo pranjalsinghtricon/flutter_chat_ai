@@ -16,14 +16,14 @@ import '../../../../main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
-  const ChatInputField({super.key});
+  final TextEditingController controller;
+  const ChatInputField({super.key, required this.controller});
 
   @override
   ConsumerState<ChatInputField> createState() => _ChatInputFieldState();
 }
 
 class _ChatInputFieldState extends ConsumerState<ChatInputField> {
-  final _controller = TextEditingController();
   File? _attachedFile;
   String _fileStatus = 'none';
 
@@ -35,10 +35,10 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   }
 
   void _send() {
-    final text = _controller.text.trim();
+    final text = widget.controller.text.trim();
     if (text.isNotEmpty || _attachedFile != null) {
       ref.read(chatControllerProvider.notifier).sendMessage(text);
-      _controller.clear();
+      widget.controller.clear();
       setState(() {
         _attachedFile = null;
         _fileStatus = 'none';
@@ -162,7 +162,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     constraints: const BoxConstraints(maxHeight: 120),
                     child: Scrollbar(
                       child: TextField(
-                        controller: _controller,
+                        controller: widget.controller,
                         maxLength: 2000,
                         maxLines: null,
                         onChanged: (_) => setState(() {}),
@@ -240,11 +240,11 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (_controller.text.isNotEmpty)
+                        if (widget.controller.text.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(right: 6),
                             child: Text(
-                              '${_controller.text.length}/2000',
+                              '${widget.controller.text.length}/2000',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: ColorConst.primaryColor,
