@@ -1,3 +1,4 @@
+import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:flutter/material.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/infrastructure/consts/asset_consts.dart';
@@ -10,58 +11,84 @@ class WelcomeMessageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userName = "Sam";
+    // return Padding(
+    //   padding: const EdgeInsets.all(24.0),
+    //   child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [
+    //       const Text(
+    //         'Good afternoon.',
+    //         style: TextStyle(
+    //           fontSize: 20,
+    //           color: ColorConst.primaryColor,
+    //           fontWeight: FontWeight.bold,
+    //         ),
+    //       ),
+    //       const SizedBox(height: 5),
+    //       const Text(
+    //         'How can I assist you today?',
+    //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+    //       ),
+    //       const SizedBox(height: 5),
+    //       const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
+    //       const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
+    //       const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
+    //       const _SuggestedPrompt('How will One Informa be measured?'),
+    //       const SizedBox(height: 8),
+    //       Padding(
+    //         padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+    //         child: Row(
+    //           crossAxisAlignment: CrossAxisAlignment.center,
+    //           children: [
+    //             SvgPicture.asset(
+    //               AssetConsts.iconShield,
+    //               width: 25,
+    //               height: 25,
+    //               colorFilter: ColorFilter.mode(
+    //                 Theme.of(context).colorScheme.onSurface,
+    //                 BlendMode.srcIn,
+    //               ),
+    //             ),
+    //             const SizedBox(width: 6),
+    //             const Expanded(
+    //               child: Text(
+    //                 'Your personal and company data are protected in this chat',
+    //                 style: TextStyle(
+    //                   fontSize: 13,
+    //                   fontWeight: FontWeight.w500,
+    //                 ),
+    //               ),
+    //             ),
+    //           ],
+    //
+    //         ),
+    //       )
+    //     ],
+    //   ),
+    // );
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            "Hi $userName,",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
           const Text(
-            'Good afternoon.',
+            "How can I assist you today?",
             style: TextStyle(
               fontSize: 20,
-              color: ColorConst.primaryColor,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
+              color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 5),
-          const Text(
-            'How can I assist you today?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 5),
-          const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
-          const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
-          const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
-          const _SuggestedPrompt('How will One Informa be measured?'),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  AssetConsts.iconShield,
-                  width: 25,
-                  height: 25,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                const Expanded(
-                  child: Text(
-                    'Your personal and company data are protected in this chat',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-
-            ),
-          )
         ],
       ),
     );

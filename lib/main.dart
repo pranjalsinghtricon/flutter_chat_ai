@@ -1,6 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/infrastructure/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +19,6 @@ Future<void> main() async {
   developer.log('🚀 Starting Elysia app...', name: 'Main');
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await dotenv.load(fileName: ".env.dev"); // 👈 load env file
   await dotenv.load(fileName: ".env");
   await Hive.initFlutter();
   Hive.registerAdapter(ChatHistoryAdapter());
@@ -59,7 +57,6 @@ class ChatApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       home: const MainLayout(child: ChatScreen()),
-      // home: const MainLayout(child: ChatScreen()),
     );
   }
 }

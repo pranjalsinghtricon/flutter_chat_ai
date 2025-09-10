@@ -1,3 +1,5 @@
+import 'package:elysia/common_ui_components/dropdowns/custom_icon_dropdown.dart';
+import 'package:elysia/infrastructure/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:elysia/common_ui_components/buttons/custom_appbar_icon_button.dart';
@@ -28,92 +30,62 @@ class GlobalAppBar extends ConsumerWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CustomAppbarIconButton(
-                    assetPath: 'assets/icons/icon-new-topic.svg',
-                    size: 25,
-                    iconColor: Colors.blue,
-                    backgroundColor: Colors.white,
-                    onPressed: () async {
-                      final controller =
-                      ref.read(chatControllerProvider.notifier);
-
-                      await controller.startNewChat(initialTitle: "New Conversation");
-
-                      if (ModalRoute.of(context)?.settings.name != '/chat') {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            settings: const RouteSettings(name: '/chat'),
-                            builder: (_) =>
-                            const MainLayout(child: ChatScreen()),
-                          ),
-                        );
-                      }
+                  Builder(
+                    builder: (context) {
+                      return IconButton(
+                        icon: const Icon(Icons.menu),
+                        color: Theme.of(context).colorScheme.onSurface,
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      );
                     },
                   ),
-                  const SizedBox(width: 10),
-                  CustomAppbarIconButton(
-                    assetPath: 'assets/icons/icon-history.svg',
-                    size: 25,
-                    iconColor: Colors.blue,
-                    backgroundColor: Colors.white,
+                  const SizedBox(width: 8),
+                  CustomSvgIconButton(
+                    assetPath: 'assets/logo/Elysia-logo.svg',
+                    size: 30,
+                    backgroundColor: Colors.transparent,
                     onPressed: () {
-                      Scaffold.of(context).openDrawer();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                          const MainLayout(child: ChatScreen()),
+                        ),
+                      );
                     },
                   ),
                 ],
               ),
             ),
-            CustomSvgIconButton(
-              assetPath: 'assets/logo/Elysia-logo.svg',
-              size: 30,
-              backgroundColor: Colors.transparent,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                    const MainLayout(child: ChatScreen()),
-                  ),
-                );
-              },
-            ),
             Align(
               alignment: Alignment.centerRight,
-              child: CustomTextDropdown(
-                buttonText: 'AR',
+              child: CustomIconDropdown(
+                icon: Icons.settings_outlined,
+                assetSize: 22,
                 items: [
                   CustomDropdownItem(
-                    icon: Icons.person,
-                    iconColor: Theme.of(context).colorScheme.onSurface,
-                    label: 'Profile',
+                    assetPath: AssetConsts.iconPrivateChat,
+                    assetSize: 20,
+                    label: 'Private chat',
                     onSelected: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const MainLayout(child: ProfileScreen()),
+                          builder: (context) => const MainLayout(
+                            child: ChatScreen(isPrivate: true),
+                          ),
                         ),
                       );
                     },
                   ),
                   CustomDropdownItem(
-                    icon: Icons.settings,
-                    iconColor: Theme.of(context).colorScheme.onSurface,
-                    label: 'View Settings',
+                    assetPath: AssetConsts.iconPaperclip,
+                    assetSize: 20,
+                    label: 'Attach photo',
                     onSelected: () {},
-                  ),
-                  CustomDropdownItem(
-                    icon: Icons.notifications,
-                    iconColor: Theme.of(context).colorScheme.onSurface,
-                    label: 'Notifications',
-                    onSelected: () {},
-                  ),
-                  CustomDropdownItem(
-                    icon: Icons.logout,
-                    iconColor: Theme.of(context).colorScheme.onSurface,
-                    label: 'Log Out',
-                    onSelected: () {},
-                  ),
+                  )
                 ],
               ),
             ),
