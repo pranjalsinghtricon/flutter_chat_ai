@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uni_links/uni_links.dart';
 import 'dart:developer' as developer;
+import 'dart:async';
 import '../../chat/presentation/screens/chat_screen.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -14,10 +17,49 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  StreamSubscription? _sub;
+
   @override
   void initState() {
     super.initState();
     developer.log('🔄 LoginPage initialized', name: 'LoginPage');
+
+    // ✅ Listen to incoming deep links (for OAuth code)
+    _sub = uriLinkStream.listen((Uri? uri) {
+      if (uri != null && uri.queryParameters.containsKey('code')) {
+        final authCode = uri.queryParameters['code'];
+        developer.log('📥 Captured OAuth Code: $authCode', name: 'OAuthFlow');
+      }
+    }, onError: (err) {
+      developer.log('⚠️ Deep link error: $err', name: 'OAuthFlow');
+    });
+
+    _logAuthSession(); // Call auth session check when initializing
+  }
+
+  Future<void> _logAuthSession() async {
+    try {
+      final AuthSession session = await Amplify.Auth.fetchAuthSession();
+      developer.log(
+        '🎨 Auth Session isSignedIn: ${session.isSignedIn}',
+        name: 'LoginPage',
+      );
+      developer.log(
+        '🎨 Full Auth Session: $session',
+        name: 'LoginPage',
+      );
+    } catch (e) {
+      developer.log(
+        '❌ Error fetching auth session: $e',
+        name: 'LoginPage',
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -53,7 +95,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           children: [
             const Icon(Icons.login, size: 100, color: Colors.blue),
             const SizedBox(height: 32),
-
             const Text(
               'Welcome to Elysia',
               style: TextStyle(
@@ -63,15 +104,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
             ),
             const SizedBox(height: 16),
-
             const Text(
               'Sign in with your Microsoft account (via Cognito)',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 48),
-
-            // Error UI
             if (authState.error != null) ...[
               Container(
                 width: double.infinity,
@@ -105,8 +143,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
             ],
-
-            // Amplify Initialization Status
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -139,8 +175,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ],
               ),
             ),
-
-            // User Info
             if (authState.isLoggedIn && authState.userInfo != null) ...[
               Container(
                 width: double.infinity,
@@ -168,8 +202,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
             ],
-
-            // Sign In Button
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -216,10 +248,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // Sign Out Button
             if (authState.isLoggedIn) ...[
               SizedBox(
                 width: double.infinity,
@@ -245,7 +274,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 ),
               ),
             ],
-
             const SizedBox(height: 32),
             Text(
               'Debug Mode: Detailed logs in console',
