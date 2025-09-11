@@ -1,24 +1,39 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-String get amplifyconfig => '''{
+const amplifyconfig = '''{
+  "UserAgent": "aws-amplify/cli",
+  "Version": "1.0",
   "auth": {
     "plugins": {
       "awsCognitoAuthPlugin": {
+        "IdentityManager": {
+          "Default": {}
+        },
         "CognitoUserPool": {
           "Default": {
-            "PoolId": "${dotenv.env['COGNITO_USERPOOL_ID']}",
-            "AppClientId": "${dotenv.env['COGNITO_WEBCLIENT_ID']}",
-            "Region": "${dotenv.env['COGNITO_REGION']}"
+            "PoolId": "eu-west-1_ge1RMFrf6",
+            "AppClientId": "1pii8vb7lqo9j6st8p9ke8rjsd",
+            "Region": "eu-west-1"
           }
         },
         "Auth": {
           "Default": {
+            "authenticationFlowType": "USER_SRP_AUTH",
+            "usernameAttributes": ["email"],
+            "signupAttributes": ["email", "name"],
+            "passwordProtectionSettings": {
+              "passwordPolicyMinLength": 8,
+              "passwordPolicyCharacters": []
+            },
             "OAuth": {
-              "WebDomain": "${dotenv.env['COGNITO_DOMAIN']}",
-              "AppClientId": "${dotenv.env['COGNITO_WEBCLIENT_ID']}",
-              "SignInRedirectURI": "${dotenv.env['COGNITO_REDIRECT_SIGNIN']}",
-              "SignOutRedirectURI": "${dotenv.env['COGNITO_REDIRECT_SIGNOUT']}",
-              "Scopes": ["openid", "profile", "email", "offline_access", "User.Read"]
+              "WebDomain": "idp.dev.iris.informa.com",
+              "AppClientId": "1pii8vb7lqo9j6st8p9ke8rjsd",
+              "SignInRedirectURI": "com.informa.elysia.dev://auth",
+              "SignOutRedirectURI": "com.informa.elysia.dev://logout",
+              "Scopes": [
+                "openid",
+                "email",
+                "profile",
+                "aws.cognito.signin.user.admin"
+              ]
             }
           }
         }

@@ -1,25 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';  // Add Riverpod import
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
-import 'package:elysia/infrastructure/theme/theme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'amplifyconfiguration.dart';
+import 'features/auth/presentation/login.dart';
+import 'features/chat/presentation/screens/chat_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'features/chat/data/models/chat_model.dart';
 import 'features/chat/data/models/message_model.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
+import 'infrastructure/theme/theme.dart';  // AppTheme import
 import 'dart:developer' as developer;
-import 'amplifyconfiguration.dart';
 
+// ✅ Define themeModeProvider globally
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
-Future<void> main() async {
-  developer.log('🚀 Starting Elysia app...', name: 'Main');
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await dotenv.load(fileName: ".env");
+
   await Hive.initFlutter();
   Hive.registerAdapter(ChatHistoryAdapter());
   Hive.registerAdapter(MessageAdapter());
@@ -27,46 +28,70 @@ Future<void> main() async {
   await Hive.openBox<String>('profileBox');
   await Hive.openBox<String>('skillBox');
 
-  await _configureAmplify();
-
-  runApp(const ProviderScope(child: ChatApp()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-Future<void> _configureAmplify() async {
-  try {
-    final auth = AmplifyAuthCognito();
-    await Amplify.addPlugin(auth);
-    await Amplify.configure(amplifyconfig);
-    developer.log('✅ Amplify configured successfully', name: 'Main');
-  } on Exception catch (e) {
-    developer.log('⚠ Amplify config error: $e', name: 'Main');
-  }
-}
-
-class ChatApp extends ConsumerWidget {
-  const ChatApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+  State<MyApp> createState() => _MyAppState();
+}
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Elysia',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,
-      home: const MainLayout(child: ChatScreen()),
-    );
+class _MyAppState extends State<MyApp> {
+  bool _isAmplifyConfigured = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _configureAmplify();
+  }
+
+  Future<void> _configureAmplify() async {
+    try {
+      final authPlugin = AmplifyAuthCognito();
+      await Amplify.addPlugin(authPlugin);
+      await Amplify.configure(amplifyconfig);
+
+      setState(() {
+        _isAmplifyConfigured = true;
+      });
+
+      developer.log('✅ Amplify configured successfully', name: 'Main');
+    } on AmplifyAlreadyConfiguredException {
+      developer.log('⚠ Amplify already configured.', name: 'Main');
+    } catch (e) {
+      developer.log('⚠ Amplify configuration error: $e', name: 'Main');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer(builder: (context, ref, _) {
+      final themeMode = ref.watch(themeModeProvider);
+
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Elysia',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeMode,
+        home: _isAmplifyConfigured
+            ? const LoginPage()
+            : const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    });
   }
 }
 
-class MainLayout extends ConsumerWidget {
+class MainLayout extends StatelessWidget {
   final Widget child;
   const MainLayout({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: const PreferredSize(
