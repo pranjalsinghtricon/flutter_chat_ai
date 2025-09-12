@@ -4,7 +4,6 @@ import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uni_links/uni_links.dart';
 import 'dart:developer' as developer;
 import 'dart:async';
 import '../../chat/presentation/screens/chat_screen.dart';
@@ -24,15 +23,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.initState();
     developer.log('🔄 LoginPage initialized', name: 'LoginPage');
 
-    // ✅ Listen to incoming deep links (for OAuth code)
-    _sub = uriLinkStream.listen((Uri? uri) {
-      if (uri != null && uri.queryParameters.containsKey('code')) {
-        final authCode = uri.queryParameters['code'];
-        developer.log('📥 Captured OAuth Code: $authCode', name: 'OAuthFlow');
-      }
-    }, onError: (err) {
-      developer.log('⚠️ Deep link error: $err', name: 'OAuthFlow');
-    });
 
     _logAuthSession(); // Call auth session check when initializing
   }
