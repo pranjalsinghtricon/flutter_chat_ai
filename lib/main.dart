@@ -13,7 +13,6 @@ import 'widgets/global_app_drawer.dart';
 import 'infrastructure/theme/theme.dart';
 import 'dart:developer' as developer;
 
-// ✅ Define themeModeProvider globally
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
 void main() async {
