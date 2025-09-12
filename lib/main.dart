@@ -1,17 +1,17 @@
+import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';  // Add Riverpod import
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'amplifyconfiguration.dart';
 import 'features/auth/presentation/login.dart';
-import 'features/chat/presentation/screens/chat_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'features/chat/data/models/chat_model.dart';
 import 'features/chat/data/models/message_model.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
-import 'infrastructure/theme/theme.dart';  // AppTheme import
+import 'infrastructure/theme/theme.dart';
 import 'dart:developer' as developer;
 
 // ✅ Define themeModeProvider globally
@@ -58,6 +58,7 @@ class _MyAppState extends State<MyApp> {
       });
 
       developer.log('✅ Amplify configured successfully', name: 'Main');
+
     } on AmplifyAlreadyConfiguredException {
       developer.log('⚠ Amplify already configured.', name: 'Main');
     } catch (e) {
@@ -76,6 +77,7 @@ class _MyAppState extends State<MyApp> {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
+        // home: const MainLayout(child: ChatScreen()),
         home: _isAmplifyConfigured
             ? const LoginPage()
             : const Scaffold(
