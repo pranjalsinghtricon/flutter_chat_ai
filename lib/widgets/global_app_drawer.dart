@@ -1,6 +1,7 @@
+import 'dart:developer' as developer;
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../main.dart';
 import '../features/chat/presentation/screens/chat_screen.dart';
 import '../features/chat/application/chat_controller.dart';
@@ -139,12 +140,32 @@ class GlobalAppDrawer extends ConsumerWidget {
                     ),
                     onTap: () => Navigator.pop(context),
                   ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.logout,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    title: Text(
+                      'Sign Out',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                      ),
+                    ),
+                    onTap: () async {
+                      developer.log('🔴 Sign out button pressed', name: 'GlobalAppDrawer');
+                      try {
+                        await Amplify.Auth.signOut();
+                      } catch (e) {
+                        developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
+                      }
+                      Navigator.pop(context);
+                    },
+                  ),
 
                 ],
               ),
             ),
             const Divider(),
-            // THEME TOGGLE AT BOTTOM
             SwitchListTile(
               title: Text(
                 "Dark Mode",
