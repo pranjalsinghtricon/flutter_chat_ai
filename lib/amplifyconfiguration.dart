@@ -30,9 +30,8 @@ const amplifyconfig = '''{
               "SignOutRedirectURI": "com.informa.elysia.dev://logout",
               "Scopes": [
                 "openid",
-                "email",
-                "profile",
-                "aws.cognito.signin.user.admin"
+                "iris.apis/ai",
+                "email"
               ]
             }
           }

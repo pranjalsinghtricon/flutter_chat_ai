@@ -48,8 +48,12 @@ dependencies:
   build_runner: ^2.5.4
   hive_ce_generator: ^1.8.2
   image_picker: ^1.2.0
-  aad_oauth: ^1.0.0
+#  aad_oauth: ^1.0.0
   flutter_secure_storage: ^9.0.0
+  amplify_auth_cognito: ^2.6.5
+  amplify_flutter: ^2.6.5
+  amplify_authenticator: ^2.3.7
+  flutter_dotenv: ^6.0.0
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +79,8 @@ flutter:
   assets:
     - assets/icons/
     - assets/logo/
-    - assets/msal_config.json
+#    - assets/msal_config.json
+    - .env
 
 
   # The following line ensures that the Material Icons font is

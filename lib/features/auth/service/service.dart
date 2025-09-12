@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
@@ -22,11 +23,11 @@ class AuthService {
       developer.log('🚀 Starting Cognito Hosted UI sign-in', name: 'AuthService');
 
       // 👇 Replace values with your Cognito configuration
-      const providerName = "microsoft"; // IdP name in Cognito
-      const clientId = "599e0r9iadva64nv7gsncvk2sk"; // Cognito User Pool App Client ID
+      const providerName = "azuread"; // IdP name in Cognito
+      const clientId = "clientId"; // Cognito User Pool App Client ID 1pii8vb7lqo9j6st8p9ke8rjsd
 
       final res = await Amplify.Auth.signInWithWebUI(
-        provider: AuthProvider.oidc(providerName, clientId),
+        provider: AuthProvider.oidc("Azure-SSO", clientId),
       );
 
       if (res.isSignedIn) {
@@ -42,8 +43,8 @@ class AuthService {
           "accessToken": tokens?.accessToken,
           "refreshToken": tokens?.refreshToken,
         };
-
-        developer.log('✅ Sign-in successful -> $_userInfo', name: 'AuthService');
+        developer.log('✅ Sign-in successful -> ${jsonEncode(_userInfo)}', name: 'AuthService');
+        // developer.log('✅ Sign-in successful -> $tokens', name: 'AuthService');
         return _userInfo;
       }
 
