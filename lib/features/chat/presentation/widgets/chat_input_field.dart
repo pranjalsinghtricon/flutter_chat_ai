@@ -160,173 +160,173 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    if (_attachedFile != null)
-                      Container(
-                        height: 42,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        margin: const EdgeInsets.only(
-                          left: 2.0,
-                          right: 2.0,
-                          top: 2.0,
-                          bottom: 4.0,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(6),
-                          color: Colors.white,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.insert_drive_file,
-                              color: Colors.teal,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _attachedFile!.path.split('/').last,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            _buildFileStatusWidget(),
-                          ],
-                        ),
-                      ),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 4.0,
-                        horizontal: 14.0,
-                      ),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 120),
-                        child: Scrollbar(
-                          child: TextField(
-                            controller: widget.controller,
-                            maxLength: 2000,
-                            maxLines: null,
-                            onChanged: (_) => setState(() {}),
-                            onSubmitted: (_) => _send(),
-                            decoration: const InputDecoration(
-                              hintText: 'Ask Elysia anything',
-                              counterText: '',
-                              border: InputBorder.none,
-                              isDense: true,
-                            ),
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 14.0),
-                          child: CustomIconDropdown(
-                            assetPath: AssetConsts.iconChatOptions,
-                            assetSize: 20,
-                            items: [
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconPrivateChat,
-                                assetSize: 20,
-                                label: 'Private chat',
-                                onSelected: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const MainLayout(
-                                        child: ChatScreen(isPrivate: true),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconPaperclip,
-                                assetSize: 20,
-                                label: 'Attach photo',
-                                onSelected: _pickImageFromGallery,
-                              ),
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconGoogleDocument,
-                                assetSize: 20,
-                                label: 'Add sources',
-                                onSelected: () {},
-                              ),
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconGoogleBookmark,
-                                assetSize: 20,
-                                label: 'Saved prompts',
-                                onSelected: () {},
-                              ),
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconChangeModel,
-                                assetSize: 20,
-                                label: 'Change model',
-                                onSelected: () =>
-                                    showModelChangeDialog(context),
-                              ),
-                              CustomDropdownItem(
-                                assetPath: AssetConsts.iconLanguage,
-                                assetSize: 20,
-                                label: 'Change language',
-                                onSelected: () =>
-                                    showLanguageChangeDialog(context),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Spacer(),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (widget.controller.text.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(right: 6),
-                                child: Text(
-                                  '${widget.controller.text.length}/2000',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: ColorConst.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.camera_alt,
-                                color: ColorConst.primaryColor,
-                              ),
-                              tooltip: "Open Camera",
-                              onPressed: captureImageFromCamera,
-                            ),
-                            CustomIconButton(
-                              svgAsset: AssetConsts.iconSend,
-                              svgColor: ColorConst.primaryColor,
-                              toolTip: 'Send',
-                              onPressed: _send,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
+              // Container(
+              //   decoration: BoxDecoration(
+              //     color: Colors.white,
+              //     border: Border.all(color: Colors.grey.shade300),
+              //     borderRadius: BorderRadius.circular(8),
+              //   ),
+              //   child: Column(
+              //     children: [
+              //       if (_attachedFile != null)
+              //         Container(
+              //           height: 42,
+              //           padding: const EdgeInsets.symmetric(horizontal: 10),
+              //           margin: const EdgeInsets.only(
+              //             left: 2.0,
+              //             right: 2.0,
+              //             top: 2.0,
+              //             bottom: 4.0,
+              //           ),
+              //           decoration: BoxDecoration(
+              //             border: Border.all(color: Colors.grey.shade300),
+              //             borderRadius: BorderRadius.circular(6),
+              //             color: Colors.white,
+              //           ),
+              //           child: Row(
+              //             crossAxisAlignment: CrossAxisAlignment.center,
+              //             children: [
+              //               const Icon(
+              //                 Icons.insert_drive_file,
+              //                 color: Colors.teal,
+              //                 size: 20,
+              //               ),
+              //               const SizedBox(width: 8),
+              //               Expanded(
+              //                 child: Text(
+              //                   _attachedFile!.path.split('/').last,
+              //                   style: const TextStyle(
+              //                     fontSize: 14,
+              //                     fontWeight: FontWeight.w500,
+              //                   ),
+              //                   overflow: TextOverflow.ellipsis,
+              //                 ),
+              //               ),
+              //               _buildFileStatusWidget(),
+              //             ],
+              //           ),
+              //         ),
+              //       Container(
+              //         alignment: Alignment.centerLeft,
+              //         padding: const EdgeInsets.symmetric(
+              //           vertical: 4.0,
+              //           horizontal: 14.0,
+              //         ),
+              //         child: ConstrainedBox(
+              //           constraints: const BoxConstraints(maxHeight: 120),
+              //           child: Scrollbar(
+              //             child: TextField(
+              //               controller: widget.controller,
+              //               maxLength: 2000,
+              //               maxLines: null,
+              //               onChanged: (_) => setState(() {}),
+              //               onSubmitted: (_) => _send(),
+              //               decoration: const InputDecoration(
+              //                 hintText: 'Ask Elysia anything',
+              //                 counterText: '',
+              //                 border: InputBorder.none,
+              //                 isDense: true,
+              //               ),
+              //               style: const TextStyle(fontSize: 14),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       Row(
+              //         children: [
+              //           Padding(
+              //             padding: const EdgeInsets.only(left: 14.0),
+              //             child: CustomIconDropdown(
+              //               assetPath: AssetConsts.iconChatOptions,
+              //               assetSize: 20,
+              //               items: [
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconPrivateChat,
+              //                   assetSize: 20,
+              //                   label: 'Private chat',
+              //                   onSelected: () {
+              //                     Navigator.push(
+              //                       context,
+              //                       MaterialPageRoute(
+              //                         builder: (context) => const MainLayout(
+              //                           child: ChatScreen(isPrivate: true),
+              //                         ),
+              //                       ),
+              //                     );
+              //                   },
+              //                 ),
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconPaperclip,
+              //                   assetSize: 20,
+              //                   label: 'Attach photo',
+              //                   onSelected: _pickImageFromGallery,
+              //                 ),
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconGoogleDocument,
+              //                   assetSize: 20,
+              //                   label: 'Add sources',
+              //                   onSelected: () {},
+              //                 ),
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconGoogleBookmark,
+              //                   assetSize: 20,
+              //                   label: 'Saved prompts',
+              //                   onSelected: () {},
+              //                 ),
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconChangeModel,
+              //                   assetSize: 20,
+              //                   label: 'Change model',
+              //                   onSelected: () =>
+              //                       showModelChangeDialog(context),
+              //                 ),
+              //                 CustomDropdownItem(
+              //                   assetPath: AssetConsts.iconLanguage,
+              //                   assetSize: 20,
+              //                   label: 'Change language',
+              //                   onSelected: () =>
+              //                       showLanguageChangeDialog(context),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //           const Spacer(),
+              //           Row(
+              //             mainAxisSize: MainAxisSize.min,
+              //             children: [
+              //               if (widget.controller.text.isNotEmpty)
+              //                 Padding(
+              //                   padding: const EdgeInsets.only(right: 6),
+              //                   child: Text(
+              //                     '${widget.controller.text.length}/2000',
+              //                     style: const TextStyle(
+              //                       fontSize: 12,
+              //                       color: ColorConst.primaryColor,
+              //                     ),
+              //                   ),
+              //                 ),
+              //               IconButton(
+              //                 icon: const Icon(
+              //                   Icons.camera_alt,
+              //                   color: ColorConst.primaryColor,
+              //                 ),
+              //                 tooltip: "Open Camera",
+              //                 onPressed: captureImageFromCamera,
+              //               ),
+              //               CustomIconButton(
+              //                 svgAsset: AssetConsts.iconSend,
+              //                 svgColor: ColorConst.primaryColor,
+              //                 toolTip: 'Send',
+              //                 onPressed: _send,
+              //               ),
+              //             ],
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.only(top: 5),
                 child: RichText(

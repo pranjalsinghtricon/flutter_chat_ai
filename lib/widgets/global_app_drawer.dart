@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:elysia/features/auth/presentation/login.dart';
+import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../main.dart';
@@ -153,12 +155,23 @@ class GlobalAppDrawer extends ConsumerWidget {
                     ),
                     onTap: () async {
                       developer.log('🔴 Sign out button pressed', name: 'GlobalAppDrawer');
+
                       try {
                         await Amplify.Auth.signOut();
                       } catch (e) {
                         developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
                       }
-                      Navigator.pop(context);
+
+                      // Reset auth state
+                      ref.read(authStateProvider.notifier).signOut();
+
+                      Navigator.pop(context); // Close drawer
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
                     },
                   ),
 

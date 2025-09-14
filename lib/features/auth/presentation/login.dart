@@ -228,32 +228,32 @@ class _LoginPageState extends ConsumerState<LoginPage>
           ),
         ),
         const SizedBox(height: 16),
-        if (authState.isLoggedIn) ...[
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: OutlinedButton(
-              onPressed: authState.isLoading
-                  ? null
-                  : () async {
-                developer.log('🔴 Sign out button pressed',
-                    name: 'LoginPage');
-                await ref.read(authStateProvider.notifier).signOut();
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red,
-                side: const BorderSide(color: Colors.red),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(fontSize: 16),
-              ),
-            ),
-          ),
-        ],
+        // if (authState.isLoggedIn) ...[
+        //   SizedBox(
+        //     width: double.infinity,
+        //     height: 50,
+        //     child: OutlinedButton(
+        //       onPressed: authState.isLoading
+        //           ? null
+        //           : () async {
+        //         developer.log('🔴 Sign out button pressed',
+        //             name: 'LoginPage');
+        //         await ref.read(authStateProvider.notifier).signOut();
+        //       },
+        //       style: OutlinedButton.styleFrom(
+        //         foregroundColor: Colors.red,
+        //         side: const BorderSide(color: Colors.red),
+        //         shape: RoundedRectangleBorder(
+        //           borderRadius: BorderRadius.circular(8),
+        //         ),
+        //       ),
+        //       child: const Text(
+        //         'Sign Out',
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ),
+        //   ),
+        // ],
         const SizedBox(height: 32),
         Text(
           'Debug Mode: Detailed logs in console',
