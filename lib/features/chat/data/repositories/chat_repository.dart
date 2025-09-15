@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:elysia/features/auth/service/service.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -9,21 +10,32 @@ import '../models/message_model.dart';
 class ChatRepository {
   static const String historyBoxName = 'chat_history';
 
-  // ===== History (list) =====
+  // ===== History =====
   Future<List<ChatHistory>> fetchChatsFromApi() async {
-    final response = await http.get(Uri.parse('http://demo0405258.mockable.io/chat-history'));
+    final response =
+    await http.get(Uri.parse('http://demo0405258.mockable.io/chat-history'));
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['data'] as Map<String, dynamic>;
       final List<ChatHistory> all = [];
-      for (final section in ['today', 'yesterday', 'last_7_days', 'last_30_days', 'archived_chats']) {
+
+      for (final section in [
+        'today',
+        'yesterday',
+        'last_7_days',
+        'last_30_days',
+        'archived_chats'
+      ]) {
         final list = (data[section] as List?) ?? [];
         for (final item in list) {
           all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
         }
       }
+
       final box = await Hive.openBox<ChatHistory>(historyBoxName);
       await box.clear();
       await box.addAll(all);
+
       return all;
     }
     throw Exception('Failed to load chats');
@@ -40,6 +52,7 @@ class ChatRepository {
           (k) => box.get(k)!.sessionId == chat.sessionId,
       orElse: () => null,
     );
+
     if (existingKey != null) {
       await box.put(existingKey, chat);
     } else {
@@ -50,7 +63,9 @@ class ChatRepository {
 
   Future<void> archiveChat(String sessionId, {bool archived = true}) async {
     final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key = box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+    final key =
+    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+
     if (key != null) {
       final current = box.get(key)!;
       await box.put(key, current.copyWith(isArchived: archived));
@@ -59,20 +74,26 @@ class ChatRepository {
 
   Future<void> renameChat(String sessionId, String newTitle) async {
     final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key = box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+    final key =
+    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+
     if (key != null) {
       final current = box.get(key)!;
-      await box.put(key, current.copyWith(title: newTitle, updatedOn: DateTime.now()));
+      await box.put(
+          key, current.copyWith(title: newTitle, updatedOn: DateTime.now()));
     }
   }
 
   Future<void> deleteChat(String sessionId) async {
     final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key = box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+    final key =
+    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
+
     if (key != null) {
       await box.delete(key);
     }
-    // also remove messages box for this session
+
+    // remove messages box
     if (Hive.isBoxOpen('messages_$sessionId')) {
       await Hive.box<Message>('messages_$sessionId').deleteFromDisk();
     } else if (await Hive.boxExists('messages_$sessionId')) {
@@ -81,7 +102,7 @@ class ChatRepository {
     }
   }
 
-  // ===== Messages (per-session) =====
+  // ===== Messages =====
   Future<Box<Message>> _openMessagesBox(String sessionId) async {
     return Hive.isBoxOpen('messages_$sessionId')
         ? Hive.box<Message>('messages_$sessionId')
@@ -111,28 +132,25 @@ class ChatRepository {
   }) async* {
     try {
       final authService = AuthService();
-      final accessToken = authService.getAccessToken();
+      final accessToken = await authService.getAccessToken();
+      if (accessToken == null) {
+        yield '[Exception: Missing access token]';
+        return;
+      }
 
       final headers = {
         'accept': '*/*',
         'accept-language': 'en-US,en;q=0.9',
-        if (accessToken != null) 'authorization': 'Bearer $accessToken',
+        'authorization': 'Bearer $accessToken',
         'content-type': 'application/json',
         'origin': 'https://elysia-qa.informa.com',
-        'priority': 'u=1, i',
-        'sec-ch-ua': '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-        'sec-fetch-dest': 'empty',
-        'sec-fetch-mode': 'cors',
-        'sec-fetch-site': 'cross-site',
         'user-agent': 'ElysiaClient/1.0',
       };
 
       final body = jsonEncode({
         "appId": "e3a5c706-7a5e-4550-bbb0-db535b1eb381",
         "query": prompt,
-        "model": "aws",
+        "model": "azure",
         "tokens": 8192,
         "creativity": "Factual",
         "personality": "Professional",
@@ -153,15 +171,14 @@ class ChatRepository {
         "intermediate_steps": true,
         "response_language": "English (US)",
         "default_response_language": "English (US)",
-        "default_name_of_model": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
-        "name_of_model": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0"
+        "default_name_of_model": "gpt-4o",
+        "name_of_model": "gpt-4o"
       });
 
       final request = http.Request(
         'POST',
-        Uri.parse('https://stream-api.iiris.com/v2/ai/chat/stream/completion'),
-      )
-        ..headers.addAll(headers)
+        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/stream/completion'),
+      )..headers.addAll(headers)
         ..body = body;
 
       final response = await request.send();
@@ -171,19 +188,21 @@ class ChatRepository {
         return;
       }
 
-      // Stream SSE chunks line by line
       await for (final line in response.stream.transform(utf8.decoder).transform(const LineSplitter())) {
         if (line.trim().isEmpty) continue;
         try {
           final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
+
           if (decoded['type'] == 'answer') {
             final chunk = decoded['answer'] as String?;
-            if (chunk != null) yield chunk;
+            if (chunk != null) {
+              yield chunk;
+            }
           }
-        } catch (_) {
+        } catch (err) {
           continue;
         }
-        // small throttle to make UI updates smoother
+
         await Future.delayed(const Duration(milliseconds: 40));
       }
     } catch (e) {
