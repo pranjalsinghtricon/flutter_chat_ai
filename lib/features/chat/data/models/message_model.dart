@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-
 part 'message_model.g.dart';
 
 @HiveType(typeId: 1)
@@ -27,7 +26,6 @@ class Message extends HiveObject {
     required this.createdAt,
   });
 
-  /// ✅ copyWith for updates
   Message copyWith({
     String? id,
     String? sessionId,
@@ -44,7 +42,6 @@ class Message extends HiveObject {
     );
   }
 
-  /// ✅ fromJson / toJson for API
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: json['id'] as String,

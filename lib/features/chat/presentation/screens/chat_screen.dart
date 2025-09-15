@@ -1,3 +1,4 @@
+// chat_screen.dart
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:elysia/features/chat/presentation/widgets/custom_horizontal_scrollanble_card.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -57,13 +57,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     if (messages.isEmpty && widget.isPrivate)
                       const PrivateChatScreen(),
                     if (messages.isNotEmpty)
-                      ...messages.map(
-                            (msg) => MessageBubble(message: msg),
-                      ),
+                      ...messages.map((msg) => MessageBubble(message: msg)),
                   ],
                 ),
               ),
-
               if (_inputController.text.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -87,7 +84,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     "Generate catchy journal titles",
                   ],
                 ),
-
               ChatInputField(controller: _inputController),
             ],
           ),

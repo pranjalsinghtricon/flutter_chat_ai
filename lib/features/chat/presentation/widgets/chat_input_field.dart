@@ -27,7 +27,6 @@ class ChatInputField extends ConsumerStatefulWidget {
 class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   File? _attachedFile;
   String _fileStatus = 'none';
-
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _launchUrl() async {
@@ -59,8 +58,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
     }
   }
 
-
-  /// Pick from gallery (Photos)
   Future<void> _pickImageFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -68,7 +65,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         _attachedFile = File(pickedFile.path);
         _fileStatus = 'uploading';
       });
-
       Future.delayed(const Duration(seconds: 2), () {
         if (!mounted) return;
         setState(() => _fileStatus = 'uploaded');
@@ -88,7 +84,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
           _attachedFile = File(pickedFile.path);
           _fileStatus = 'uploading';
         });
-
         Future.delayed(const Duration(seconds: 2), () {
           if (!mounted) return;
           setState(() => _fileStatus = 'uploaded');
@@ -335,7 +330,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     children: [
                       const TextSpan(
                         text:
-                            'Elysia responses may be inaccurate. Know more about how your data is processed ',
+                        'Elysia responses may be inaccurate. Know more about how your data is processed ',
                       ),
                       TextSpan(
                         text: 'here',
@@ -361,14 +356,11 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  // border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
                   children: [
-                    // Plus button
                     Container(
-
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(12),
@@ -405,7 +397,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
-
                             IconButton(
                               icon: const Icon(Icons.mic, color: Colors.grey),
                               onPressed: () {
@@ -413,7 +404,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                               },
                               splashRadius: 20,
                             ),
-
                             Container(
                               width: 40,
                               height: 40,
@@ -433,7 +423,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -445,10 +434,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   }
 }
 
-
 void openBottomDrawer(BuildContext context) {
   final _state = context.findAncestorStateOfType<_ChatInputFieldState>();
-
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -465,7 +452,6 @@ void openBottomDrawer(BuildContext context) {
               icon: Icons.camera_alt_outlined,
               label: 'Camera',
               onTap: () {
-                // Navigator.pop(context);
                 _state?.captureImageFromCamera();
               },
             ),
@@ -473,7 +459,6 @@ void openBottomDrawer(BuildContext context) {
               icon: Icons.photo_outlined,
               label: 'Photos',
               onTap: () {
-                // Navigator.pop(context);
                 _state?._pickImageFromGallery();
               },
             ),
@@ -481,7 +466,6 @@ void openBottomDrawer(BuildContext context) {
               icon: Icons.attach_file,
               label: 'Attach Files',
               onTap: () {
-                // Navigator.pop(context);
                 _state?.pickFile();
               },
             ),
@@ -491,7 +475,6 @@ void openBottomDrawer(BuildContext context) {
     },
   );
 }
-
 
 Widget _buildOption({
   required IconData icon,

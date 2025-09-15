@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-
 part 'chat_model.g.dart';
 
 @HiveType(typeId: 0)
@@ -23,7 +22,6 @@ class ChatHistory extends HiveObject {
     required this.isArchived,
   });
 
-  /// ✅ copyWith for updates
   ChatHistory copyWith({
     String? sessionId,
     String? title,
@@ -38,7 +36,6 @@ class ChatHistory extends HiveObject {
     );
   }
 
-  /// ✅ fromJson / toJson for API
   factory ChatHistory.fromJson(Map<String, dynamic> json) {
     return ChatHistory(
       sessionId: json['sessionId'] as String,

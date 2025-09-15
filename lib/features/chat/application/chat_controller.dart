@@ -1,3 +1,4 @@
+// chat_controller.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';
@@ -11,10 +12,10 @@ Provider<ChatRepository>((ref) => ChatRepository());
 final chatControllerProvider =
 StateNotifierProvider<ChatController, List<Message>>(
       (ref) =>
-      ChatController(ref.read(chatRepositoryProvider)),
+          ChatController(ref.read(chatRepositoryProvider)),
 );
 
-/// Sidebar chat list (Today / Last 7 days / Last 30 days / Archived)
+/// Sidebar chat list controller
 final chatHistoryProvider =
 StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
       (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
@@ -22,7 +23,6 @@ StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
 
 class ChatController extends StateNotifier<List<Message>> {
   final ChatRepository _repo;
-
   String? _currentSessionId;
   String? get currentSessionId => _currentSessionId;
 
@@ -85,19 +85,15 @@ class ChatController extends StateNotifier<List<Message>> {
     );
     await _repo.upsertHistory(updatedHistory);
 
-    // Stream from REPOSITORY
-    _repo
-        .sendPromptStream(prompt: text, sessionId: _currentSessionId!)
-        .listen((chunk) async {
+    // Stream from repository
+    _repo.sendPromptStream(prompt: text, sessionId: _currentSessionId!).listen((chunk) async {
       botMsg = botMsg.copyWith(content: botMsg.content + chunk);
-
       final copy = [...state];
       final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
       if (lastIndex != -1) {
         copy[lastIndex] = botMsg;
         state = copy;
       }
-
       await _repo.replaceMessages(_currentSessionId!, state);
     });
   }

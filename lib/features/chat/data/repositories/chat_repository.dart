@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
+import 'package:elysia/features/auth/service/service.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import '../models/chat_model.dart';
@@ -13,7 +14,6 @@ class ChatRepository {
     final response = await http.get(Uri.parse('http://demo0405258.mockable.io/chat-history'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body)['data'] as Map<String, dynamic>;
-
       final List<ChatHistory> all = [];
       for (final section in ['today', 'yesterday', 'last_7_days', 'last_30_days', 'archived_chats']) {
         final list = (data[section] as List?) ?? [];
@@ -21,7 +21,6 @@ class ChatRepository {
           all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
         }
       }
-
       final box = await Hive.openBox<ChatHistory>(historyBoxName);
       await box.clear();
       await box.addAll(all);
@@ -111,11 +110,13 @@ class ChatRepository {
     required String sessionId,
   }) async* {
     try {
+      final authService = AuthService();
+      final accessToken = authService.getAccessToken();
+
       final headers = {
         'accept': '*/*',
         'accept-language': 'en-US,en;q=0.9',
-        'authorization':
-        'Bearer eyJraWQiOiJ6YlwvZTNEUk5Rb1BJRmlJQzcyWWI0VVp6N3k0VWJtNVFGSzFQQ2prUkVlaz0iLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0YjQ3Y2RjYy1mNmI3LTQ5YTMtYTQxNS1lZWNjMDc3ZGJmYTYiLCJjb2duaXRvOmdyb3VwcyI6WyIqXC9hdWRpZW5jZVwvKiIsImV1LXdlc3QtMV8ydnV6UjdRTzJfQXp1cmUtU1NPIl0sImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC5ldS13ZXN0LTEuYW1hem9uYXdzLmNvbVwvZXUtd2VzdC0xXzJ2dXpSN1FPMiIsInZlcnNpb24iOjIsImNsaWVudF9pZCI6IjE0Y2xpbHRtbWcya290NW5kY2JuYXYzZ3EzIiwib3JpZ2luX2p0aSI6ImEwNDY1YzNiLTViYjktNGFiMS1hZDc0LTI2NGQxNTlmM2ZjNSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoib3BlbmlkIGlyaXMuYXBpc1wvYWkgZW1haWwiLCJhdXRoX3RpbWUiOjE3NTczMzE1NjYsImV4cCI6MTc1NzMzNTE2NywiaWF0IjoxNzU3MzMxNTY3LCJqdGkiOiI2MzU5MzdhYS0zMDk0LTQxOTMtYmFhZi03OWFhNDJjNjAzYTEiLCJ1c2VybmFtZSI6IkF6dXJlLVNTT19QcmFuamFsLlNpbmdoQGluZm9ybWEuY29tIn0.cgcxvM_vlb2jn5uSGQIcK699727f-clVgv1OMiZvTp9lhsPab8BkthY5oN32v2k0mkueU4jUt07YFTSeydSnMXvKOpwlcL48H2sFO90_g57rf2eBHfzXZlqEE0ZgT4Y4PWSQgP_avXodNOBUTDx3iv9toDpkiVti1B24kP8dkjq7AOXYWfrrebRdA5fPlTATT-ZsRGGQNA90HWycWrRZ9Rs01w3wXJvKlFvi2IvT-VZ5126e7bWFomDmlyEMes1wyklKmihW4A0c17owadVt_YoZWBwoo82rh-WwRinDk8pVWqyJ2ICP8xOHoSXkPf8Nq5c302eev6B5Gvqgw1MkZg',
+        if (accessToken != null) 'authorization': 'Bearer $accessToken',
         'content-type': 'application/json',
         'origin': 'https://elysia-qa.informa.com',
         'priority': 'u=1, i',
@@ -125,7 +126,7 @@ class ChatRepository {
         'sec-fetch-dest': 'empty',
         'sec-fetch-mode': 'cors',
         'sec-fetch-site': 'cross-site',
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+        'user-agent': 'ElysiaClient/1.0',
       };
 
       final body = jsonEncode({
@@ -152,8 +153,7 @@ class ChatRepository {
         "intermediate_steps": true,
         "response_language": "English (US)",
         "default_response_language": "English (US)",
-        "default_name_of_model":
-        "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
+        "default_name_of_model": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0",
         "name_of_model": "eu.anthropic.claude-3-7-sonnet-20250219-v1:0"
       });
 
@@ -172,13 +172,10 @@ class ChatRepository {
       }
 
       // Stream SSE chunks line by line
-      await for (final line in response.stream
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())) {
+      await for (final line in response.stream.transform(utf8.decoder).transform(const LineSplitter())) {
         if (line.trim().isEmpty) continue;
         try {
-          final Map<String, dynamic> decoded =
-          jsonDecode(line) as Map<String, dynamic>;
+          final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
           if (decoded['type'] == 'answer') {
             final chunk = decoded['answer'] as String?;
             if (chunk != null) yield chunk;
@@ -186,6 +183,7 @@ class ChatRepository {
         } catch (_) {
           continue;
         }
+        // small throttle to make UI updates smoother
         await Future.delayed(const Duration(milliseconds: 40));
       }
     } catch (e) {

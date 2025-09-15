@@ -1,10 +1,11 @@
+// welcome_screen.dart
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:flutter/material.dart';
-import 'package:elysia/features/chat/application/chat_controller.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:elysia/infrastructure/consts/asset_consts.dart';
 import '../../../../core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:elysia/features/chat/application/chat_controller.dart';
 
 class WelcomeMessageScreen extends StatelessWidget {
   const WelcomeMessageScreen({super.key});
@@ -122,28 +123,26 @@ class _SuggestedPrompt extends ConsumerWidget {
               //   width: 20,
               //   height: 20,
               // ),
-            SvgPicture.asset(
-              AssetConsts.iconSampleChat,
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                Theme.of(context).colorScheme.onSurface,
-                BlendMode.srcIn,
+              SvgPicture.asset(
+                AssetConsts.iconSampleChat,
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onSurface,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   text,
                   style: const TextStyle(
                     fontSize: 14,
-                    // color: Colors.black87,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
             ],
-
           ),
         ),
       ),

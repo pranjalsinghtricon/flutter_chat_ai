@@ -18,7 +18,6 @@ final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
   await Hive.initFlutter();
   Hive.registerAdapter(ChatHistoryAdapter());
   Hive.registerAdapter(MessageAdapter());
@@ -31,7 +30,6 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -50,11 +48,9 @@ class _MyAppState extends State<MyApp> {
       final authPlugin = AmplifyAuthCognito();
       await Amplify.addPlugin(authPlugin);
       await Amplify.configure(amplifyconfig);
-
       setState(() {
         _isAmplifyConfigured = true;
       });
-
       developer.log('✅ Amplify configured successfully', name: 'Main');
     } on AmplifyAlreadyConfiguredException {
       developer.log('⚠ Amplify already configured.', name: 'Main');
@@ -67,7 +63,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, _) {
       final themeMode = ref.watch(themeModeProvider);
-
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Elysia',
@@ -87,7 +82,6 @@ class _MyAppState extends State<MyApp> {
 class MainLayout extends StatelessWidget {
   final Widget child;
   const MainLayout({super.key, required this.child});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
