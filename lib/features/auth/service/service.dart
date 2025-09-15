@@ -70,7 +70,7 @@ class AuthService {
   Future<void> saveAccessToken(String token) async {
     await _storage.write(key: 'access_token', value: token);
     developer.log(
-      'Token saved in secure storage ========================================= : $token',
+      'Token saved in secure storage ======================================= : $token',
       name: 'AuthService File',
     );
   }
