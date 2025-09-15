@@ -38,19 +38,19 @@ class ChatHistory extends HiveObject {
 
   factory ChatHistory.fromJson(Map<String, dynamic> json) {
     return ChatHistory(
-      sessionId: json['sessionId'] as String,
-      title: json['title'] as String,
-      updatedOn: DateTime.parse(json['updatedOn'] as String),
-      isArchived: json['isArchived'] as bool,
+      sessionId: json['session_id'] as String? ?? '',
+      title: json['chat_history_title'] as String? ?? 'Untitled Chat',
+      updatedOn: DateTime.tryParse(json['updated_on'] as String? ?? '') ?? DateTime.now(),
+      isArchived: json['is_archived'] == true, // null or false → false
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'sessionId': sessionId,
-      'title': title,
-      'updatedOn': updatedOn.toIso8601String(),
-      'isArchived': isArchived,
+      'session_id': sessionId,
+      'chat_history_title': title,
+      'updated_on': updatedOn.toIso8601String(),
+      'is_archived': isArchived,
     };
   }
 }

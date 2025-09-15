@@ -12,34 +12,59 @@ class ChatRepository {
 
   // ===== History =====
   Future<List<ChatHistory>> fetchChatsFromApi() async {
-    final response =
-    await http.get(Uri.parse('http://demo0405258.mockable.io/chat-history'));
+    try {
+      final authService = AuthService();
+      final accessToken = await authService.getAccessToken();
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)['data'] as Map<String, dynamic>;
-      final List<ChatHistory> all = [];
-
-      for (final section in [
-        'today',
-        'yesterday',
-        'last_7_days',
-        'last_30_days',
-        'archived_chats'
-      ]) {
-        final list = (data[section] as List?) ?? [];
-        for (final item in list) {
-          all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
-        }
+      if (accessToken == null) {
+        throw Exception("Missing access token");
       }
 
-      final box = await Hive.openBox<ChatHistory>(historyBoxName);
-      await box.clear();
-      await box.addAll(all);
+      final headers = {
+        'accept': 'application/json, text/plain, */*',
+        'authorization': 'Bearer $accessToken',
+        'origin': 'https://elysia-qa.informa.com',
+      };
 
-      return all;
+      final url = Uri.parse(
+        'https://stream-api-qa.iiris.com/v2/ai/chat/users/28ade118-c0bf-4239-aee6-5ced0ed7da0e/conversations?timezone=Asia/Calcutta',
+      );
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final data = body['data'] as Map<String, dynamic>;
+
+        final List<ChatHistory> all = [];
+        for (final section in [
+          'today',
+          'yesterday',
+          'last_7_days',
+          'last_30_days',
+          'archived_chats'
+        ]) {
+          final list = (data[section] as List?) ?? [];
+          for (final item in list) {
+            all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
+          }
+        }
+
+        // Store in Hive
+        final box = await Hive.openBox<ChatHistory>(historyBoxName);
+        await box.clear();
+        await box.addAll(all);
+
+        return all;
+      } else {
+        throw Exception('Failed to load chats: ${response.statusCode}');
+      }
+    } catch (e, stack) {
+      developer.log('❌ fetchChatsFromApi error: $e', name: 'ChatRepository', error: e, stackTrace: stack);
+      throw Exception('Error fetching chats: $e');
     }
-    throw Exception('Failed to load chats');
   }
+
 
   Future<List<ChatHistory>> getLocalChats() async {
     final box = await Hive.openBox<ChatHistory>(historyBoxName);
