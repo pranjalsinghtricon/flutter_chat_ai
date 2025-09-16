@@ -213,7 +213,6 @@ class GlobalAppDrawer extends ConsumerWidget {
               ),
             ),
             const Divider(),
-
             ListTile(
               leading: const CircleAvatar(
                 child: Text("ST"),
