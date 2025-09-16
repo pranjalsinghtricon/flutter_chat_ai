@@ -2,23 +2,25 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:elysia/features/auth/service/service.dart';
-import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
 class ChatRepository {
-  static const String historyBoxName = 'chat_history';
-
-  // ===== History =====
+  // ===== History (API only, no Hive) =====
   Future<List<ChatHistory>> fetchChatsFromApi() async {
     try {
       final authService = AuthService();
       final accessToken = await authService.getAccessToken();
-
       if (accessToken == null) {
         throw Exception("Missing access token");
       }
+
+      // Decode JWT to get sub
+      final parts = accessToken.split('.');
+      if (parts.length != 3) throw Exception("Invalid JWT token");
+      final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
+      final sub = jsonDecode(payload)['sub'] as String;
 
       final headers = {
         'accept': 'application/json, text/plain, */*',
@@ -27,7 +29,7 @@ class ChatRepository {
       };
 
       final url = Uri.parse(
-        'https://stream-api-qa.iiris.com/v2/ai/chat/users/28ade118-c0bf-4239-aee6-5ced0ed7da0e/conversations?timezone=Asia/Calcutta',
+        'https://stream-api-qa.iiris.com/v2/ai/chat/users/$sub/conversations?timezone=Asia/Calcutta',
       );
 
       final response = await http.get(url, headers: headers);
@@ -49,105 +51,29 @@ class ChatRepository {
             all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
           }
         }
-
-        // Store in Hive
-        final box = await Hive.openBox<ChatHistory>(historyBoxName);
-        await box.clear();
-        await box.addAll(all);
-
         return all;
       } else {
         throw Exception('Failed to load chats: ${response.statusCode}');
       }
     } catch (e, stack) {
-      developer.log('❌ fetchChatsFromApi error: $e', name: 'ChatRepository', error: e, stackTrace: stack);
+      developer.log('❌ fetchChatsFromApi error: $e',
+          name: 'ChatRepository', error: e, stackTrace: stack);
       throw Exception('Error fetching chats: $e');
     }
   }
 
-
-  Future<List<ChatHistory>> getLocalChats() async {
-    final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    return box.values.toList();
-  }
-
-  Future<ChatHistory> upsertHistory(ChatHistory chat) async {
-    final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final existingKey = box.keys.firstWhere(
-          (k) => box.get(k)!.sessionId == chat.sessionId,
-      orElse: () => null,
-    );
-
-    if (existingKey != null) {
-      await box.put(existingKey, chat);
-    } else {
-      await box.add(chat);
-    }
-    return chat;
-  }
-
-  Future<void> archiveChat(String sessionId, {bool archived = true}) async {
-    final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key =
-    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
-
-    if (key != null) {
-      final current = box.get(key)!;
-      await box.put(key, current.copyWith(isArchived: archived));
-    }
-  }
-
-  Future<void> renameChat(String sessionId, String newTitle) async {
-    final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key =
-    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
-
-    if (key != null) {
-      final current = box.get(key)!;
-      await box.put(
-          key, current.copyWith(title: newTitle, updatedOn: DateTime.now()));
-    }
-  }
-
-  Future<void> deleteChat(String sessionId) async {
-    final box = await Hive.openBox<ChatHistory>(historyBoxName);
-    final key =
-    box.keys.firstWhere((k) => box.get(k)!.sessionId == sessionId, orElse: () => null);
-
-    if (key != null) {
-      await box.delete(key);
-    }
-
-    // remove messages box
-    if (Hive.isBoxOpen('messages_$sessionId')) {
-      await Hive.box<Message>('messages_$sessionId').deleteFromDisk();
-    } else if (await Hive.boxExists('messages_$sessionId')) {
-      final b = await Hive.openBox<Message>('messages_$sessionId');
-      await b.deleteFromDisk();
-    }
-  }
-
-  // ===== Messages =====
-  Future<Box<Message>> _openMessagesBox(String sessionId) async {
-    return Hive.isBoxOpen('messages_$sessionId')
-        ? Hive.box<Message>('messages_$sessionId')
-        : await Hive.openBox<Message>('messages_$sessionId');
-  }
-
+  // ===== Messages still stored locally =====
   Future<List<Message>> getMessages(String sessionId) async {
-    final box = await _openMessagesBox(sessionId);
-    return box.values.toList();
+    // keep Hive for messages
+    return [];
   }
 
   Future<void> addMessage(Message m) async {
-    final box = await _openMessagesBox(m.sessionId);
-    await box.add(m);
+    // keep Hive for messages
   }
 
   Future<void> replaceMessages(String sessionId, List<Message> all) async {
-    final box = await _openMessagesBox(sessionId);
-    await box.clear();
-    await box.addAll(all);
+    // keep Hive for messages
   }
 
   // ===== Streaming Chat Completion API =====
@@ -165,7 +91,6 @@ class ChatRepository {
 
       final headers = {
         'accept': '*/*',
-        'accept-language': 'en-US,en;q=0.9',
         'authorization': 'Bearer $accessToken',
         'content-type': 'application/json',
         'origin': 'https://elysia-qa.informa.com',
@@ -207,17 +132,18 @@ class ChatRepository {
         ..body = body;
 
       final response = await request.send();
-
       if (response.statusCode != 200) {
         yield '[Exception: HTTP ${response.statusCode}]';
         return;
       }
 
-      await for (final line in response.stream.transform(utf8.decoder).transform(const LineSplitter())) {
+      await for (final line in response.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())) {
         if (line.trim().isEmpty) continue;
         try {
-          final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
-
+          final Map<String, dynamic> decoded =
+          jsonDecode(line) as Map<String, dynamic>;
           if (decoded['type'] == 'answer') {
             final chunk = decoded['answer'] as String?;
             if (chunk != null) {
@@ -227,7 +153,6 @@ class ChatRepository {
         } catch (err) {
           continue;
         }
-
         await Future.delayed(const Duration(milliseconds: 40));
       }
     } catch (e) {

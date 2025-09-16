@@ -5,9 +5,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'amplifyconfiguration.dart';
 import 'features/auth/presentation/login.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'features/chat/data/models/chat_model.dart';
-import 'features/chat/data/models/message_model.dart';
+import 'features/auth/presentation/splash_screen.dart'; // ✅ Import splash screen
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
 import 'infrastructure/theme/theme.dart';
@@ -18,12 +16,6 @@ final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await Hive.initFlutter();
-  Hive.registerAdapter(ChatHistoryAdapter());
-  Hive.registerAdapter(MessageAdapter());
-  await Hive.openBox<ChatHistory>('chat_history');
-  await Hive.openBox<String>('profileBox');
-  await Hive.openBox<String>('skillBox');
 
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -70,7 +62,7 @@ class _MyAppState extends State<MyApp> {
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         home: _isAmplifyConfigured
-            ? const LoginPage()
+            ? const SplashScreen()
             : const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         ),

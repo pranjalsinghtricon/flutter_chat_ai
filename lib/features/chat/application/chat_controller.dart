@@ -11,11 +11,10 @@ Provider<ChatRepository>((ref) => ChatRepository());
 /// Holds the in-memory messages for the *currently open* session.
 final chatControllerProvider =
 StateNotifierProvider<ChatController, List<Message>>(
-      (ref) =>
-          ChatController(ref.read(chatRepositoryProvider)),
+      (ref) => ChatController(ref.read(chatRepositoryProvider)),
 );
 
-/// Sidebar chat list controller
+/// Sidebar chat list controller (API-based now, no Hive fallback).
 final chatHistoryProvider =
 StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
       (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
@@ -30,13 +29,9 @@ class ChatController extends StateNotifier<List<Message>> {
 
   Future<String> startNewChat({String initialTitle = 'New Conversation'}) async {
     _currentSessionId = const Uuid().v4();
-    final history = ChatHistory(
-      sessionId: _currentSessionId!,
-      title: initialTitle,
-      updatedOn: DateTime.now(),
-      isArchived: false,
-    );
-    await _repo.upsertHistory(history);
+
+    // We no longer upsert history locally → history is managed by API
+    // But still initialize messages
     state = [];
     return _currentSessionId!;
   }
@@ -77,16 +72,10 @@ class ChatController extends StateNotifier<List<Message>> {
     state = [...state, botMsg];
     await _repo.addMessage(botMsg);
 
-    final updatedHistory = ChatHistory(
-      sessionId: _currentSessionId!,
-      title: _titleFrom(text),
-      updatedOn: DateTime.now(),
-      isArchived: false,
-    );
-    await _repo.upsertHistory(updatedHistory);
-
-    // Stream from repository
-    _repo.sendPromptStream(prompt: text, sessionId: _currentSessionId!).listen((chunk) async {
+    // Stream response from API
+    _repo
+        .sendPromptStream(prompt: text, sessionId: _currentSessionId!)
+        .listen((chunk) async {
       botMsg = botMsg.copyWith(content: botMsg.content + chunk);
       final copy = [...state];
       final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
@@ -113,23 +102,32 @@ class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
   Future<void> loadChats() async {
     try {
       state = await _repo.fetchChatsFromApi();
-    } catch (_) {
-      state = await _repo.getLocalChats();
+    } catch (e) {
+      // No Hive fallback anymore → just log error & keep current state
+      state = [];
     }
   }
 
+  // Archive/rename/delete were Hive-based → now they should be handled via API
+  // If backend doesn’t yet support, we just update local state temporarily
   Future<void> archiveChat(String sessionId, {bool archived = true}) async {
-    await _repo.archiveChat(sessionId, archived: archived);
-    await loadChats();
+    // TODO: Replace with API call when available
+    state = state
+        .map((c) =>
+    c.sessionId == sessionId ? c.copyWith(isArchived: archived) : c)
+        .toList();
   }
 
   Future<void> renameChat(String sessionId, String newTitle) async {
-    await _repo.renameChat(sessionId, newTitle);
-    await loadChats();
+    // TODO: Replace with API call when available
+    state = state
+        .map((c) =>
+    c.sessionId == sessionId ? c.copyWith(title: newTitle) : c)
+        .toList();
   }
 
   Future<void> deleteChat(String sessionId) async {
-    await _repo.deleteChat(sessionId);
-    await loadChats();
+    // TODO: Replace with API call when available
+    state = state.where((c) => c.sessionId != sessionId).toList();
   }
 }
