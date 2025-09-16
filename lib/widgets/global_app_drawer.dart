@@ -67,6 +67,19 @@ class GlobalAppDrawer extends ConsumerWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(12.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Search",
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
                     child: CustomIconTextOutlinedButton(
                       assetPath: 'assets/icons/icon-new-topic.svg',
                       text: 'New Chat',
@@ -116,32 +129,32 @@ class GlobalAppDrawer extends ConsumerWidget {
                       items: archived,
                       onTapItem: openChat),
                   const Divider(),
-                  ListTile(
-                    leading: Icon(
-                      Icons.settings,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    title: Text(
-                      'Settings',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.person,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    title: Text(
-                      'Profile',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                    onTap: () => Navigator.pop(context),
-                  ),
+                  // ListTile(
+                  //   leading: Icon(
+                  //     Icons.settings,
+                  //     color: Theme.of(context).colorScheme.onSurface,
+                  //   ),
+                  //   title: Text(
+                  //     'Settings',
+                  //     style: TextStyle(
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //     ),
+                  //   ),
+                  //   onTap: () => Navigator.pop(context),
+                  // ),
+                  // ListTile(
+                  //   leading: Icon(
+                  //     Icons.person,
+                  //     color: Theme.of(context).colorScheme.onSurface,
+                  //   ),
+                  //   title: Text(
+                  //     'Profile',
+                  //     style: TextStyle(
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //     ),
+                  //   ),
+                  //   onTap: () => Navigator.pop(context),
+                  // ),
                   ListTile(
                     leading: Icon(
                       Icons.logout,
@@ -175,10 +188,40 @@ class GlobalAppDrawer extends ConsumerWidget {
                     },
                   ),
 
+                  // ⚙ Manage Content
+                   ListTile(
+                    leading: Icon(Icons.article_outlined),
+                    title: Text(
+                      "Manage Content",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                      ),
+                    ),
+                  ),
+
+                  // ❓ Help
+                   ListTile(
+                    leading: Icon(Icons.help_outline),
+                    title: Text(
+                      "Help",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary,
+                      ),),
+                  ),
+
                 ],
               ),
             ),
             const Divider(),
+
+            ListTile(
+              leading: const CircleAvatar(
+                child: Text("ST"),
+              ),
+              title: const Text("Sam Taylor"),
+              trailing: const Icon(Icons.keyboard_arrow_down),
+              onTap: () {},
+            ),
             SwitchListTile(
               title: Text(
                 "Dark Mode",
