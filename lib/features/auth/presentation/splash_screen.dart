@@ -27,7 +27,6 @@ class _SplashScreenState extends State<SplashScreen>
     // Start fade-in immediately
     _fadeController.forward();
 
-    // Wait 2 seconds then fade out and navigate
     Timer(const Duration(seconds: 2), () {
       _fadeController.reverse().whenComplete(() {
         Navigator.of(context).pushReplacement(
