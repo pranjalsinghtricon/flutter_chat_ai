@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
+import 'package:elysia/features/profile/presentation/screens/profile_landing_screen.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -188,7 +189,6 @@ class GlobalAppDrawer extends ConsumerWidget {
                     },
                   ),
 
-                  // ⚙ Manage Content
                    ListTile(
                     leading: Icon(Icons.article_outlined),
                     title: Text(
@@ -199,7 +199,6 @@ class GlobalAppDrawer extends ConsumerWidget {
                     ),
                   ),
 
-                  // ❓ Help
                    ListTile(
                     leading: Icon(Icons.help_outline),
                     title: Text(
@@ -219,7 +218,15 @@ class GlobalAppDrawer extends ConsumerWidget {
               ),
               title: const Text("Sam Taylor"),
               trailing: const Icon(Icons.keyboard_arrow_down),
-              onTap: () {},
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileLandingScreen(),
+                  ),
+                );
+              },
             ),
             SwitchListTile(
               title: Text(
