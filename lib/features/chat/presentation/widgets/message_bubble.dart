@@ -11,7 +11,7 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     if (message.isUser) {
       return CustomUserQueryCard(
-        initials: 'AR',
+        // initials: 'AR',
         message: message.content,
       );
     }

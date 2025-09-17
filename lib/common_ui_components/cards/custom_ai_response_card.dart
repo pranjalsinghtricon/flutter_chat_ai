@@ -55,7 +55,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                AssetConsts.elysiaLogo,
+                AssetConsts.elysiaBrainSvg,
                 width: 22,
                 height: 22,
               ),
@@ -66,7 +66,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                       ? "Elyria is creating response for you..."
                       : "Elysia’s response",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: isGenerating ? FontWeight.w400 : FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
@@ -76,14 +76,12 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
           ),
         ),
 
-        /// Message content
         if (!isGenerating)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
-        /// Footer icons (only show once response is ready)
         if (!isGenerating)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

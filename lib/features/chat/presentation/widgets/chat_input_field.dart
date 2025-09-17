@@ -322,29 +322,29 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
               //   ),
               // ),
               // const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: RichText(
-                  text: TextSpan(
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    children: [
-                      const TextSpan(
-                        text:
-                        'Elysia responses may be inaccurate. Know more about how your data is processed ',
-                      ),
-                      TextSpan(
-                        text: 'here',
-                        style: const TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                        recognizer: TapGestureRecognizer()..onTap = _launchUrl,
-                      ),
-                      const TextSpan(text: '.'),
-                    ],
-                  ),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 5),
+              //   child: RichText(
+              //     text: TextSpan(
+              //       style: const TextStyle(fontSize: 12, color: Colors.grey),
+              //       children: [
+              //         const TextSpan(
+              //           text:
+              //           'Elysia responses may be inaccurate. Know more about how your data is processed ',
+              //         ),
+              //         TextSpan(
+              //           text: 'here',
+              //           style: const TextStyle(
+              //             color: Colors.blue,
+              //             decoration: TextDecoration.underline,
+              //           ),
+              //           recognizer: TapGestureRecognizer()..onTap = _launchUrl,
+              //         ),
+              //         const TextSpan(text: '.'),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

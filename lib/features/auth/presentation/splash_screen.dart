@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'login.dart'; // Import your login page
@@ -59,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                "assets/logo/logo.svg",
+               AssetConsts.elysiaBrainSvg,
                 width: 120,
                 height: 120,
               ),

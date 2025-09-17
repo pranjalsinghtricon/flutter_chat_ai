@@ -1,12 +1,11 @@
+import 'package:elysia/core/constants/color_constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomUserQueryCard extends StatelessWidget {
-  final String initials;
   final String message;
 
   const CustomUserQueryCard({
     Key? key,
-    required this.initials,
     required this.message,
   }) : super(key: key);
 
@@ -15,38 +14,28 @@ class CustomUserQueryCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 36,
-            height: 36,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.blue, width: 1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              initials,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+          const Icon(
+            Icons.bookmark_border,
+            size: 20,
+            color: Colors.black54,
           ),
           const SizedBox(width: 8),
-          // Message bubble
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey.shade300),
+                color: ColorConst.primaryChatQueryResponse,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 message,
-                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
                 softWrap: true,
                 overflow: TextOverflow.visible,
               ),
