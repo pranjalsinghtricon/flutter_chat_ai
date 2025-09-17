@@ -46,12 +46,11 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Rename chat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextField(
               controller: _renameController,
               decoration: const InputDecoration(
-                labelText: 'New chat name',
+                labelText: 'New name',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -86,6 +85,44 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
     _renameController.dispose();
     super.dispose();
   }
+  }
+
+  Future<bool?> _deleteDialog(ChatHistory chat) async {
+    return await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Delete chat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            const Text('Are you sure you want to delete the chat history?'),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -124,36 +161,43 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                       } else if (value == 'Rename') {
                         await _renameDialog(chat);
                       } else if (value == 'Delete') {
-                        await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
-                        ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
+                        final confirmed = await _deleteDialog(chat);
+                        if (confirmed == true) {
+                          await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
+                          ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
+                        }
                       }
                     },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: chat.isArchived ? 'Unarchive' : 'Archive',
-                        child: Row(children: [
-                          Icon(chat.isArchived ? Icons.unarchive_outlined : Icons.archive_outlined, size: 18, color:  Theme.of(context).colorScheme.onSurface),
-                          const SizedBox(width: 8),
-                          Text(chat.isArchived ? 'Unarchive' : 'Archive'),
-                        ]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Rename',
-                        child: Row(children:  [
-                          Icon(Icons.edit_outlined, size: 18, color: Theme.of(context).colorScheme.onSurface,),
-                          SizedBox(width: 8),
-                          Text('Rename'),
-                        ]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Delete',
-                        child: Row(children:  [
-                          Icon(Icons.delete_outline, size: 18, color:  Theme.of(context).colorScheme.onSurface,),
-                          SizedBox(width: 8),
-                          Text('Delete'),
-                        ]),
-                      ),
-                    ],
+                    itemBuilder: (context) {
+                      final isArchived = chat.isArchived == true;
+                      return [
+                        if (!isArchived)
+                          PopupMenuItem(
+                            value: 'Archive',
+                            child: Row(children: [
+                              Icon(Icons.archive_outlined, size: 18, color:  Theme.of(context).colorScheme.onSurface),
+                              const SizedBox(width: 8),
+                              Text('Archive'),
+                            ]),
+                          ),
+                        PopupMenuItem(
+                          value: 'Rename',
+                          child: Row(children:  [
+                            Icon(Icons.edit_outlined, size: 18, color: Theme.of(context).colorScheme.onSurface,),
+                            SizedBox(width: 8),
+                            Text('Rename'),
+                          ]),
+                        ),
+                        PopupMenuItem(
+                          value: 'Delete',
+                          child: Row(children:  [
+                            Icon(Icons.delete_outline, size: 18, color:  Theme.of(context).colorScheme.onSurface,),
+                            SizedBox(width: 8),
+                            Text('Delete'),
+                          ]),
+                        ),
+                      ];
+                    },
                   ),
                   onTap: () => widget.onTapItem(chat),
                 ),
