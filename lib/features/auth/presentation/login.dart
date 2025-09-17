@@ -152,16 +152,16 @@ class LoginPage extends ConsumerWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
-
-                          Text(
-                            "By continuing, you agree to our Terms of privacy policy",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          // const SizedBox(height: 40),
+                          //
+                          // Text(
+                          //   "By continuing, you agree to our Terms of privacy policy",
+                          //   style: const TextStyle(
+                          //     fontSize: 12,
+                          //     color: Colors.grey,
+                          //   ),
+                          //   textAlign: TextAlign.center,
+                          // ),
                         ],
                       ),
 
