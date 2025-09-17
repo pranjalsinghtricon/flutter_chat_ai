@@ -54,6 +54,7 @@ dependencies:
   amplify_flutter: ^2.6.5
   amplify_authenticator: ^2.3.7
   flutter_dotenv: ^6.0.0
+  go_router: ^16.2.1
 
 dev_dependencies:
   flutter_test:
