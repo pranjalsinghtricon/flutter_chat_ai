@@ -123,13 +123,16 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
             ),
           ),
 
-        /// Disclaimer (after response ends)
         if (!isGenerating)
           Padding(
-            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+            padding: const EdgeInsets.only(left: 30, right: 30, bottom: 12),
             child: Text(
-              "Elysia response may be inaccurate. Know more about how your data is processed here",
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              "Elysia responses may be inaccurate. Know more about how your data is processed here",
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center, // ✅ Center-aligns multi-line text
             ),
           ),
 
