@@ -15,6 +15,7 @@ import '../../../../common_ui_components/dropdowns/custom_dropdown_item.dart';
 import '../../../../common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import '../../../../main.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../common_ui_components/dialog/bottom_drawer_options.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -450,61 +451,26 @@ void openBottomDrawer(BuildContext context) {
     ),
     backgroundColor: Colors.white,
     builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildOption(
-              icon: Icons.camera_alt_outlined,
-              label: 'Camera',
-              onTap: () {
-                _state?.captureImageFromCamera();
-              },
-            ),
-            _buildOption(
-              icon: Icons.photo_outlined,
-              label: 'Photos',
-              onTap: () {
-                _state?._pickImageFromGallery();
-              },
-            ),
-            _buildOption(
-              icon: Icons.attach_file,
-              label: 'Attach Files',
-              onTap: () {
-                _state?.pickFile();
-              },
-            ),
-          ],
-        ),
+      return BottomDrawerOptions(
+        options: [
+          BottomDrawerOption(
+            icon: Icons.camera_alt_outlined,
+            label: 'Camera',
+            onTap: () => _state?.captureImageFromCamera(),
+          ),
+          BottomDrawerOption(
+            icon: Icons.photo_outlined,
+            label: 'Photos',
+            onTap: () => _state?._pickImageFromGallery(),
+          ),
+          BottomDrawerOption(
+            icon: Icons.attach_file,
+            label: 'Attach Files',
+            onTap: () => _state?.pickFile(),
+          ),
+          // Add more options here if needed
+        ],
       );
     },
-  );
-}
-
-Widget _buildOption({
-  required IconData icon,
-  required String label,
-  required VoidCallback onTap,
-}) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF3F3F3),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, size: 30, color: Colors.black54),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 14)),
-      ],
-    ),
   );
 }

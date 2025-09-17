@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../features/chat/application/chat_controller.dart';
 import '../../../features/chat/data/models/chat_model.dart';
+import '../../features/chat/application/chat_actions_controller.dart';
+import '../../../features/chat/application/chat_controller.dart';
+import '../dialog/bottom_drawer_options.dart';
 
 class CustomExpandableTile extends ConsumerStatefulWidget {
   final String title;
@@ -24,6 +26,7 @@ class CustomExpandableTile extends ConsumerStatefulWidget {
 
 class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
   bool _isExpanded = false;
+  final TextEditingController _renameController = TextEditingController();
 
   @override
   void initState() {
@@ -32,21 +35,57 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
   }
 
   Future<void> _renameDialog(ChatHistory chat) async {
-    final controller = TextEditingController(text: chat.title);
-    final newTitle = await showDialog<String?>(
+    _renameController.text = chat.title;
+    final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Rename chat'),
-        content: TextField(controller: controller, autofocus: true),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, null), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Save')),
-        ],
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Rename chat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _renameController,
+              decoration: const InputDecoration(
+                labelText: 'New chat name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
-    if (newTitle != null && newTitle.isNotEmpty) {
-      await ref.read(chatHistoryProvider.notifier).renameChat(chat.sessionId, newTitle);
+    if (confirmed == true) {
+      final newTitle = _renameController.text.trim();
+      if (newTitle.isNotEmpty && newTitle != chat.title) {
+        await ref.read(chatActionsControllerProvider.notifier).renameChat(chat.sessionId, newTitle);
+        ref.read(chatHistoryProvider.notifier).updateTitle(chat.sessionId, newTitle);
+      }
     }
+  @override
+  void dispose() {
+    _renameController.dispose();
+    super.dispose();
+  }
   }
 
   @override
@@ -80,13 +119,13 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                     icon:  Icon(Icons.more_horiz, color: Theme.of(context).colorScheme.onSurface),
                     onSelected: (value) async {
                       if (value == 'Archive') {
-                        await ref.read(chatHistoryProvider.notifier).archiveChat(chat.sessionId, archived: true);
-                      } else if (value == 'Unarchive') {
-                        await ref.read(chatHistoryProvider.notifier).archiveChat(chat.sessionId, archived: false);
+                        await ref.read(chatActionsControllerProvider.notifier).archiveChat(chat.sessionId);
+                        ref.read(chatHistoryProvider.notifier).updateArchiveStatus(chat.sessionId);
                       } else if (value == 'Rename') {
                         await _renameDialog(chat);
                       } else if (value == 'Delete') {
-                        await ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
+                        await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
+                        ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
                       }
                     },
                     itemBuilder: (context) => [
