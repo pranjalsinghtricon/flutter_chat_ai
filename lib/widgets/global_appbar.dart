@@ -59,36 +59,36 @@ class GlobalAppBar extends ConsumerWidget {
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: CustomIconDropdown(
-                icon: Icons.settings_outlined,
-                assetSize: 22,
-                items: [
-                  CustomDropdownItem(
-                    assetPath: AssetConsts.iconPrivateChat,
-                    assetSize: 20,
-                    label: 'Private chat',
-                    onSelected: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainLayout(
-                            child: ChatScreen(isPrivate: true),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  CustomDropdownItem(
-                    assetPath: AssetConsts.iconPaperclip,
-                    assetSize: 20,
-                    label: 'Attach photo',
-                    onSelected: () {},
-                  )
-                ],
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: CustomIconDropdown(
+            //     icon: Icons.settings_outlined,
+            //     assetSize: 22,
+            //     items: [
+            //       CustomDropdownItem(
+            //         assetPath: AssetConsts.iconPrivateChat,
+            //         assetSize: 20,
+            //         label: 'Private chat',
+            //         onSelected: () {
+            //           Navigator.push(
+            //             context,
+            //             MaterialPageRoute(
+            //               builder: (context) => const MainLayout(
+            //                 child: ChatScreen(isPrivate: true),
+            //               ),
+            //             ),
+            //           );
+            //         },
+            //       ),
+            //       CustomDropdownItem(
+            //         assetPath: AssetConsts.iconPaperclip,
+            //         assetSize: 20,
+            //         label: 'Attach photo',
+            //         onSelected: () {},
+            //       )
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
