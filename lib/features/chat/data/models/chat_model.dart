@@ -3,6 +3,11 @@ part 'chat_model.g.dart';
 
 @HiveType(typeId: 0)
 class ChatHistory extends HiveObject {
+  @override
+  String toString() {
+    return 'ChatHistory(sessionId: $sessionId, title: $title, updatedOn: $updatedOn, isArchived: $isArchived)';
+  }
+  
   @HiveField(0)
   final String sessionId;
 

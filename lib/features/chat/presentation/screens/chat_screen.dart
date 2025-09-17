@@ -8,7 +8,7 @@ import 'package:elysia/features/chat/presentation/screens/welcome_message_screen
 import 'package:elysia/features/chat/presentation/widgets/chat_input_field.dart';
 import 'package:elysia/features/chat/presentation/widgets/message_bubble.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key, this.isPrivate = false});

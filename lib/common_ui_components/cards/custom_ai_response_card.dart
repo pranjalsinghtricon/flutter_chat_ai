@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:elysia/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:elysia/common_ui_components/markdown/custom_markdown_renderer.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_feedback_card.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAiResponseCard extends StatefulWidget {

@@ -4,6 +4,8 @@ import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 
+
+// Ensure ChatRepository is defined in ../data/repositories/chat_repository.dart
 final chatRepositoryProvider =
 Provider<ChatRepository>((ref) => ChatRepository());
 
@@ -13,7 +15,7 @@ StateNotifierProvider<ChatController, List<Message>>(
       (ref) => ChatController(ref.read(chatRepositoryProvider)),
 );
 
-/// Sidebar chat list controller (API-based now, no Hive fallback).
+/// Holds the list of chat histories (sessions).
 final chatHistoryProvider =
 StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
       (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
@@ -37,7 +39,8 @@ class ChatController extends StateNotifier<List<Message>> {
 
   Future<void> loadSession(String sessionId) async {
     _currentSessionId = sessionId;
-    state = await _repo.getMessages(sessionId);
+    final messages = await _repo.getMessages(sessionId);
+    state = messages;
   }
 
   void resetChatViewOnly() {
@@ -102,7 +105,6 @@ class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
     try {
       state = await _repo.fetchChatsFromApi();
     } catch (e) {
-      // No Hive fallback anymore → just log error & keep current state
       state = [];
     }
   }

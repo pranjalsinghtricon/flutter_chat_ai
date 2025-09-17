@@ -2,7 +2,7 @@
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import '../../../../core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';

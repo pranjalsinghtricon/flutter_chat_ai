@@ -1,5 +1,5 @@
 import 'package:elysia/common_ui_components/dropdowns/custom_icon_dropdown.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:elysia/common_ui_components/buttons/custom_appbar_icon_button.dart';

@@ -50,11 +50,13 @@ class Message extends HiveObject {
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
-      id: json['id'] as String,
-      sessionId: json['sessionId'] as String,
-      content: json['content'] as String,
-      isUser: json['isUser'] as bool,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      id: (json['id'] ?? '') as String,
+      sessionId: (json['sessionId'] ?? '') as String,
+      content: (json['content'] ?? '') as String,
+      isUser: (json['isUser'] ?? false) as bool,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
       isGenerating: json['isGenerating'] as bool? ?? false,
     );
   }

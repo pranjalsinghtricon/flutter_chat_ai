@@ -12,15 +12,20 @@ import '../features/chat/data/models/chat_model.dart';
 import '../common_ui_components/buttons/custom_icon_text_outlined_button.dart';
 import '../common_ui_components/expandable_tile/custom_expandable_tile.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class GlobalAppDrawer extends ConsumerWidget {
   const GlobalAppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chats = ref.watch(chatHistoryProvider);
-    final themeMode = ref.watch(themeModeProvider);
+  final chats = ref.watch(chatHistoryProvider);
+  final themeMode = ref.watch(themeModeProvider);
 
-    final now = DateTime.now();
+  // Cache the current route name to avoid unsafe ancestor lookup
+  final currentRouteName = ModalRoute.of(context)?.settings.name;
+
+  final now = DateTime.now();
 
     List<ChatHistory> today(List<ChatHistory> list) => list.where((c) =>
     c.updatedOn.year == now.year &&
@@ -44,19 +49,18 @@ class GlobalAppDrawer extends ConsumerWidget {
 
     final archived = chats.where((c) => c.isArchived).toList();
 
-    void openChat(ChatHistory chat) async {
-      Navigator.pop(context);
-      await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
-      if (ModalRoute.of(context)?.settings.name != '/chat') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            settings: const RouteSettings(name: '/chat'),
-            builder: (_) => const MainLayout(child: ChatScreen()),
-          ),
-        );
-      }
+  void openChat(ChatHistory chat) async {
+    Navigator.of(context, rootNavigator: true).pop(); // closes drawer
+    await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
+    if (currentRouteName != '/chat') {
+      navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(
+          settings: const RouteSettings(name: '/chat'),
+          builder: (_) => const MainLayout(child: ChatScreen()),
+        ),
+      );
     }
+  }
 
     return Drawer(
       child: SafeArea(
