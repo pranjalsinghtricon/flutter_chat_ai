@@ -4,4 +4,5 @@ class ColorConst {
   static const primaryColor = Color(0xFF0A7DA4);
   static const primaryColorLight = Color(0xFF294E9B);
   static const primaryBlack = Color(0xFF002244);
+  static const primaryWhite = Color(0xFFFFFFFF);
 }

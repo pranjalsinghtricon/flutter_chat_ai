@@ -9,11 +9,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomAiResponseCard extends StatefulWidget {
   final Message message;
+  final bool isGenerating;
   final ValueChanged<Message>? onMessageUpdated;
 
   const CustomAiResponseCard({
     super.key,
     required this.message,
+    required this.isGenerating,
     this.onMessageUpdated,
   });
 
@@ -32,7 +34,6 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
 
   void _copyToClipboard() {
     Clipboard.setData(ClipboardData(text: widget.message.content));
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Copied to clipboard"),
@@ -43,123 +44,98 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
 
   @override
   Widget build(BuildContext context) {
+    final isGenerating = widget.isGenerating;
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black26, width: 1),
-            borderRadius: BorderRadius.circular(5),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              )
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              /// Top content
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: SvgPicture.asset(
-                        AssetConsts.elysiaLogo,
-                        width: 25,
-                        height: 25,
-                        colorFilter: ColorFilter.mode(
-                          Theme.of(context).colorScheme.onSurface,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CustomMarkdownRenderer(data: widget.message.content),
-                  ],
-                ),
+              SvgPicture.asset(
+                AssetConsts.elysiaLogo,
+                width: 22,
+                height: 22,
               ),
-
-              /// Divider
-              Container(
-                height: 1,
-                color: Colors.grey[300],
-                margin: const EdgeInsets.symmetric(horizontal: 12),
-              ),
-
-              /// Footer Row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomIconButton(
-                      icon: Icons.info_outline,
-                      svgColor: Colors.grey,
-                      toolTip: 'Info',
-                      onPressed: () {},
-                      isDense: true,
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: Text(
-                            "Share Feedback:",
-                            style: TextStyle(fontSize: 13),
-                          ),
-                        ),
-                        CustomIconButton(
-                          icon: Icons.thumb_up_alt_outlined,
-                          svgColor: Colors.grey,
-                          toolTip: 'Like',
-                          onPressed: _toggleFeedback,
-                          isDense: true,
-                          iconSize: 18,
-                          tapTargetSize: const Size(18, 18),
-                          padding: EdgeInsets.zero,
-                          backgroundPadding: EdgeInsets.zero,
-                        ),
-                        CustomIconButton(
-                          icon: Icons.thumb_down_alt_outlined,
-                          svgColor: Colors.grey,
-                          toolTip: 'Dislike',
-                          onPressed: _toggleFeedback,
-                          isDense: true,
-                          iconSize: 18,
-                          tapTargetSize: const Size(18, 18),
-                          padding: EdgeInsets.zero,
-                          backgroundPadding: EdgeInsets.zero,
-                        ),
-                        CustomIconButton(
-                          icon: Icons.copy,
-                          svgColor: Colors.grey,
-                          toolTip: 'Copy',
-                          onPressed: _copyToClipboard,
-                          isDense: true,
-                          iconSize: 18,
-                          tapTargetSize: const Size(18, 18),
-                          padding: EdgeInsets.zero,
-                          backgroundPadding: EdgeInsets.zero,
-                        ),
-                      ],
-                    ),
-                  ],
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  isGenerating
+                      ? "Elyria is creating response for you..."
+                      : "Elysia’s response",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isGenerating ? FontWeight.w400 : FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ),
             ],
           ),
         ),
 
-        /// Separate Feedback Card below the container
+        /// Message content
+        if (!isGenerating)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: CustomMarkdownRenderer(data: widget.message.content),
+          ),
+
+        /// Footer icons (only show once response is ready)
+        if (!isGenerating)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CustomIconButton(
+                  icon: Icons.info_outline,
+                  svgColor: Colors.grey,
+                  toolTip: 'Info',
+                  onPressed: () {},
+                  isDense: true,
+                ),
+                CustomIconButton(
+                  icon: Icons.thumb_up_alt_outlined,
+                  svgColor: Colors.grey,
+                  toolTip: 'Like',
+                  onPressed: _toggleFeedback,
+                  isDense: true,
+                  iconSize: 18,
+                ),
+                CustomIconButton(
+                  icon: Icons.thumb_down_alt_outlined,
+                  svgColor: Colors.grey,
+                  toolTip: 'Dislike',
+                  onPressed: _toggleFeedback,
+                  isDense: true,
+                  iconSize: 18,
+                ),
+                CustomIconButton(
+                  icon: Icons.copy,
+                  svgColor: Colors.grey,
+                  toolTip: 'Copy',
+                  onPressed: _copyToClipboard,
+                  isDense: true,
+                  iconSize: 18,
+                ),
+              ],
+            ),
+          ),
+
+        /// Disclaimer (after response ends)
+        if (!isGenerating)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+            child: Text(
+              "Elysia response may be inaccurate. Know more about how your data is processed here",
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ),
+
+        /// Feedback Card (if toggled)
         if (_showFeedback)
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

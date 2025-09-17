@@ -409,15 +409,22 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                               height: 40,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color(0xFF2C7BE5),
+                                color: ColorConst.primaryColor,
                               ),
-                              child: IconButton(
-                                icon: const Icon(Icons.graphic_eq, color: Colors.white),
-                                onPressed: () {
-                                  // Add custom action
-                                },
-                                splashRadius: 20,
+                              child: CustomIconButton(
+                                svgAsset: AssetConsts.iconSend,
+                                toolTip: 'Send',
+                                onPressed: _send,
                               ),
+                              // IconButton(
+                              //   icon: const Icon(Icons.graphic_eq, color: Colors.white),
+                              //   onPressed: () {
+                              //     // Add custom action
+                              //   },
+                              //   splashRadius: 20,
+                              // ),
+
+
                             ),
                           ],
                         ),
