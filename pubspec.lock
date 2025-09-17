@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.11.13"
-  amplify_authenticator:
-    dependency: "direct main"
-    description:
-      name: amplify_authenticator
-      sha256: c457a7663fcac8194944708b3a52b2696081ab64e311179f68176c90b55d7d27
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.7"
   amplify_core:
     dependency: transitive
     description:
@@ -74,7 +66,7 @@ packages:
     source: hosted
     version: "0.4.12"
   amplify_flutter:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: amplify_flutter
       sha256: "3a99edcd82a3838edff47b35971fcde62d766ae28e02c677a6168d89240b0c6f"
@@ -454,11 +446,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.4"
-  flutter_localizations:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -997,22 +984,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  qr:
-    dependency: transitive
-    description:
-      name: qr
-      sha256: "5a1d2586170e172b8a8c8470bbbffd5eb0cd38a66c0d77155ea138d3af3a4445"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.2"
-  qr_flutter:
-    dependency: transitive
-    description:
-      name: qr_flutter
-      sha256: "5095f0fc6e3f71d08adef8feccc8cea4f12eec18a2e31c2e8d82cb6019f4b097"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.1.0"
   retry:
     dependency: transitive
     description:

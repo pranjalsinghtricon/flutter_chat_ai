@@ -13,7 +13,7 @@ class AuthService {
 
   Map<String, dynamic>? _userInfo;
 
-  bool get isInitialized => true; // Amplify configured in main
+  bool get isInitialized => true;
   bool get isLoggedIn => _userInfo != null;
   Map<String, dynamic>? get userInfo => _userInfo;
   String? get currentUserId => _userInfo?['id'];
@@ -30,6 +30,11 @@ class AuthService {
 
       final res = await Amplify.Auth.signInWithWebUI(
         provider: AuthProvider.oidc("Azure-SSO", clientId),
+        options: const SignInWithWebUIOptions(
+          pluginOptions: CognitoSignInWithWebUIPluginOptions(
+            isPreferPrivateSession: true,
+          ),
+        ),
       );
 
       if (res.isSignedIn) {
