@@ -18,12 +18,16 @@ class Message extends HiveObject {
   @HiveField(4)
   final DateTime createdAt;
 
+  @HiveField(5)
+  final bool isGenerating;
+
   Message({
     required this.id,
     required this.sessionId,
     required this.content,
     required this.isUser,
     required this.createdAt,
+    this.isGenerating = false, // default
   });
 
   Message copyWith({
@@ -32,6 +36,7 @@ class Message extends HiveObject {
     String? content,
     bool? isUser,
     DateTime? createdAt,
+    bool? isGenerating,
   }) {
     return Message(
       id: id ?? this.id,
@@ -39,6 +44,7 @@ class Message extends HiveObject {
       content: content ?? this.content,
       isUser: isUser ?? this.isUser,
       createdAt: createdAt ?? this.createdAt,
+      isGenerating: isGenerating ?? this.isGenerating,
     );
   }
 
@@ -49,6 +55,7 @@ class Message extends HiveObject {
       content: json['content'] as String,
       isUser: json['isUser'] as bool,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      isGenerating: json['isGenerating'] as bool? ?? false,
     );
   }
 
@@ -59,6 +66,8 @@ class Message extends HiveObject {
       'content': content,
       'isUser': isUser,
       'createdAt': createdAt.toIso8601String(),
+      'isGenerating': isGenerating,
     };
   }
 }
+

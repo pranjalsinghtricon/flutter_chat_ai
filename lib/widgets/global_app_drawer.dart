@@ -171,7 +171,8 @@ class GlobalAppDrawer extends ConsumerWidget {
                       developer.log('🔴 Sign out button pressed', name: 'GlobalAppDrawer');
 
                       try {
-                        await Amplify.Auth.signOut();
+                        SignOutResult result = await Amplify.Auth.signOut();
+                        developer.log('✅ Sign out result: ${result.toString()}', name: 'GlobalAppDrawer');
                       } catch (e) {
                         developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
                       }

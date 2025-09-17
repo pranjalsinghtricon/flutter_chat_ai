@@ -1,4 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:elysia/core/constants/color_constants.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
@@ -150,7 +151,8 @@ class LoginPage extends ConsumerWidget {
                               SizedBox(width: 10),
                               Text(
                                 'Sign in with Microsoft',
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(fontSize: 16,
+                                    color: ColorConst.primaryWhite),
                               ),
                             ],
                           ),

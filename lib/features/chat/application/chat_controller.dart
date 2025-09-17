@@ -1,4 +1,3 @@
-// chat_controller.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';

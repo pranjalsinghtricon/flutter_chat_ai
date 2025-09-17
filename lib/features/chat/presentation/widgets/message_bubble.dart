@@ -10,11 +10,15 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (message.isUser) {
-      // Provide initials / avatar logic if needed
-      return CustomUserQueryCard(initials: 'AR', message: message.content);
+      return CustomUserQueryCard(
+        initials: 'AR',
+        message: message.content,
+      );
     }
+
     return CustomAiResponseCard(
       message: message,
+      isGenerating: message.isGenerating ?? false, // <-- NEW
       onMessageUpdated: (_) {},
     );
   }
