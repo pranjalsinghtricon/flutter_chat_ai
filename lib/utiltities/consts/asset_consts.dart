@@ -4,6 +4,7 @@ class AssetConsts {
   static const elysiaLogo = '$_logoPath/Elysia-logo.svg';
   static const elysiaBrainPng = '$_logoPath/icon-elysia-brain.png';
   static const elysiaBrainSvg = '$_logoPath/icon-elysia-brain.svg';
+  static const elysiaLoginScreen = '$_logoPath/screen.svg';
 
   // ---------------- ICONS ----------------
   static const _iconsPath = 'assets/icons';
