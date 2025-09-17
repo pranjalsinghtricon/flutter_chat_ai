@@ -61,29 +61,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   ],
                 ),
               ),
-              if (_inputController.text.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      AppShortcut(icon: AssetConsts.iconAiImages, label: "AI Images"),
-                      AppShortcut(icon: AssetConsts.iconAiImages, label: "PapagAlo"),
-                      AppShortcut(icon: AssetConsts.iconCareerCoach, label: "Career Coach"),
-                      AppShortcut(icon: AssetConsts.iconMoreApp, label: "More Apps"),
+              if (messages.isEmpty)
+                if (_inputController.text.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: const [
+                        AppShortcut(icon: AssetConsts.iconAiImages, label: "AI Images"),
+                        AppShortcut(icon: AssetConsts.iconAiImages, label: "PapagAlo"),
+                        AppShortcut(icon: AssetConsts.iconCareerCoach, label: "Career Coach"),
+                        AppShortcut(icon: AssetConsts.iconMoreApp, label: "More Apps"),
+                      ],
+                    ),
+                  )
+                else
+                  CustomHorizontalScrollableCard(
+                    items: const [
+                      "Draft email to suppliers about new payment terms",
+                      "Suggest tools and techniques for monitoring projects",
+                      "Suggest tools and techniques",
+                      "Suggest tools and techniques for monitoring projects",
+                      "Generate catchy journal titles",
                     ],
                   ),
-                )
-              else
-                CustomHorizontalScrollableCard(
-                  items: const [
-                    "Draft email to suppliers about new payment terms",
-                    "Suggest tools and techniques for monitoring projects",
-                    "Suggest tools and techniques",
-                    "Suggest tools and techniques for monitoring projects",
-                    "Generate catchy journal titles",
-                  ],
-                ),
               ChatInputField(controller: _inputController),
             ],
           ),
