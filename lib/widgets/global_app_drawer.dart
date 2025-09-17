@@ -119,17 +119,21 @@ class GlobalAppDrawer extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  CustomExpandableTile(
+                  if (today(chats).isNotEmpty)
+                    CustomExpandableTile(
                       title: "Today's", items: today(chats), onTapItem: openChat),
-                  CustomExpandableTile(
+                  if (last7(chats).isNotEmpty)
+                    CustomExpandableTile(
                       title: 'Last 7 days',
                       items: last7(chats),
                       onTapItem: openChat),
-                  CustomExpandableTile(
+                  if (last30(chats).isNotEmpty)
+                    CustomExpandableTile(
                       title: 'Last 30 days',
                       items: last30(chats),
                       onTapItem: openChat),
-                  CustomExpandableTile(
+                  if (archived.isNotEmpty)
+                    CustomExpandableTile(
                       title: 'Archived Chats',
                       items: archived,
                       onTapItem: openChat),
