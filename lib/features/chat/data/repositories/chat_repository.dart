@@ -64,7 +64,7 @@ class ChatRepository {
     }
   }
 
-  Future<List<Map<String, String>>> getMessages(String sessionId) async {
+  Future<List<Message>> getMessages(String sessionId) async {
     try {
       final authService = AuthService();
       final accessToken = await authService.getAccessToken();
@@ -84,7 +84,7 @@ class ChatRepository {
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
-        final List<Map<String, String>> result = [];
+        final List<Message> result = [];
         final dataList = body['data'] as List? ?? [];
         for (final session in dataList) {
           final historyList = session['history'] as List? ?? [];
@@ -93,13 +93,31 @@ class ChatRepository {
             final outputList = history['output'] as List? ?? [];
             final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
             final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
-            result.add({
-              'input': inputText,
-              'output': outputText,
-            });
+            final createdAt = history['createdAt'] != null
+                ? DateTime.tryParse(history['createdAt'].toString()) ?? DateTime.now()
+                : DateTime.now();
+            // User message
+            if (inputText.isNotEmpty) {
+              result.add(Message(
+                id: inputList.isNotEmpty && inputList[0]['id'] != null ? inputList[0]['id'] as String : '',
+                sessionId: sessionId,
+                content: inputText,
+                isUser: true,
+                createdAt: createdAt,
+              ));
+            }
+            // AI message
+            if (outputText.isNotEmpty) {
+              result.add(Message(
+                id: outputList.isNotEmpty && outputList[0]['id'] != null ? outputList[0]['id'] as String : '',
+                sessionId: sessionId,
+                content: outputText,
+                isUser: false,
+                createdAt: createdAt,
+              ));
+            }
           }
         }
-        print('Fetched $result');
         return result;
       } else {
         throw Exception('Failed to load messages: ${response.statusCode}');

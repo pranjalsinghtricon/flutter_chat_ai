@@ -40,8 +40,8 @@ class ChatController extends StateNotifier<List<Message>> {
 
   Future<void> loadSession(String sessionId) async {
     _currentSessionId = sessionId;
-    final rawMessages = await _repo.getMessages(sessionId);
-    state = rawMessages.map((json) => Message.fromJson(json)).toList();
+    final messages = await _repo.getMessages(sessionId);
+    state = messages;
   }
 
   void resetChatViewOnly() {
