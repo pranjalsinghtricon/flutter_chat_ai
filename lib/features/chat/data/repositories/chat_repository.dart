@@ -5,9 +5,10 @@ import 'package:elysia/features/auth/service/service.dart';
 import 'package:http/http.dart' as http;
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
+import '../../../../utiltities/data-time/timezone.dart';
 
 class ChatRepository {
-  // ===== History (API only, no Hive) =====
+
   Future<List<ChatHistory>> fetchChatsFromApi() async {
     try {
       final authService = AuthService();
@@ -20,7 +21,8 @@ class ChatRepository {
       final parts = accessToken.split('.');
       if (parts.length != 3) throw Exception("Invalid JWT token");
       final payload = utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
-      final sub = jsonDecode(payload)['sub'] as String;
+      final userId = jsonDecode(payload)['sub'] as String;
+      final timezone = await getLocalTimezone();
 
       final headers = {
         'accept': 'application/json, text/plain, */*',
@@ -29,7 +31,7 @@ class ChatRepository {
       };
 
       final url = Uri.parse(
-        'https://stream-api-qa.iiris.com/v2/ai/chat/users/$sub/conversations?timezone=Asia/Calcutta',
+        'https://stream-api-qa.iiris.com/v2/ai/chat/users/$userId/conversations?timezone=$timezone',
       );
 
       final response = await http.get(url, headers: headers);
@@ -62,10 +64,50 @@ class ChatRepository {
     }
   }
 
-  // ===== Messages still stored locally =====
-  Future<List<Message>> getMessages(String sessionId) async {
-    // keep Hive for messages
-    return [];
+  Future<List<Map<String, String>>> getMessages(String sessionId) async {
+    try {
+      final authService = AuthService();
+      final accessToken = await authService.getAccessToken();
+      if (accessToken == null) {
+        throw Exception("Missing access token");
+      }
+
+      final headers = {
+        'accept': 'application/json, text/plain, */*',
+        'authorization': 'Bearer $accessToken',
+        'origin': 'https://elysia-qa.informa.com',
+        'user-agent': 'ElysiaClient/1.0',
+      };
+
+      final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/session/$sessionId');
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final List<Map<String, String>> result = [];
+        final dataList = body['data'] as List? ?? [];
+        for (final session in dataList) {
+          final historyList = session['history'] as List? ?? [];
+          for (final history in historyList) {
+            final inputList = history['input'] as List? ?? [];
+            final outputList = history['output'] as List? ?? [];
+            final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
+            final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
+            result.add({
+              'input': inputText,
+              'output': outputText,
+            });
+          }
+        }
+        print('Fetched $result');
+        return result;
+      } else {
+        throw Exception('Failed to load messages: ${response.statusCode}');
+      }
+    } catch (e, stack) {
+      developer.log('❌ getMessages error: $e', name: 'ChatRepository', error: e, stackTrace: stack);
+      throw Exception('Error fetching messages: $e');
+    }
   }
 
   Future<void> addMessage(Message m) async {

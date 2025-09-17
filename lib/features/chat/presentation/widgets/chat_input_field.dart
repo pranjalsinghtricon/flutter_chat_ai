@@ -3,7 +3,7 @@ import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_language_change_dialog.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_model_change_dialog.dart';
-import 'package:elysia/infrastructure/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

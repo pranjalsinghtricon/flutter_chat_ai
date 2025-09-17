@@ -8,7 +8,7 @@ import 'features/auth/presentation/login.dart';
 import 'features/auth/presentation/splash_screen.dart'; // ✅ Import splash screen
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
-import 'infrastructure/theme/theme.dart';
+import 'utiltities/theme/theme.dart';
 import 'dart:developer' as developer;
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);

@@ -1,6 +1,6 @@
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
-import 'package:elysia/infrastructure/navigations/routes.dart';
+import 'package:elysia/utiltities/navigations/routes.dart';
 import 'package:elysia/widgets/global_app_drawer.dart';
 import 'package:elysia/widgets/global_appbar.dart';
 import 'package:flutter/material.dart';
