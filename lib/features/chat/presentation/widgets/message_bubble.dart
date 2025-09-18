@@ -5,7 +5,13 @@ import '../../../../common_ui_components/cards/custom_user_query_card.dart';
 
 class MessageBubble extends StatelessWidget {
   final Message message;
-  const MessageBubble({required this.message, super.key});
+  final bool isLast;
+
+  const MessageBubble({
+    required this.message,
+    required this.isLast,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +24,7 @@ class MessageBubble extends StatelessWidget {
 
     return CustomAiResponseCard(
       message: message,
-      isGenerating: message.isGenerating ?? false, // <-- NEW
+      isGenerating: message.isGenerating ?? false,
       onMessageUpdated: (_) {},
     );
   }
