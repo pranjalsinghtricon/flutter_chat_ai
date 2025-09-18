@@ -109,26 +109,22 @@ class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
     }
   }
 
-  // Archive/rename/delete were Hive-based → now they should be handled via API
-  // If backend doesn’t yet support, we just update local state temporarily
-  Future<void> archiveChat(String sessionId, {bool archived = true}) async {
-    // TODO: Replace with API call when available
-    state = state
-        .map((c) =>
-    c.sessionId == sessionId ? c.copyWith(isArchived: archived) : c)
-        .toList();
+  /// Locally update archive status for a chat
+  void updateArchiveStatus(String sessionId) {
+    state = state.map((c) =>
+      c.sessionId == sessionId ? c.copyWith(isArchived: true) : c
+    ).toList();
   }
 
-  Future<void> renameChat(String sessionId, String newTitle) async {
-    // TODO: Replace with API call when available
-    state = state
-        .map((c) =>
-    c.sessionId == sessionId ? c.copyWith(title: newTitle) : c)
-        .toList();
+  /// Locally update chat title for a chat
+  void updateTitle(String sessionId, String newTitle) {
+    state = state.map((c) =>
+      c.sessionId == sessionId ? c.copyWith(title: newTitle) : c
+    ).toList();
   }
 
-  Future<void> deleteChat(String sessionId) async {
-    // TODO: Replace with API call when available
+  /// Remove a chat from the state by sessionId
+  void deleteChat(String sessionId) {
     state = state.where((c) => c.sessionId != sessionId).toList();
   }
 }
