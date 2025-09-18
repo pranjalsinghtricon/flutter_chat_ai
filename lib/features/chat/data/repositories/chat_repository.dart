@@ -5,11 +5,37 @@ import 'package:elysia/features/auth/service/service.dart';
 import 'package:http/http.dart' as http;
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
+import '../models/chat_model.dart';
 import '../../../../utiltities/data-time/timezone.dart';
+
+class ChatSections {
+  final List<ChatHistory> today;
+  final List<ChatHistory> yesterday;
+  final List<ChatHistory> last7;
+  final List<ChatHistory> last30;
+  final List<ChatHistory> archived;
+
+  ChatSections({
+    required this.today,
+    required this.yesterday,
+    required this.last7,
+    required this.last30,
+    required this.archived,
+  });
+
+  factory ChatSections.empty() => ChatSections(
+        today: [],
+        yesterday: [],
+        last7: [],
+        last30: [],
+        archived: [],
+      );
+}
+
 
 class ChatRepository {
 
-  Future<List<ChatHistory>> fetchChatsFromApi() async {
+  Future<ChatSections> fetchChatsFromApi() async {
     try {
       final authService = AuthService();
       final accessToken = await authService.getAccessToken();
@@ -40,20 +66,23 @@ class ChatRepository {
         final body = jsonDecode(response.body);
         final data = body['data'] as Map<String, dynamic>;
 
-        final List<ChatHistory> all = [];
-        for (final section in [
-          'today',
-          'yesterday',
-          'last_7_days',
-          'last_30_days',
-          'archived_chats'
-        ]) {
-          final list = (data[section] as List?) ?? [];
-          for (final item in list) {
-            all.add(ChatHistory.fromJson(item as Map<String, dynamic>));
-          }
-        }
-        return all;
+        return ChatSections(
+          today: (data['today'] as List? ?? [])
+              .map((e) => ChatHistory.fromJson(e))
+              .toList(),
+          yesterday: (data['yesterday'] as List? ?? [])
+              .map((e) => ChatHistory.fromJson(e))
+              .toList(),
+          last7: (data['last_7_days'] as List? ?? [])
+              .map((e) => ChatHistory.fromJson(e))
+              .toList(),
+          last30: (data['last_30_days'] as List? ?? [])
+              .map((e) => ChatHistory.fromJson(e))
+              .toList(),
+          archived: (data['archived_chats'] as List? ?? [])
+              .map((e) => ChatHistory.fromJson(e))
+              .toList(),
+        );
       } else {
         throw Exception('Failed to load chats: ${response.statusCode}');
       }

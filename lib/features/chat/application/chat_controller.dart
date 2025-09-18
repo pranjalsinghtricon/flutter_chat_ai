@@ -17,8 +17,8 @@ StateNotifierProvider<ChatController, List<Message>>(
 
 /// Holds the list of chat histories (sessions).
 final chatHistoryProvider =
-StateNotifierProvider<ChatHistoryController, List<ChatHistory>>(
-      (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
+    StateNotifierProvider<ChatHistoryController, ChatSections>(
+  (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
 );
 
 class ChatController extends StateNotifier<List<Message>> {
@@ -95,9 +95,9 @@ class ChatController extends StateNotifier<List<Message>> {
   }
 }
 
-class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
+class ChatHistoryController extends StateNotifier<ChatSections> {
   final ChatRepository _repo;
-  ChatHistoryController(this._repo) : super([]) {
+  ChatHistoryController(this._repo) : super(ChatSections.empty()) {
     loadChats();
   }
 
@@ -105,26 +105,60 @@ class ChatHistoryController extends StateNotifier<List<ChatHistory>> {
     try {
       state = await _repo.fetchChatsFromApi();
     } catch (e) {
-      state = [];
+      state = ChatSections.empty();
     }
   }
 
-  /// Locally update archive status for a chat
   void updateArchiveStatus(String sessionId) {
-    state = state.map((c) =>
-      c.sessionId == sessionId ? c.copyWith(isArchived: true) : c
-    ).toList();
+    ChatHistory? chatToArchive;
+
+    List<ChatHistory> removeAndUpdate(List<ChatHistory> list) {
+      return list.where((chat) {
+        if (chat.sessionId == sessionId) {
+          chatToArchive = chat.copyWith(isArchived: true);
+          return false; // remove from current list
+        }
+        return true;
+      }).toList();
+    }
+
+    state = ChatSections(
+      today: removeAndUpdate(state.today),
+      yesterday: removeAndUpdate(state.yesterday),
+      last7: removeAndUpdate(state.last7),
+      last30: removeAndUpdate(state.last30),
+      archived: chatToArchive != null ? [chatToArchive!, ...state.archived] : state.archived,
+    );
   }
 
-  /// Locally update chat title for a chat
   void updateTitle(String sessionId, String newTitle) {
-    state = state.map((c) =>
-      c.sessionId == sessionId ? c.copyWith(title: newTitle) : c
-    ).toList();
+    state = _mapChats(
+      (chat) => chat.sessionId == sessionId
+          ? chat.copyWith(title: newTitle)
+          : chat,
+    );
   }
 
-  /// Remove a chat from the state by sessionId
   void deleteChat(String sessionId) {
-    state = state.where((c) => c.sessionId != sessionId).toList();
+    state = _mapChats(
+      (chat) => chat.sessionId == sessionId ? null : chat,
+      removeNulls: true,
+    );
+  }
+
+  ChatSections _mapChats(ChatHistory? Function(ChatHistory) transform,
+      {bool removeNulls = false}) {
+    List<ChatHistory> apply(List<ChatHistory> list) {
+      final mapped = list.map(transform).toList();
+      return removeNulls ? mapped.whereType<ChatHistory>().toList() : mapped.cast<ChatHistory>();
+    }
+
+    return ChatSections(
+      today: apply(state.today),
+      yesterday: apply(state.yesterday),
+      last7: apply(state.last7),
+      last30: apply(state.last30),
+      archived: apply(state.archived),
+    );
   }
 }
