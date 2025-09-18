@@ -44,7 +44,7 @@ class GlobalAppBar extends ConsumerWidget {
                   const SizedBox(width: 8),
                   CustomSvgIconButton(
                     assetPath: AssetConsts.elysiaLogo,
-                    size: 2,
+                    size: 25,
                     backgroundColor: Colors.transparent,
                     onPressed: () {
                       Navigator.push(

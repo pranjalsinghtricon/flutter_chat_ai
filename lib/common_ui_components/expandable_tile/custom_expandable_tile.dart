@@ -1,3 +1,4 @@
+import 'package:elysia/core/constants/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -63,7 +64,11 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                   size: _isExpanded ? 25 : 15, color: Colors.grey[600]),
             ),
           ),
-          title: Text(widget.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          title: Text(widget.title, style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: ColorConst.primaryBlack)
+          ),
           onTap: () => setState(() => _isExpanded = !_isExpanded),
         ),
         if (_isExpanded)

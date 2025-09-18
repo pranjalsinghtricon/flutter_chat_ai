@@ -1,10 +1,12 @@
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:elysia/core/constants/color_constants.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/profile/presentation/screens/profile_landing_screen.dart';
 import 'package:elysia/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../main.dart';
 import '../features/chat/presentation/screens/chat_screen.dart';
 import '../features/chat/application/chat_controller.dart';
@@ -22,6 +24,15 @@ class GlobalAppDrawer extends ConsumerWidget {
   final chats = ref.watch(chatHistoryProvider);
   final themeMode = ref.watch(themeModeProvider);
 
+  final userInfo = ref.watch(userInfoProvider);
+  final userFullName = userInfo?['full_name'] ?? 'Unknown User';
+
+  String getInitials(String name) {
+    final parts = name.split(' ');
+    if (parts.isEmpty) return '';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
   // Cache the current route name to avoid unsafe ancestor lookup
   final currentRouteName = ModalRoute.of(context)?.settings.name;
 
@@ -70,19 +81,19 @@ class GlobalAppDrawer extends ConsumerWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Search",
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-                      ),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(12.0),
+                  //   child: TextField(
+                  //     decoration: InputDecoration(
+                  //       hintText: "Search",
+                  //       prefixIcon: const Icon(Icons.search),
+                  //       border: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.circular(8),
+                  //       ),
+                  //       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                  //     ),
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: CustomIconTextOutlinedButton(
@@ -109,16 +120,38 @@ class GlobalAppDrawer extends ConsumerWidget {
                       },
                     ),
                   ),
-                  const Padding(
+
+                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Text(
-                      'Chat History',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                      ),
+                    child: Row(
+                      children: [
+                        // 👇 Add your history icon
+                        SvgPicture.asset(
+                          'assets/icons/icon-history.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                        SizedBox(width: 8), // spacing between icon and text
+                        Text(
+                          'Chat History',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  // const Padding(
+                  //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  //   child: Text(
+                  //     'Chat History',
+                  //     style: TextStyle(
+                  //         fontWeight: FontWeight.bold,
+                  //         fontSize: 16
+                  //     ),
+                  //   ),
+                  // ),
                   CustomExpandableTile(
                       title: "Today's", items: today(chats), onTapItem: openChat),
                   CustomExpandableTile(
@@ -133,7 +166,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                       title: 'Archived Chats',
                       items: archived,
                       onTapItem: openChat),
-                  const Divider(),
+                  // const Divider(),
                   // ListTile(
                   //   leading: Icon(
                   //     Icons.settings,
@@ -160,68 +193,73 @@ class GlobalAppDrawer extends ConsumerWidget {
                   //   ),
                   //   onTap: () => Navigator.pop(context),
                   // ),
-                  ListTile(
-                    leading: Icon(
-                      Icons.logout,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                    title: Text(
-                      'Sign Out',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                    onTap: () async {
-                      developer.log('🔴 Sign out button pressed', name: 'GlobalAppDrawer');
+                  // ListTile(
+                  //   leading: Icon(
+                  //     Icons.logout,
+                  //     color: Theme.of(context).colorScheme.onSurface,
+                  //   ),
+                  //   title: Text(
+                  //     'Sign Out',
+                  //     style: TextStyle(
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //     ),
+                  //   ),
+                  //   onTap: () async {
+                  //     developer.log('🔴 Sign out button pressed', name: 'GlobalAppDrawer');
+                  //
+                  //     try {
+                  //       SignOutResult result = await Amplify.Auth.signOut();
+                  //       developer.log('✅ Sign out result: ${result.toString()}', name: 'GlobalAppDrawer');
+                  //     } catch (e) {
+                  //       developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
+                  //     }
+                  //
+                  //     // Reset auth state
+                  //     ref.read(authStateProvider.notifier).signOut();
+                  //
+                  //     Navigator.pop(context); // Close drawer
+                  //     Navigator.pushReplacement(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => const LoginPage(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
 
-                      try {
-                        SignOutResult result = await Amplify.Auth.signOut();
-                        developer.log('✅ Sign out result: ${result.toString()}', name: 'GlobalAppDrawer');
-                      } catch (e) {
-                        developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
-                      }
-
-                      // Reset auth state
-                      ref.read(authStateProvider.notifier).signOut();
-
-                      Navigator.pop(context); // Close drawer
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                      );
-                    },
-                  ),
-
-                   ListTile(
-                    leading: Icon(Icons.article_outlined),
-                    title: Text(
-                      "Manage Content",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
-                    ),
-                  ),
-
-                   ListTile(
-                    leading: Icon(Icons.help_outline),
-                    title: Text(
-                      "Help",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),),
-                  ),
+                  //  ListTile(
+                  //   leading: Icon(Icons.article_outlined),
+                  //   title: Text(
+                  //     "Manage Content",
+                  //     style: TextStyle(
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //     ),
+                  //   ),
+                  // ),
+                  //
+                  //  ListTile(
+                  //   leading: Icon(Icons.help_outline),
+                  //   title: Text(
+                  //     "Help",
+                  //     style: TextStyle(
+                  //       color: Theme.of(context).colorScheme.onSecondary,
+                  //     ),),
+                  // ),
 
                 ],
               ),
             ),
-            const Divider(),
+            const Divider(
+              color: Color(0xFFDADADA),
+              thickness: 1,
+              height: 1,  ),
+
             ListTile(
-              leading: const CircleAvatar(
-                child: Text("ST"),
+              leading: CircleAvatar(
+                backgroundColor: ColorConst.primaryColor,
+                child: Text(getInitials(userFullName)),
               ),
-              title: const Text("Sam Taylor"),
+              title: Text(userFullName, ),
               trailing: const Icon(Icons.keyboard_arrow_down),
               onTap: () {
                 Navigator.pop(context);
@@ -233,23 +271,23 @@ class GlobalAppDrawer extends ConsumerWidget {
                 );
               },
             ),
-            SwitchListTile(
-              title: Text(
-                "Dark Mode",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
-                ),
-              ),
-              secondary: Icon(
-                Icons.brightness_6,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-              value: themeMode == ThemeMode.dark,
-              onChanged: (value) {
-                ref.read(themeModeProvider.notifier).state =
-                value ? ThemeMode.dark : ThemeMode.light;
-              },
-            ),
+            // SwitchListTile(
+            //   title: Text(
+            //     "Dark Mode",
+            //     style: TextStyle(
+            //       color: Theme.of(context).colorScheme.onSecondary,
+            //     ),
+            //   ),
+            //   secondary: Icon(
+            //     Icons.brightness_6,
+            //     color: Theme.of(context).colorScheme.onSurface,
+            //   ),
+            //   value: themeMode == ThemeMode.dark,
+            //   onChanged: (value) {
+            //     ref.read(themeModeProvider.notifier).state =
+            //     value ? ThemeMode.dark : ThemeMode.light;
+            //   },
+            // ),
           ],
         ),
       ),

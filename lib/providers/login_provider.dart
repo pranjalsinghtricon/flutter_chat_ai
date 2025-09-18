@@ -101,6 +101,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
           userId: userInfo['id'],
           userInfo: userInfo,
         );
+        await _authService.fetchUserProfile();
       } else {
         state = state.copyWith(
           isLoading: false,

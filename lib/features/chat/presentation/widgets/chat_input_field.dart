@@ -374,7 +374,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0 , vertical: 6.0),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade200,
                           borderRadius: BorderRadius.circular(12),
@@ -397,13 +397,13 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                                 style: const TextStyle(fontSize: 16),
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.mic, color: Colors.grey),
-                              onPressed: () {
-                                // Add voice input logic
-                              },
-                              splashRadius: 20,
-                            ),
+                            // IconButton(
+                            //   icon: const Icon(Icons.mic, color: Colors.grey),
+                            //   onPressed: () {
+                            //     // Add voice input logic
+                            //   },
+                            //   splashRadius: 20,
+                            // ),
                             Container(
                               width: 40,
                               height: 40,
