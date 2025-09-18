@@ -86,7 +86,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CustomIconButton(
                   icon: Icons.info_outline,
@@ -132,7 +132,7 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
                 fontSize: 12,
                 color: Colors.grey,
               ),
-              textAlign: TextAlign.center, // ✅ Center-aligns multi-line text
+              textAlign: TextAlign.center, 
             ),
           ),
 

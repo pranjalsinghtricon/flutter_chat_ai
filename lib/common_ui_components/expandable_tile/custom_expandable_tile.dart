@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../features/chat/data/models/chat_model.dart';
 import '../../features/chat/application/chat_actions_controller.dart';
 import '../../../features/chat/application/chat_controller.dart';
-import '../dialog/bottom_drawer_options.dart';
 
 class CustomExpandableTile extends ConsumerStatefulWidget {
   final String title;
@@ -35,45 +34,61 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
     _isExpanded = widget.initiallyExpanded;
   }
 
-  Future<void> _renameDialog(ChatHistory chat) async {
+  @override
+  void dispose() {
+    _renameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _showRenameSheet(ChatHistory chat) async {
     _renameController.text = chat.title;
+
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            TextField(
-              controller: _renameController,
-              decoration: const InputDecoration(
-                labelText: 'New name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Save'),
-                ),
-              ],
-            ),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("New name", style: TextStyle(fontWeight: FontWeight.w500)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _renameController,
+                decoration: InputDecoration(
+                  hintText: "Enter name",
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text("Cancel"),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text("Rename"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
+
     if (confirmed == true) {
       final newTitle = _renameController.text.trim();
       if (newTitle.isNotEmpty && newTitle != chat.title) {
@@ -81,49 +96,54 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
         ref.read(chatHistoryProvider.notifier).updateTitle(chat.sessionId, newTitle);
       }
     }
-  @override
-  void dispose() {
-    _renameController.dispose();
-    super.dispose();
-  }
   }
 
-  Future<bool?> _deleteDialog(ChatHistory chat) async {
-    return await showModalBottomSheet<bool>(
+  Future<void> _showDeleteSheet(ChatHistory chat) async {
+    final confirmed = await showModalBottomSheet<bool>(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Delete chat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            const Text('Are you sure you want to delete the chat history?'),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                  child: const Text('Delete'),
-                ),
-              ],
-            ),
-          ],
-        ),
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Delete Chat",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              const Text("Are you sure, you want to delete the chat history?"),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text("Cancel", style: TextStyle(color: ColorConst.primaryBlack),),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text("Delete"),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
+
+    if (confirmed == true) {
+      await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
+      ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
+    }
   }
 
   @override
@@ -136,14 +156,20 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
             width: 25,
             height: 25,
             child: Center(
-              child: Icon(_isExpanded ? Icons.expand_more : Icons.arrow_forward_ios_outlined,
-                  size: _isExpanded ? 25 : 15, color: Colors.grey[600]),
+              child: Icon(
+                _isExpanded ? Icons.expand_more : Icons.arrow_forward_ios_outlined,
+                size: _isExpanded ? 25 : 15,
+                color: Colors.grey[600],
+              ),
             ),
           ),
-          title: Text(widget.title, style: const TextStyle(
+          title: Text(
+            widget.title,
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 14,
-              color: ColorConst.primaryBlack)
+              color: ColorConst.primaryBlack,
+            ),
           ),
           onTap: () => setState(() => _isExpanded = !_isExpanded),
         ),
@@ -152,25 +178,27 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
             children: widget.items.map((chat) {
               return Container(
                 color: Theme.of(context).colorScheme.surface,
-              child: ListTile(
+                child: ListTile(
                   dense: true,
                   contentPadding: const EdgeInsets.only(left: 22, right: 8),
-                  title: Text(chat.title, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis),
+                  title: Text(
+                    chat.title,
+                    style: const TextStyle(fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                   trailing: PopupMenuButton<String>(
-                    // color: Colors.white,
-                    icon:  Icon(Icons.more_horiz, color: Theme.of(context).colorScheme.onSurface),
+                    icon: Icon(Icons.more_horiz,
+                        color: Theme.of(context).colorScheme.onSurface),
                     onSelected: (value) async {
                       if (value == 'Archive') {
-                        await ref.read(chatActionsControllerProvider.notifier).archiveChat(chat.sessionId);
+                        await ref
+                            .read(chatActionsControllerProvider.notifier)
+                            .archiveChat(chat.sessionId);
                         ref.read(chatHistoryProvider.notifier).updateArchiveStatus(chat.sessionId);
                       } else if (value == 'Rename') {
-                        await _renameDialog(chat);
+                        await _showRenameSheet(chat);
                       } else if (value == 'Delete') {
-                        final confirmed = await _deleteDialog(chat);
-                        if (confirmed == true) {
-                          await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
-                          ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
-                        }
+                        await _showDeleteSheet(chat);
                       }
                     },
                     itemBuilder: (context) {
@@ -180,25 +208,31 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                           PopupMenuItem(
                             value: 'Archive',
                             child: Row(children: [
-                              Icon(Icons.archive_outlined, size: 18, color:  Theme.of(context).colorScheme.onSurface),
+                              Icon(Icons.archive_outlined,
+                                  size: 18,
+                                  color: Theme.of(context).colorScheme.onSurface),
                               const SizedBox(width: 8),
-                              Text('Archive'),
+                              const Text('Archive'),
                             ]),
                           ),
                         PopupMenuItem(
                           value: 'Rename',
-                          child: Row(children:  [
-                            Icon(Icons.edit_outlined, size: 18, color: Theme.of(context).colorScheme.onSurface,),
-                            SizedBox(width: 8),
-                            Text('Rename'),
+                          child: Row(children: [
+                            Icon(Icons.edit_outlined,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onSurface),
+                            const SizedBox(width: 8),
+                            const Text('Rename'),
                           ]),
                         ),
                         PopupMenuItem(
                           value: 'Delete',
-                          child: Row(children:  [
-                            Icon(Icons.delete_outline, size: 18, color:  Theme.of(context).colorScheme.onSurface,),
-                            SizedBox(width: 8),
-                            Text('Delete'),
+                          child: Row(children: [
+                            Icon(Icons.delete_outline,
+                                size: 18,
+                                color: Theme.of(context).colorScheme.onSurface),
+                            const SizedBox(width: 8),
+                            const Text('Delete'),
                           ]),
                         ),
                       ];
