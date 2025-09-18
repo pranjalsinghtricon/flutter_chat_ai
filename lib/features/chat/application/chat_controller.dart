@@ -5,7 +5,6 @@ import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 
 
-// Ensure ChatRepository is defined in ../data/repositories/chat_repository.dart
 final chatRepositoryProvider =
 Provider<ChatRepository>((ref) => ChatRepository());
 
