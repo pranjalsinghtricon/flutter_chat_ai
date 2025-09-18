@@ -9,8 +9,8 @@ class AuthService {
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   Map<String, dynamic>? _userInfo;
 
   bool get isInitialized => true;
@@ -18,7 +18,16 @@ class AuthService {
   Map<String, dynamic>? get userInfo => _userInfo;
   String? get currentUserId => _userInfo?['id'];
 
-  Future<bool> initialize() async => true;
+  Future<bool> initialize() async {
+    final storedToken = await getStoredAccessToken();
+    if (storedToken != null) {
+      _userInfo ??= {};
+      _userInfo!['accessToken'] = storedToken;
+      developer.log("🔄 Restored access token from storage", name: "AuthService");
+      return true;
+    }
+    return false;
+  }
 
   Future<Map<String, dynamic>?> signIn() async {
     try {
@@ -69,13 +78,15 @@ class AuthService {
     }
   }
 
-  Future<void> fetchUserProfile() async {
+  Future<bool> fetchUserProfile() async {
     try {
       final token = getAccessToken();
       if (token == null) {
         developer.log('❌ Access token not available', name: 'AuthService');
-        return;
+        return false;
       }
+
+      developer.log('Access token available ======= Inside self api', name: 'AuthService');
 
       final response = await http.get(
         Uri.parse('https://stream-api-qa.iiris.com/v2/ai/profile/self'),
@@ -95,26 +106,26 @@ class AuthService {
           final userDoc = data[0]['doc'];
           final fullName = userDoc['full_name'] as String? ?? 'Unknown Name';
 
-          // Store full_name in _userInfo
           _userInfo?['full_name'] = fullName;
         }
+        return true; // ✅ API succeeded
       } else {
         developer.log(
-            '⚠ Failed to fetch profile: ${response.statusCode} ${response.body}',
-            name: 'AuthService');
+          '⚠ Failed to fetch profile: ${response.statusCode} ${response.body}',
+          name: 'AuthService',
+        );
+        return false;
       }
     } catch (e, st) {
       developer.log('❌ Error fetching profile: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
+      return false;
     }
   }
 
   Future<void> saveAccessToken(String token) async {
     await _storage.write(key: 'access_token', value: token);
-    developer.log(
-      '🔐 Token saved in secure storage ======================================= : $token',
-      name: 'AuthService',
-    );
+    developer.log('🔐 Token saved: $token', name: 'AuthService');
   }
 
   Future<String?> getStoredAccessToken() async {
@@ -128,7 +139,8 @@ class AuthService {
         options: const SignOutOptions(globalSignOut: true),
       );
       _userInfo = null;
-      developer.log('✅ Signed out from Cognito + Azure AD', name: 'AuthService');
+      await _storage.delete(key: 'access_token');
+      developer.log('✅ Signed out and token cleared', name: 'AuthService');
     } catch (e, st) {
       developer.log('⚠ Sign-out error: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
