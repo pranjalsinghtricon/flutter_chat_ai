@@ -21,7 +21,8 @@ class CustomExpandableTile extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<CustomExpandableTile> createState() => _CustomExpandableTileState();
+  ConsumerState<CustomExpandableTile> createState() =>
+      _CustomExpandableTileState();
 }
 
 class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
@@ -56,13 +57,19 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("New name", style: TextStyle(fontWeight: FontWeight.w500)),
+              const Text(
+                "New name",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               const SizedBox(height: 8),
               TextField(
                 controller: _renameController,
                 decoration: InputDecoration(
                   hintText: "Enter name",
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -72,15 +79,39 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        side: const BorderSide(
+                          color: Color(0xFFDDDDDD),
+                          width: 1,
+                        ),
+                      ),
+                    ),
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text("Cancel"),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: ColorConst.primaryBlack),
+                    ),
                   ),
                   const SizedBox(width: 8),
+
                   FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: ColorConst.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
                     onPressed: () => Navigator.pop(context, true),
                     child: const Text("Rename"),
                   ),
+                  // FilledButton(
+                  //   onPressed: () => Navigator.pop(context, true),
+                  //   child: const Text("Rename"),
+                  // ),
                 ],
               ),
             ],
@@ -92,8 +123,12 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
     if (confirmed == true) {
       final newTitle = _renameController.text.trim();
       if (newTitle.isNotEmpty && newTitle != chat.title) {
-        await ref.read(chatActionsControllerProvider.notifier).renameChat(chat.sessionId, newTitle);
-        ref.read(chatHistoryProvider.notifier).updateTitle(chat.sessionId, newTitle);
+        await ref
+            .read(chatActionsControllerProvider.notifier)
+            .renameChat(chat.sessionId, newTitle);
+        ref
+            .read(chatHistoryProvider.notifier)
+            .updateTitle(chat.sessionId, newTitle);
       }
     }
   }
@@ -112,22 +147,45 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Delete Chat",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text(
+                "Delete Chat",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 16),
               const Text("Are you sure, you want to delete the chat history?"),
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                        side: const BorderSide(
+                          color: Color(0xFFDDDDDD),
+                          width: 1,
+                        ),
+                      ),
+                    ),
                     onPressed: () => Navigator.pop(context, false),
-                    child: const Text("Cancel", style: TextStyle(color: ColorConst.primaryBlack),),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(color: ColorConst.primaryBlack),
+                    ),
                   ),
+
+                  // TextButton(
+                  //   onPressed: () => Navigator.pop(context, false),
+                  //   child: const Text("Cancel", style: TextStyle(color: ColorConst.primaryBlack),),
+                  // ),
                   const SizedBox(width: 8),
                   FilledButton(
                     style: FilledButton.styleFrom(
                       backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
                     onPressed: () => Navigator.pop(context, true),
                     child: const Text("Delete"),
@@ -141,7 +199,9 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
     );
 
     if (confirmed == true) {
-      await ref.read(chatActionsControllerProvider.notifier).deleteChat(chat.sessionId);
+      await ref
+          .read(chatActionsControllerProvider.notifier)
+          .deleteChat(chat.sessionId);
       ref.read(chatHistoryProvider.notifier).deleteChat(chat.sessionId);
     }
   }
@@ -157,7 +217,9 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
             height: 25,
             child: Center(
               child: Icon(
-                _isExpanded ? Icons.expand_more : Icons.arrow_forward_ios_outlined,
+                _isExpanded
+                    ? Icons.expand_more
+                    : Icons.arrow_forward_ios_outlined,
                 size: _isExpanded ? 25 : 15,
                 color: Colors.grey[600],
               ),
@@ -183,18 +245,25 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                   contentPadding: const EdgeInsets.only(left: 22, right: 8),
                   title: Text(
                     chat.title,
-                    style: const TextStyle(fontSize: 14, color: ColorConst.primaryBlack),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: ColorConst.primaryBlack,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert,
-                        color: Theme.of(context).colorScheme.onSurface),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                     onSelected: (value) async {
                       if (value == 'Archive') {
                         await ref
                             .read(chatActionsControllerProvider.notifier)
                             .archiveChat(chat.sessionId);
-                        ref.read(chatHistoryProvider.notifier).updateArchiveStatus(chat.sessionId);
+                        ref
+                            .read(chatHistoryProvider.notifier)
+                            .updateArchiveStatus(chat.sessionId);
                       } else if (value == 'Rename') {
                         await _showRenameSheet(chat);
                       } else if (value == 'Delete') {
@@ -207,33 +276,47 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                         if (!isArchived)
                           PopupMenuItem(
                             value: 'Archive',
-                            child: Row(children: [
-                              Icon(Icons.archive_outlined,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.archive_outlined,
                                   size: 18,
-                                  color: Theme.of(context).colorScheme.onSurface),
-                              const SizedBox(width: 8),
-                              const Text('Archive'),
-                            ]),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Archive'),
+                              ],
+                            ),
                           ),
                         PopupMenuItem(
                           value: 'Rename',
-                          child: Row(children: [
-                            Icon(Icons.edit_outlined,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.edit_outlined,
                                 size: 18,
-                                color: Theme.of(context).colorScheme.onSurface),
-                            const SizedBox(width: 8),
-                            const Text('Rename'),
-                          ]),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text('Rename'),
+                            ],
+                          ),
                         ),
                         PopupMenuItem(
                           value: 'Delete',
-                          child: Row(children: [
-                            Icon(Icons.delete_outline,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline,
                                 size: 18,
-                                color: Theme.of(context).colorScheme.onSurface),
-                            const SizedBox(width: 8),
-                            const Text('Delete'),
-                          ]),
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text('Delete'),
+                            ],
+                          ),
                         ),
                       ];
                     },
