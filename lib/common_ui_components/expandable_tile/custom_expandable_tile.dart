@@ -183,11 +183,11 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                   contentPadding: const EdgeInsets.only(left: 22, right: 8),
                   title: Text(
                     chat.title,
-                    style: const TextStyle(fontSize: 14),
+                    style: const TextStyle(fontSize: 14, color: ColorConst.primaryBlack),
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: PopupMenuButton<String>(
-                    icon: Icon(Icons.more_horiz,
+                    icon: Icon(Icons.more_vert,
                         color: Theme.of(context).colorScheme.onSurface),
                     onSelected: (value) async {
                       if (value == 'Archive') {

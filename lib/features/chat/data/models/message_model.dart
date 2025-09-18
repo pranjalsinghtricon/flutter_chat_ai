@@ -27,7 +27,7 @@ class Message extends HiveObject {
     required this.content,
     required this.isUser,
     required this.createdAt,
-    this.isGenerating = false, // default
+    this.isGenerating = false, // default false
   });
 
   Message copyWith({
@@ -48,6 +48,7 @@ class Message extends HiveObject {
     );
   }
 
+  /// Factory to create a Message object from JSON
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: (json['id'] ?? '') as String,
@@ -55,12 +56,13 @@ class Message extends HiveObject {
       content: (json['content'] ?? '') as String,
       isUser: (json['isUser'] ?? false) as bool,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
       isGenerating: json['isGenerating'] as bool? ?? false,
     );
   }
 
+  /// Convert Message object to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -72,4 +74,3 @@ class Message extends HiveObject {
     };
   }
 }
-

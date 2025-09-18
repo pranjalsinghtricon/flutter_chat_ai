@@ -35,15 +35,17 @@ class GlobalAppBar extends ConsumerWidget {
                       return IconButton(
                         icon: const Icon(Icons.menu),
                         color: Theme.of(context).colorScheme.onSurface,
+                        padding: EdgeInsets.zero,
+                        constraints:
+                        const BoxConstraints(),
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
                       );
                     },
                   ),
-                  const SizedBox(width: 8),
                   CustomSvgIconButton(
-                    assetPath: AssetConsts.elysiaLogo,
+                    assetPath: AssetConsts.elysiaNamedLogo,
                     size: 25,
                     backgroundColor: Colors.transparent,
                     onPressed: () {
@@ -56,7 +58,7 @@ class GlobalAppBar extends ConsumerWidget {
                       );
                     },
                   ),
-                ],
+                ]
               ),
             ),
             // Align(

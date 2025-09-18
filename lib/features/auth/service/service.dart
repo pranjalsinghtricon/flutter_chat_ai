@@ -45,7 +45,7 @@ class AuthService {
           "username": user.username,
           "idToken": tokens?.idToken.raw,
           "accessToken": tokens?.accessToken.raw,
-          "refreshToken": tokens?.refreshToken,
+          "refreshToken": tokens?.refreshToken, // ⚠️ not raw
         };
 
         if (tokens?.accessToken != null) {
@@ -99,7 +99,9 @@ class AuthService {
           _userInfo?['full_name'] = fullName;
         }
       } else {
-        developer.log('⚠ Failed to fetch profile: ${response.statusCode} ${response.body}', name: 'AuthService');
+        developer.log(
+            '⚠ Failed to fetch profile: ${response.statusCode} ${response.body}',
+            name: 'AuthService');
       }
     } catch (e, st) {
       developer.log('❌ Error fetching profile: $e', name: 'AuthService');
@@ -110,7 +112,7 @@ class AuthService {
   Future<void> saveAccessToken(String token) async {
     await _storage.write(key: 'access_token', value: token);
     developer.log(
-      'Token saved in secure storage ======================================= : $token',
+      '🔐 Token saved in secure storage ======================================= : $token',
       name: 'AuthService',
     );
   }

@@ -4,6 +4,7 @@ import 'package:elysia/core/constants/color_constants.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/profile/presentation/screens/profile_landing_screen.dart';
 import 'package:elysia/providers/login_provider.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,23 +22,24 @@ class GlobalAppDrawer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-  final chats = ref.watch(chatHistoryProvider);
-  final themeMode = ref.watch(themeModeProvider);
+    final chats = ref.watch(chatHistoryProvider);
+    final themeMode = ref.watch(themeModeProvider);
 
-  final userInfo = ref.watch(userInfoProvider);
-  final userFullName = userInfo?['full_name'] ?? 'Unknown User';
+    final userInfo = ref.watch(userInfoProvider);
+    final userFullName = userInfo?['full_name'] ?? 'Unknown User';
 
-  String getInitials(String name) {
-    final parts = name.split(' ');
-    if (parts.isEmpty) return '';
-    if (parts.length == 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
-  // Cache the current route name to avoid unsafe ancestor lookup
-  final currentRouteName = ModalRoute.of(context)?.settings.name;
+    String getInitials(String name) {
+      final parts = name.split(' ');
+      if (parts.isEmpty) return '';
+      if (parts.length == 1) return parts[0][0].toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    // Cache the current route name to avoid unsafe ancestor lookup
+    final currentRouteName = ModalRoute.of(context)?.settings.name;
 
   void openChat(ChatHistory chat) async {
-    Navigator.of(context, rootNavigator: true).pop(); // closes drawer
+    Navigator.of(context, rootNavigator: true).pop(); 
     await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
     if (currentRouteName != '/chat') {
       navigatorKey.currentState?.pushReplacement(
@@ -47,9 +49,11 @@ class GlobalAppDrawer extends ConsumerWidget {
         ),
       );
     }
-  }
 
     return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+      ),
       child: SafeArea(
         child: Column(
           children: [
@@ -70,48 +74,101 @@ class GlobalAppDrawer extends ConsumerWidget {
                   //     ),
                   //   ),
                   // ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: CustomIconTextOutlinedButton(
-                      assetPath: 'assets/icons/icon-new-topic.svg',
-                      text: 'New Chat',
-                      onPressed: () async {
-                        final sessionId = await ref
-                            .read(chatControllerProvider.notifier)
-                            .startNewChat();
-                        await ref
-                            .read(chatControllerProvider.notifier)
-                            .loadSession(sessionId);
-                        Navigator.pop(context);
-                        if (ModalRoute.of(context)?.settings.name != '/chat') {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              settings: const RouteSettings(name: '/chat'),
-                              builder: (_) =>
-                              const MainLayout(child: ChatScreen()),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(12.0),
+                  //   child: CustomIconTextOutlinedButton(
+                  //     assetPath: 'assets/icons/icon-new-topic.svg',
+                  //     text: 'New Chat',
+                  //     onPressed: () async {
+                  //       final sessionId = await ref
+                  //           .read(chatControllerProvider.notifier)
+                  //           .startNewChat();
+                  //       await ref
+                  //           .read(chatControllerProvider.notifier)
+                  //           .loadSession(sessionId);
+                  //       Navigator.pop(context);
+                  //       if (ModalRoute.of(context)?.settings.name != '/chat') {
+                  //         Navigator.pushReplacement(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //             settings: const RouteSettings(name: '/chat'),
+                  //             builder: (_) =>
+                  //             const MainLayout(child: ChatScreen()),
+                  //           ),
+                  //         );
+                  //       }
+                  //     },
+                  //   ),
+                  // ),
+
+                  InkWell(
+                    onTap: () async {
+                      final sessionId = await ref
+                          .read(chatControllerProvider.notifier)
+                          .startNewChat();
+                      await ref
+                          .read(chatControllerProvider.notifier)
+                          .loadSession(sessionId);
+                      Navigator.pop(context);
+                      if (ModalRoute.of(context)?.settings.name != '/chat') {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            settings: const RouteSettings(name: '/chat'),
+                            builder: (_) =>
+                            const MainLayout(child: ChatScreen()),
+                          ),
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 8),
+                      child: Row(
+                        children: [
+                          SvgPicture.asset(
+                            AssetConsts.iconNewTopic,
+                            width: 20,
+                            height: 20,
+                            color: const Color(0xFF525A5C),
+                          ),
+                          const SizedBox(
+                              width: 20),
+                          const Text(
+                            'New Chat',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
                             ),
-                          );
-                        }
-                      },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                  SizedBox(height: 10,),
 
-                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  const Divider(
+                    color: Color(0xFFDADADA),
+                    thickness: 1,
+                    height: 1,
+                  ),
+                  SizedBox(height: 10,),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 8),
                     child: Row(
                       children: [
-                        // 👇 Add your history icon
                         SvgPicture.asset(
                           'assets/icons/icon-history.svg',
                           width: 20,
                           height: 20,
                         ),
-                        SizedBox(width: 8), // spacing between icon and text
-                        Text(
+                        const SizedBox(
+                            width: 20),
+                        const Text(
                           'Chat History',
                           style: TextStyle(
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
                         ),
@@ -131,6 +188,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                   // ),
                   if (chats?.today.isNotEmpty ?? false)
                     CustomExpandableTile(
+
                       title: "Today's",
                       items: chats!.today,
                       onTapItem: openChat,
@@ -245,15 +303,28 @@ class GlobalAppDrawer extends ConsumerWidget {
             const Divider(
               color: Color(0xFFDADADA),
               thickness: 1,
-              height: 1,  ),
-
+              height: 1,
+            ),
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: ColorConst.primaryColor,
-                child: Text(getInitials(userFullName)),
+                child: Text(getInitials(userFullName), ),
               ),
-              title: Text(userFullName, ),
-              trailing: const Icon(Icons.keyboard_arrow_down),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    userFullName,
+                    style: const TextStyle(
+                      color: ColorConst.primaryBlack,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.keyboard_arrow_down, size: 20),
+                ],
+              ),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(

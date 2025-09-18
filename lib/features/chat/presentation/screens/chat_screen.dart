@@ -26,7 +26,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     _inputController.addListener(() {
-      setState(() {}); // rebuild on input change
+      setState(() {});
     });
   }
 
@@ -53,11 +53,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   padding: const EdgeInsets.all(8.0),
                   children: [
                     if (messages.isEmpty && !widget.isPrivate)
-                      const WelcomeMessageScreen(),
+                      WelcomeMessageScreen(),
                     if (messages.isEmpty && widget.isPrivate)
-                      const PrivateChatScreen(),
+                      PrivateChatScreen(),
                     if (messages.isNotEmpty)
-                      ...messages.map((msg) => MessageBubble(message: msg)),
+                      ...messages.map(
+                            (msg) => MessageBubble(
+                          message: msg,
+                          isLast: false,
+                        ),
+                      ),
                   ],
                 ),
               ),

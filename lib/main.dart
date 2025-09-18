@@ -62,6 +62,7 @@ class _MyAppState extends State<MyApp> {
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         home: _isAmplifyConfigured
+          // const MainLayout(child: ChatScreen())
             ? const LoginPage()
             : const Scaffold(
           body: Center(child: CircularProgressIndicator()),

@@ -28,7 +28,7 @@ class MessageAdapter extends TypeAdapter<Message> {
   @override
   void write(BinaryWriter writer, Message obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(6) // number of fields
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
