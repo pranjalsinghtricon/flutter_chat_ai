@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 class ColorConst {
+  static const elysiaTextBlue = Color(0xFF28B4FF);
   static const borderGreyColor = Color(0xFFE6E7E7);
   static const primaryColor = Color(0xFF0A7DA4);
   static const primaryColorLight = Color(0xFF294E9B);

@@ -5,7 +5,7 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'amplifyconfiguration.dart';
 import 'features/auth/presentation/login.dart';
-import 'features/auth/presentation/splash_screen.dart'; // ✅ Import splash screen
+import 'features/auth/presentation/splash_screen.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
 import 'utiltities/theme/theme.dart';
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         home: _isAmplifyConfigured
-            ? const SplashScreen()
+            ? const LoginPage()
             : const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         ),
