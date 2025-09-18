@@ -7,7 +7,8 @@ final authServiceProvider = Provider<AuthService>((ref) {
 });
 
 // Auth state provider
-final authStateProvider = StateNotifierProvider<AuthStateNotifier, AuthState>((ref) {
+final authStateProvider =
+StateNotifierProvider<AuthStateNotifier, AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
   return AuthStateNotifier(authService);
 });
@@ -18,7 +19,7 @@ final userInfoProvider = Provider<Map<String, dynamic>?>((ref) {
   return authState.userInfo;
 });
 
-// Auth state classes
+// ================== Auth State ==================
 class AuthState {
   final bool isInitialized;
   final bool isLoading;
@@ -55,6 +56,7 @@ class AuthState {
   }
 }
 
+// ================== Notifier ==================
 class AuthStateNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
 
@@ -77,12 +79,15 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         );
       } else {
         state = state.copyWith(
+          isInitialized: true, // ✅ keep initialized true
           isLoading: false,
+          isLoggedIn: false,
           error: 'Failed to initialize authentication service',
         );
       }
     } catch (e) {
       state = state.copyWith(
+        isInitialized: true, // ✅ still mark as initialized
         isLoading: false,
         error: 'Initialization error: $e',
       );
@@ -96,6 +101,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       final userInfo = await _authService.signIn();
       if (userInfo != null) {
         state = state.copyWith(
+          isInitialized: true,
           isLoading: false,
           isLoggedIn: true,
           userId: userInfo['id'],
@@ -104,12 +110,14 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         await _authService.fetchUserProfile();
       } else {
         state = state.copyWith(
+          isInitialized: true,
           isLoading: false,
           error: 'Sign-in failed: No user information received',
         );
       }
     } catch (e) {
       state = state.copyWith(
+        isInitialized: true,
         isLoading: false,
         error: 'Sign-in error: $e',
       );
@@ -122,6 +130,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     try {
       await _authService.signOut();
       state = state.copyWith(
+        isInitialized: true, // ✅ keep initialized so button re-enables
         isLoading: false,
         isLoggedIn: false,
         userId: null,
@@ -129,6 +138,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       );
     } catch (e) {
       state = state.copyWith(
+        isInitialized: true,
         isLoading: false,
         error: 'Sign-out error: $e',
       );
