@@ -26,7 +26,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     _inputController.addListener(() {
-      setState(() {}); // rebuild on input change
+      setState(() {});
     });
   }
 
