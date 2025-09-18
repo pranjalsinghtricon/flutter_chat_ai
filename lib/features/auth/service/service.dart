@@ -45,7 +45,7 @@ class AuthService {
           "username": user.username,
           "idToken": tokens?.idToken.raw,
           "accessToken": tokens?.accessToken.raw,
-          "refreshToken": tokens?.refreshToken, // ⚠️ not raw
+          "refreshToken": tokens?.refreshToken,
         };
 
         if (tokens?.accessToken != null) {

@@ -6,6 +6,7 @@ import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../chat/presentation/screens/chat_screen.dart';
 import '../../../main.dart';
@@ -27,6 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _navigate() async {
     // Show splash for at least 1 sec
     await Future.delayed(const Duration(seconds: 1));
+    final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
     try {
       final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
@@ -35,9 +37,21 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (session.isSignedIn) {
         final tokens = session.userPoolTokensResult.valueOrNull;
-        developer.log("🟢 ID Token: ${tokens?.idToken.raw}", name: "SplashScreen");
-        developer.log("🟢 Access Token: ${tokens?.accessToken.raw}", name: "SplashScreen");
-        developer.log("🟢 Refresh Token: ${tokens?.refreshToken}", name: "SplashScreen");
+        developer.log("🟢 ID After Splash Token: ${tokens?.idToken.raw}", name: "SplashScreen");
+        developer.log("🟢 Access After Splash Token: ${tokens?.accessToken.raw}", name: "SplashScreen");
+        developer.log("🟢 Refresh After Splash Token: ${tokens?.refreshToken}", name: "SplashScreen");
+
+        Future<void> saveAccessToken(String token) async {
+          await _storage.write(key: 'access_token', value: token);
+          developer.log(
+            '🔐 Token saved in secure storage ======================================= : $token',
+            name: 'AuthService',
+          );
+        }
+
+        Future<String?> getStoredAccessToken() async {
+          return await _storage.read(key: 'access_token');
+        }
 
         _fadeTo(const MainLayout(child: ChatScreen()));
       } else {
