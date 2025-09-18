@@ -1,9 +1,9 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/auth/service/service.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
-import 'package:elysia/providers/login_provider.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,6 +62,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final double targetTop = screenHeight * 0.15; // move up
 
     if (authState.isLoggedIn && authState.userInfo != null) {
+      print('User logged in ${authState}, heyy ${authState} ===== ${authState.userInfo}');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await AuthService().fetchUserProfile();
         Navigator.of(context).pushReplacement(
@@ -142,7 +143,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         icon: authState.isLoading
                             ? const SizedBox.shrink()
-                            : const Icon(Icons.login, color: Colors.white),
+                            :  SvgPicture.asset(
+                          AssetConsts.microsoftLogo,
+                        ),
                         label: authState.isLoading
                             ? const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
