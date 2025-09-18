@@ -17,7 +17,7 @@ import '../common_ui_components/expandable_tile/custom_expandable_tile.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-class GlobalAppDrawer extends ConsumerWidget {
+ class GlobalAppDrawer extends ConsumerWidget {
   const GlobalAppDrawer({super.key});
 
   @override
@@ -38,16 +38,17 @@ class GlobalAppDrawer extends ConsumerWidget {
     // Cache the current route name to avoid unsafe ancestor lookup
     final currentRouteName = ModalRoute.of(context)?.settings.name;
 
-  void openChat(ChatHistory chat) async {
-    Navigator.of(context, rootNavigator: true).pop(); 
-    await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
-    if (currentRouteName != '/chat') {
-      navigatorKey.currentState?.pushReplacement(
-        MaterialPageRoute(
-          settings: const RouteSettings(name: '/chat'),
-          builder: (_) => const MainLayout(child: ChatScreen()),
-        ),
-      );
+    void openChat(ChatHistory chat) async {
+      Navigator.of(context, rootNavigator: true).pop();
+      await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
+      if (currentRouteName != '/chat') {
+        navigatorKey.currentState?.pushReplacement(
+          MaterialPageRoute(
+            settings: const RouteSettings(name: '/chat'),
+            builder: (_) => const MainLayout(child: ChatScreen()),
+          ),
+        );
+      }
     }
 
     return Drawer(
@@ -116,7 +117,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                           MaterialPageRoute(
                             settings: const RouteSettings(name: '/chat'),
                             builder: (_) =>
-                            const MainLayout(child: ChatScreen()),
+                                const MainLayout(child: ChatScreen()),
                           ),
                         );
                       }
@@ -188,7 +189,6 @@ class GlobalAppDrawer extends ConsumerWidget {
                   // ),
                   if (chats?.today.isNotEmpty ?? false)
                     CustomExpandableTile(
-
                       title: "Today's",
                       items: chats!.today,
                       onTapItem: openChat,
@@ -277,8 +277,8 @@ class GlobalAppDrawer extends ConsumerWidget {
                   //     );
                   //   },
                   // ),
-
-                  //  ListTile(
+                  //
+                  // ListTile(
                   //   leading: Icon(Icons.article_outlined),
                   //   title: Text(
                   //     "Manage Content",
