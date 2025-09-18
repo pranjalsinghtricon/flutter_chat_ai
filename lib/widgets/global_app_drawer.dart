@@ -36,30 +36,6 @@ class GlobalAppDrawer extends ConsumerWidget {
   // Cache the current route name to avoid unsafe ancestor lookup
   final currentRouteName = ModalRoute.of(context)?.settings.name;
 
-  final now = DateTime.now();
-
-    List<ChatHistory> today(List<ChatHistory> list) => list.where((c) =>
-    c.updatedOn.year == now.year &&
-        c.updatedOn.month == now.month &&
-        c.updatedOn.day == now.day &&
-        !c.isArchived).toList();
-
-    List<ChatHistory> last7(List<ChatHistory> list) => list.where((c) {
-      final d = DateTime(now.year, now.month, now.day)
-          .subtract(const Duration(days: 1));
-      return c.updatedOn.isAfter(now.subtract(const Duration(days: 7))) &&
-          c.updatedOn.isBefore(d) &&
-          !c.isArchived;
-    }).toList();
-
-    List<ChatHistory> last30(List<ChatHistory> list) => list.where((c) =>
-    c.updatedOn.isAfter(now.subtract(const Duration(days: 30))) &&
-        !c.isArchived &&
-        !today(list).contains(c) &&
-        !last7(list).contains(c)).toList();
-
-    final archived = chats.where((c) => c.isArchived).toList();
-
   void openChat(ChatHistory chat) async {
     Navigator.of(context, rootNavigator: true).pop(); // closes drawer
     await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
@@ -142,9 +118,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  if (today(chats).isNotEmpty)
-                    CustomExpandableTile(
-
+                  // CustomExpandableTile(
                   // const Padding(
                   //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   //   child: Text(
@@ -155,24 +129,37 @@ class GlobalAppDrawer extends ConsumerWidget {
                   //     ),
                   //   ),
                   // ),
-               //  CustomExpandableTile(
-                      title: "Today's", items: today(chats), onTapItem: openChat),
-                  if (last7(chats).isNotEmpty)
+                  if (chats?.today.isNotEmpty ?? false)
                     CustomExpandableTile(
-                      title: 'Last 7 days',
-                      items: last7(chats),
-                      onTapItem: openChat),
-                  if (last30(chats).isNotEmpty)
+                      title: "Today's",
+                      items: chats!.today,
+                      onTapItem: openChat,
+                    ),
+                  if (chats?.yesterday.isNotEmpty ?? false)
                     CustomExpandableTile(
-                      title: 'Last 30 days',
-                      items: last30(chats),
-                      onTapItem: openChat),
-                  if (archived.isNotEmpty)
+                      title: "Yesterday",
+                      items: chats!.yesterday,
+                      onTapItem: openChat,
+                    ),
+                  if (chats?.last7.isNotEmpty ?? false)
                     CustomExpandableTile(
-                      title: 'Archived Chats',
-                      items: archived,
-                      onTapItem: openChat),
-                  // const Divider(),
+                      title: "Last 7 days",
+                      items: chats!.last7,
+                      onTapItem: openChat,
+                    ),
+                  if (chats?.last30.isNotEmpty ?? false)
+                    CustomExpandableTile(
+                      title: "Last 30 days",
+                      items: chats!.last30,
+                      onTapItem: openChat,
+                    ),
+                  if (chats?.archived.isNotEmpty ?? false)
+                    CustomExpandableTile(
+                      title: "Archived Chats",
+                      items: chats!.archived,
+                      onTapItem: openChat,
+                    ),
+                  const Divider(),
                   // ListTile(
                   //   leading: Icon(
                   //     Icons.settings,

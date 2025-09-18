@@ -1,23 +1,7 @@
-import 'package:hive/hive.dart';
-part 'chat_model.g.dart';
-
-@HiveType(typeId: 0)
-class ChatHistory extends HiveObject {
-  @override
-  String toString() {
-    return 'ChatHistory(sessionId: $sessionId, title: $title, updatedOn: $updatedOn, isArchived: $isArchived)';
-  }
-  
-  @HiveField(0)
+class ChatHistory {
   final String sessionId;
-
-  @HiveField(1)
   final String title;
-
-  @HiveField(2)
   final DateTime updatedOn;
-
-  @HiveField(3)
   final bool isArchived;
 
   ChatHistory({
@@ -26,6 +10,11 @@ class ChatHistory extends HiveObject {
     required this.updatedOn,
     required this.isArchived,
   });
+
+  @override
+  String toString() {
+    return 'ChatHistory(sessionId: $sessionId, title: $title, updatedOn: $updatedOn, isArchived: $isArchived)';
+  }
 
   ChatHistory copyWith({
     String? sessionId,
