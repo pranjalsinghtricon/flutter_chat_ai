@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/features/auth/service/service.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/providers/login_provider.dart';
@@ -27,7 +28,10 @@ class LoginPage extends ConsumerWidget {
     final authState = ref.watch(authStateProvider);
 
     if (authState.isLoggedIn && authState.userInfo != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Ensure user profile is fetched before navigating
+        await AuthService().fetchUserProfile();
+
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const MainLayout(child: ChatScreen()),
@@ -152,16 +156,16 @@ class LoginPage extends ConsumerWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
-
-                          Text(
-                            "By continuing, you agree to our Terms of privacy policy",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          // const SizedBox(height: 40),
+                          //
+                          // Text(
+                          //   "By continuing, you agree to our Terms of privacy policy",
+                          //   style: const TextStyle(
+                          //     fontSize: 12,
+                          //     color: Colors.grey,
+                          //   ),
+                          //   textAlign: TextAlign.center,
+                          // ),
                         ],
                       ),
 

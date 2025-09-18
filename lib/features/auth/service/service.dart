@@ -1,9 +1,9 @@
-// Service.dart
 import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -20,13 +20,11 @@ class AuthService {
 
   Future<bool> initialize() async => true;
 
-  /// Sign in using Cognito Hosted UI with Azure AD as IdP
   Future<Map<String, dynamic>?> signIn() async {
     try {
       developer.log('🚀 Starting Cognito Hosted UI sign-in', name: 'AuthService');
 
-      // Replace provider and clientId with values in your Cognito setup
-      const clientId = "clientId"; // replace with real app client id if needed
+      const clientId = "clientId"; // Replace with real app client id if needed
 
       final res = await Amplify.Auth.signInWithWebUI(
         provider: AuthProvider.oidc("Azure-SSO", clientId),
@@ -45,12 +43,11 @@ class AuthService {
         _userInfo = {
           "id": user.userId,
           "username": user.username,
-          "idToken": tokens?.idToken.raw,        // JsonWebToken → String
-          "accessToken": tokens?.accessToken.raw, // JsonWebToken → String
-          "refreshToken": tokens?.refreshToken,   // Already String
+          "idToken": tokens?.idToken.raw,
+          "accessToken": tokens?.accessToken.raw,
+          "refreshToken": tokens?.refreshToken,
         };
 
-        // Save the access token securely
         if (tokens?.accessToken != null) {
           await saveAccessToken(tokens!.accessToken.raw);
         }
@@ -72,11 +69,49 @@ class AuthService {
     }
   }
 
+  Future<void> fetchUserProfile() async {
+    try {
+      final token = getAccessToken();
+      if (token == null) {
+        developer.log('❌ Access token not available', name: 'AuthService');
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/profile/self'),
+        headers: {
+          'accept': 'application/json, text/plain, */*',
+          'authorization': 'Bearer $token',
+          'origin': 'https://elysia-qa.informa.com',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        developer.log('✅ Profile Response: $jsonResponse', name: 'AuthService');
+
+        final data = jsonResponse['data'] as List<dynamic>;
+        if (data.isNotEmpty) {
+          final userDoc = data[0]['doc'];
+          final fullName = userDoc['full_name'] as String? ?? 'Unknown Name';
+
+          // Store full_name in _userInfo
+          _userInfo?['full_name'] = fullName;
+        }
+      } else {
+        developer.log('⚠ Failed to fetch profile: ${response.statusCode} ${response.body}', name: 'AuthService');
+      }
+    } catch (e, st) {
+      developer.log('❌ Error fetching profile: $e', name: 'AuthService');
+      developer.log('$st', name: 'AuthService');
+    }
+  }
+
   Future<void> saveAccessToken(String token) async {
     await _storage.write(key: 'access_token', value: token);
     developer.log(
       'Token saved in secure storage ======================================= : $token',
-      name: 'AuthService File',
+      name: 'AuthService',
     );
   }
 
@@ -98,6 +133,5 @@ class AuthService {
     }
   }
 
-  /// Helper to get access token (from memory, if available)
   String? getAccessToken() => _userInfo?['accessToken'] as String?;
 }

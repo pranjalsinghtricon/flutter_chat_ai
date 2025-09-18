@@ -1,4 +1,3 @@
-// welcome_screen.dart
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,13 +5,16 @@ import 'package:elysia/utiltities/consts/asset_consts.dart';
 import '../../../../core/constants/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
+import 'package:elysia/providers/login_provider.dart';  // Make sure this import is present
 
-class WelcomeMessageScreen extends StatelessWidget {
+class WelcomeMessageScreen extends ConsumerWidget {
   const WelcomeMessageScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final userName = "Sam";
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userInfo = ref.watch(userInfoProvider);
+    final userFullName = userInfo?['full_name'] ?? 'Unknown User';
+
     // return Padding(
     //   padding: const EdgeInsets.all(24.0),
     //   child: Column(
@@ -62,7 +64,6 @@ class WelcomeMessageScreen extends StatelessWidget {
     //               ),
     //             ),
     //           ],
-    //
     //         ),
     //       )
     //     ],
@@ -75,7 +76,7 @@ class WelcomeMessageScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Hi $userName,",
+            "Hi $userFullName,",
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
