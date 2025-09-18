@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/color_constants.dart';
+import '../../../../utiltities/consts/color_constants.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../../common_ui_components/buttons/custom_icon_button.dart';
 import '../../../../common_ui_components/dropdowns/custom_dropdown_item.dart';

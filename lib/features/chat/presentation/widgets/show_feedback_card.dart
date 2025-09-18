@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ShowFeedbackCard extends StatelessWidget {

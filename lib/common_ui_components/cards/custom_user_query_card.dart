@@ -1,4 +1,4 @@
-import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomUserQueryCard extends StatelessWidget {

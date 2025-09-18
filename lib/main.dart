@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
         themeMode: themeMode,
         home: _isAmplifyConfigured
           // const MainLayout(child: ChatScreen())
-            ? const LoginPage()
+            ? const SplashScreen()
             : const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         ),

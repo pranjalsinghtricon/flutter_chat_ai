@@ -1,8 +1,14 @@
 import 'dart:async';
+import 'dart:developer' as developer;
+import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'login.dart'; // Import your login page
+import '../../chat/presentation/screens/chat_screen.dart';
+import '../../../main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,70 +17,64 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    _fadeController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 1));
-    _fadeAnimation =
-        CurvedAnimation(parent: _fadeController, curve: Curves.easeInOut);
-
-    // Start fade-in immediately
-    _fadeController.forward();
-
-    Timer(const Duration(seconds: 2), () {
-      _fadeController.reverse().whenComplete(() {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const LoginPage(),
-            transitionsBuilder: (_, animation, __, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 800),
-          ),
-        );
-      });
-    });
+    _navigate();
   }
 
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
+  Future<void> _navigate() async {
+    // Show splash for at least 1 sec
+    await Future.delayed(const Duration(seconds: 1));
+
+    try {
+      final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+
+      developer.log("🔑 isSignedIn: ${session.isSignedIn}", name: "SplashScreen");
+
+      if (session.isSignedIn) {
+        final tokens = session.userPoolTokensResult.valueOrNull;
+        developer.log("🟢 ID Token: ${tokens?.idToken.raw}", name: "SplashScreen");
+        developer.log("🟢 Access Token: ${tokens?.accessToken.raw}", name: "SplashScreen");
+        developer.log("🟢 Refresh Token: ${tokens?.refreshToken}", name: "SplashScreen");
+
+        _fadeTo(const MainLayout(child: ChatScreen()));
+      } else {
+        _fadeTo(const LoginPage());
+      }
+    } catch (e, st) {
+      developer.log("❌ Error fetching session: $e", name: "SplashScreen");
+      developer.log("$st", name: "SplashScreen");
+      _fadeTo(const LoginPage());
+    }
+  }
+
+  void _fadeTo(Widget page) {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => page,
+        transitionDuration: const Duration(milliseconds: 700),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE6F5FF), // light blue background
+      backgroundColor: ColorConst.elysiaBackgroundBlue,
       body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-               AssetConsts.elysiaBrainSvg,
-                width: 120,
-                height: 120,
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                "Elysia",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
+        child: SvgPicture.asset(
+          AssetConsts.elysiaLogo,
+          width: 100,
+          height: 100,
         ),
       ),
     );

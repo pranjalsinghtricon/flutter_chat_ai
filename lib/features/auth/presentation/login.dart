@@ -1,5 +1,5 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/auth/service/service.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
@@ -57,6 +57,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authState = ref.watch(authStateProvider);
     final screenHeight = MediaQuery.of(context).size.height;
 
+    const double logoSize = 100;
+    final double initialTop = (screenHeight / 2) - (logoSize / 2); // center
+    final double targetTop = screenHeight * 0.15; // move up
+
     if (authState.isLoggedIn && authState.userInfo != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await AuthService().fetchUserProfile();
@@ -69,14 +73,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE6F5FF),
+      backgroundColor: ColorConst.elysiaBackgroundBlue,
       body: Stack(
         children: [
-          // === Logo Animation ===
           AnimatedPositioned(
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
-            top: _logoMovedUp ? screenHeight * 0.15 : screenHeight * 0.4,
+            top: _logoMovedUp ? targetTop : initialTop,
             left: 0,
             right: 0,
             child: AnimatedScale(
@@ -88,18 +91,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 children: [
                   SvgPicture.asset(
                     AssetConsts.elysiaLogo,
-                    width: 100,
-                    height: 100,
+                    width: logoSize,
+                    height: logoSize,
                   ),
-                  // const SizedBox(width: 8),
-                  // const Text(
-                  //   "Elysia",
-                  //   style: TextStyle(
-                  //     fontSize: 28,
-                  //     fontWeight: FontWeight.w600,
-                  //     color: ColorConst.elysiaTextBlue,
-                  //   ),
-                  // ),
                 ],
               ),
             ),

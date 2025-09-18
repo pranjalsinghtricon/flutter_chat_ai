@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elysia/common_ui_components/dialog/plain_alert_dialog.dart';
-import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/chat/data/repositories/ai_model_repository.dart';
 
 void showModelChangeDialog(BuildContext context) {

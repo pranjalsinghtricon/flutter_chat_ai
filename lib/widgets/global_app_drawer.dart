@@ -1,6 +1,6 @@
 import 'dart:developer' as developer;
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:elysia/core/constants/color_constants.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/profile/presentation/screens/profile_landing_screen.dart';
 import 'package:elysia/providers/login_provider.dart';
@@ -217,7 +217,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                       items: chats!.archived,
                       onTapItem: openChat,
                     ),
-                  const Divider(),
+                  // const Divider(),
                   // ListTile(
                   //   leading: Icon(
                   //     Icons.settings,
