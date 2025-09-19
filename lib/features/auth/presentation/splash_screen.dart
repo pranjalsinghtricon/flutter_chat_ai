@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:elysia/features/auth/presentation/login.dart';
-import 'package:elysia/features/auth/service/service.dart';
+import 'package:elysia/features/auth/service/auth_service.dart';
 import 'package:elysia/features/chat/data/repositories/chat_repository.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';

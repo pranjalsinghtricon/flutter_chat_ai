@@ -1,4 +1,4 @@
-import 'package:elysia/features/auth/service/service.dart';
+import 'package:elysia/features/auth/service/auth_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:developer' as developer;
 

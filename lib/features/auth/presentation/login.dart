@@ -4,7 +4,6 @@ import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
-import 'package:elysia/utiltities/navigations/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -66,8 +65,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     const double logoSize = 100;
-    final double initialTop = (screenHeight / 2) - (logoSize / 2); // center
-    final double targetTop = screenHeight * 0.15; // move up
+    final double initialTop = (screenHeight / 2) - (logoSize / 2);
+    final double targetTop = screenHeight * 0.15;
 
     if (authState.isLoggedIn && authState.userInfo != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
