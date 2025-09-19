@@ -19,10 +19,18 @@ class LoginPage extends ConsumerStatefulWidget {
 class _LoginPageState extends ConsumerState<LoginPage> {
   bool _logoMovedUp = false;
   bool _showContent = false;
+  bool _showBackground = false;
 
   @override
   void initState() {
     super.initState();
+
+    // Show background after 1s
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      setState(() {
+        _showBackground = true;
+      });
+    });
 
     // Animate logo upwards after 1s
     Future.delayed(const Duration(seconds: 1), () {
@@ -61,7 +69,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final double targetTop = screenHeight * 0.15; // move up
 
     if (authState.isLoggedIn && authState.userInfo != null) {
-      print('User logged in ${authState}, heyy ${authState} ===== ${authState.userInfo}');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await ref.read(authServiceProvider).fetchUserProfile();
         Navigator.of(context).pushReplacement(
@@ -76,16 +83,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: ColorConst.elysiaBackgroundBlue,
       body: Stack(
         children: [
-          // === Half Circular White Background ===
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.55,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.elliptical(900, 400),
-                  topRight: Radius.elliptical(900, 400),
+          // === Half Circular White Background (fade in after 1s) ===
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 2000),
+            opacity: _showBackground ? 1 : 0,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.55,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.elliptical(900, 400),
+                    topRight: Radius.elliptical(900, 400),
+                  ),
                 ),
               ),
             ),
@@ -146,7 +157,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             : () async {
                           developer.log('🔵 Sign in button pressed',
                               name: 'LoginPage');
-                          await ref.read(authStateProvider.notifier).signIn();
+                          await ref
+                              .read(authStateProvider.notifier)
+                              .signIn();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0F80A8),
@@ -158,9 +171,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         icon: authState.isLoading
                             ? const SizedBox.shrink()
-                            : SvgPicture.asset(
-                          AssetConsts.microsoftLogo,
-                        ),
+                            : SvgPicture.asset(AssetConsts.microsoftLogo),
                         label: authState.isLoading
                             ? const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

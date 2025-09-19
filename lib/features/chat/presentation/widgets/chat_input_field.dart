@@ -31,11 +31,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   String _fileStatus = 'none';
   final ImagePicker _picker = ImagePicker();
 
-  Future<void> _launchUrl() async {
-    final url = Uri.parse('https://your-link.com');
-    await launchUrl(url, mode: LaunchMode.externalApplication);
-  }
-
   void _send() {
     final text = widget.controller.text.trim();
     if (text.isNotEmpty || _attachedFile != null) {
