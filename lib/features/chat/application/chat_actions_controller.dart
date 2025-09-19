@@ -1,5 +1,5 @@
+import 'package:elysia/features/chat/data/repositories/chat_actions_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/repositories/chat_actions.dart';
 
 final chatActionsRepositoryProvider =
     Provider<ChatActionsRepository>((ref) => ChatActionsRepository());

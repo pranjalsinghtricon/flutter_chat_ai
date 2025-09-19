@@ -1,19 +1,18 @@
 import 'package:elysia/features/auth/service/service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:developer' as developer;
 
-// Auth service provider
+// ================== Providers ==================
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
 
-// Auth state provider
 final authStateProvider =
 StateNotifierProvider<AuthStateNotifier, AuthState>((ref) {
   final authService = ref.watch(authServiceProvider);
   return AuthStateNotifier(authService);
 });
 
-// User info provider
 final userInfoProvider = Provider<Map<String, dynamic>?>((ref) {
   final authState = ref.watch(authStateProvider);
   return authState.userInfo;
@@ -79,7 +78,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         );
       } else {
         state = state.copyWith(
-          isInitialized: true, // ✅ keep initialized true
+          isInitialized: true,
           isLoading: false,
           isLoggedIn: false,
           error: 'Failed to initialize authentication service',
@@ -87,7 +86,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       }
     } catch (e) {
       state = state.copyWith(
-        isInitialized: true, // ✅ still mark as initialized
+        isInitialized: true,
         isLoading: false,
         error: 'Initialization error: $e',
       );
@@ -99,6 +98,8 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
     try {
       final userInfo = await _authService.signIn();
+      developer.log(' ${userInfo}',
+          name: 'Auth Service provider');
       if (userInfo != null) {
         state = state.copyWith(
           isInitialized: true,
@@ -130,7 +131,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
     try {
       await _authService.signOut();
       state = state.copyWith(
-        isInitialized: true, // ✅ keep initialized so button re-enables
+        isInitialized: true,
         isLoading: false,
         isLoggedIn: false,
         userId: null,

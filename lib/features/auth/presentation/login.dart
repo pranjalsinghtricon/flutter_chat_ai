@@ -1,7 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
-import 'package:elysia/features/auth/service/service.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
@@ -64,7 +63,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (authState.isLoggedIn && authState.userInfo != null) {
       print('User logged in ${authState}, heyy ${authState} ===== ${authState.userInfo}');
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await AuthService().fetchUserProfile();
+        await ref.read(authServiceProvider).fetchUserProfile();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const MainLayout(child: ChatScreen()),

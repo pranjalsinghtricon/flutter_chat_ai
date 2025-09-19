@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/auth/service/service.dart';
+import 'package:elysia/features/chat/data/repositories/chat_repository.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final AuthService _authService = AuthService();
+  final ChatRepository _chatRepository = ChatRepository();
 
   @override
   void initState() {
@@ -32,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     try {
       final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
-      developer.log("🔑 isSignedIn: ${session.isSignedIn}", name: "SplashScreen");
+      developer.log("🔑 isSignedIn: ${session.isSignedIn} ${Amplify.Auth.fetchAuthSession()}", name: "SplashScreen");
 
       if (session.isSignedIn) {
         final tokens = session.userPoolTokensResult.valueOrNull;
@@ -45,9 +47,22 @@ class _SplashScreenState extends State<SplashScreen> {
         developer.log("🟢 Access Token: ${tokens?.accessToken.raw}", name: "SplashScreen");
         developer.log("🟢 Refresh Token: ${tokens?.refreshToken}", name: "SplashScreen");
 
+        developer.log("✅ ========= User Profile Fetched: 1 ", name: "SplashScreen");
+        developer.log("✅ ========= User Profile Fetched: 2 ", name: "SplashScreen");
+        developer.log("✅ ========= User Profile Fetched: 3 ", name: "SplashScreen");
+
         // 🔹 Only navigate if API returns true
         final success = await _authService.fetchUserProfile();
+        developer.log("✅ ========= User Profile Fetched: ", name: "SplashScreen");
         if (success) {
+          developer.log("✅ ========= User Profile Fetched: Success ", name: "SplashScreen");
+
+          try {
+            final chats = await _chatRepository.fetchChatsFromApi();
+            developer.log("✅ ========= Prefetched chats: today=${chats.today.length}", name: "SplashScreen");
+          } catch (e) {
+            developer.log("⚠ ======== Failed to prefetch chats: $e", name: "SplashScreen");
+          }
           _fadeTo(const MainLayout(child: ChatScreen()));
         } else {
           _fadeTo(const LoginPage());

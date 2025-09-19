@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -46,7 +46,8 @@ class AuthService {
 
       if (res.isSignedIn) {
         final user = await Amplify.Auth.getCurrentUser();
-        final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+        final session =
+        await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
         final tokens = session.userPoolTokensResult.valueOrNull;
 
         _userInfo = {
@@ -79,14 +80,21 @@ class AuthService {
   }
 
   Future<bool> fetchUserProfile() async {
+    developer.log("✅ ========= User Profile Fetched: 6 ", name: "AuthService");
     try {
+      developer.log("✅ ========= User Profile Fetched: 7 ", name: "AuthService");
       final token = getAccessToken();
       if (token == null) {
+        developer.log("✅ ========= User Profile Fetched: 8", name: "AuthService");
         developer.log('❌ Access token not available', name: 'AuthService');
         return false;
       }
 
-      developer.log('Access token available ======= Inside self api', name: 'AuthService');
+      developer.log("✅ ========= User Profile Fetched: 9", name: "AuthService");
+      developer.log(
+        'Access token available ======= Inside self api',
+        name: 'AuthService',
+      );
 
       final response = await http.get(
         Uri.parse('https://stream-api-qa.iiris.com/v2/ai/profile/self'),
@@ -98,27 +106,36 @@ class AuthService {
       );
 
       if (response.statusCode == 200) {
+        developer.log("✅ ========= User Profile Fetched: 10", name: "AuthService");
         final jsonResponse = jsonDecode(response.body);
         developer.log('✅ Profile Response: $jsonResponse', name: 'AuthService');
+        developer.log("✅ ========= User Profile Fetched: 11", name: "AuthService");
+
 
         final data = jsonResponse['data'] as List<dynamic>;
         if (data.isNotEmpty) {
+          developer.log("✅ ========= User Profile Fetched: 12", name: "AuthService");
           final userDoc = data[0]['doc'];
           final fullName = userDoc['full_name'] as String? ?? 'Unknown Name';
 
           _userInfo?['full_name'] = fullName;
+          developer.log("✅ ========= User Profile Fetched: 13", name: "AuthService");
         }
-        return true; // ✅ API succeeded
+        return true;
       } else {
+        developer.log("✅ ========= User Profile Fetched: 14", name: "AuthService");
         developer.log(
           '⚠ Failed to fetch profile: ${response.statusCode} ${response.body}',
           name: 'AuthService',
         );
+        developer.log("✅ ========= User Profile Fetched: 15", name: "AuthService");
         return false;
       }
     } catch (e, st) {
+      developer.log("✅ ========= User Profile Fetched: 16", name: "AuthService");
       developer.log('❌ Error fetching profile: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
+      developer.log("✅ ========= User Profile Fetched: 17", name: "AuthService");
       return false;
     }
   }
@@ -129,6 +146,7 @@ class AuthService {
   }
 
   Future<String?> getStoredAccessToken() async {
+    developer.log('🔐 Get Stored Access token: ', name: 'AuthService');
     return await _storage.read(key: 'access_token');
   }
 
