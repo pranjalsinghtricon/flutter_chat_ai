@@ -131,15 +131,16 @@ class _CustomAiResponseCardState extends State<CustomAiResponseCard> {
 
         if (!isGenerating)
         Padding(
-          padding: const EdgeInsets.only(top: 5),
+          padding: const EdgeInsets.only(left: 20, right: 30, bottom: 12),
           child: RichText(
             text: TextSpan(
               style: const TextStyle(fontSize: 12, color: Colors.grey),
               children: [
-                const TextSpan(
+                 TextSpan(
                   text:
                   'Elysia responses may be inaccurate. Know more about how your data is processed ',
                 ),
+                //     textAlign: TextAlign.center,
                 TextSpan(
                   text: 'here',
                   style: const TextStyle(
