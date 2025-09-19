@@ -76,6 +76,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       backgroundColor: ColorConst.elysiaBackgroundBlue,
       body: Stack(
         children: [
+          // === Half Circular White Background ===
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.55,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.elliptical(900, 400),
+                  topRight: Radius.elliptical(900, 400),
+                ),
+              ),
+            ),
+          ),
+
+          // === Animated Logo ===
           AnimatedPositioned(
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
@@ -142,7 +158,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         icon: authState.isLoading
                             ? const SizedBox.shrink()
-                            :  SvgPicture.asset(
+                            : SvgPicture.asset(
                           AssetConsts.microsoftLogo,
                         ),
                         label: authState.isLoading
@@ -154,8 +170,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               height: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             ),
                             SizedBox(width: 12),
