@@ -1,4 +1,5 @@
 import 'package:elysia/features/chat/data/models/message_model.dart';
+import 'package:elysia/features/chat/data/repositories/chat_repository.dart';
 import 'package:flutter/material.dart';
 import '../../../../common_ui_components/cards/custom_ai_response_card.dart';
 import '../../../../common_ui_components/cards/custom_user_query_card.dart';
@@ -17,14 +18,14 @@ class MessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     if (message.isUser) {
       return CustomUserQueryCard(
-        // initials: 'AR',
         message: message.content,
       );
     }
+    final chatRepo = ChatRepository();
 
     return CustomAiResponseCard(
       message: message,
-      isGenerating: message.isGenerating ?? false,
+      isStreaming: chatRepo.isStreaming,
       onMessageUpdated: (_) {},
     );
   }

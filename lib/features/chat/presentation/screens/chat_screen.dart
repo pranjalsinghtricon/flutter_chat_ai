@@ -1,4 +1,3 @@
-// chat_screen.dart
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:elysia/features/chat/presentation/widgets/custom_horizontal_scrollanble_card.dart';
 import 'package:flutter/material.dart';

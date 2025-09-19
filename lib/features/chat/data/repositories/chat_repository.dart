@@ -34,6 +34,9 @@ class ChatSections {
 class ChatRepository {
   final TokenStorage _tokenStorage = TokenStorage();
 
+  /// ✅ Streaming state flag
+  bool isStreaming = false;
+
   /// === Fetch chat list grouped by sections ===
   Future<ChatSections> fetchChatsFromApi() async {
     return _withAuthHeaders((headers) async {
@@ -75,10 +78,10 @@ class ChatRepository {
   }
 
   /// === Fetch messages for a given session ===
-  /// === Fetch messages for a given session ===
   Future<List<Message>> getMessages(String sessionId) async {
     return _withAuthHeaders((headers) async {
-      final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/session/$sessionId');
+      final url =
+      Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/session/$sessionId');
       final response = await http.get(url, headers: headers);
 
       if (response.statusCode == 200) {
@@ -91,8 +94,8 @@ class ChatRepository {
           for (final history in historyList) {
             final inputList = history['input'] as List? ?? [];
             final outputList = history['output'] as List? ?? [];
-            final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
-            final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
+            final inputText =  inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
+            final outputText =   outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
             final createdAt = history['createdAt'] != null
                 ? DateTime.tryParse(history['createdAt'].toString()) ?? DateTime.now()
                 : DateTime.now();
@@ -203,36 +206,51 @@ class ChatRepository {
         yield '[Exception: HTTP ${response.statusCode}]';
         return;
       }
+      /// ✅ Mark streaming started
+      isStreaming = true;
+      try {
+        developer.log('===========1 ${isStreaming}',
+            name: 'ChatRepository', );
 
-      await for (final line in response.stream
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())) {
-        if (line.trim().isEmpty) continue;
+        await for (final line in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())) {
+          if (line.trim().isEmpty) continue;
+          developer.log('===========2 ${isStreaming}',
+            name: 'ChatRepository', );
 
-        try {
-          final Map<String, dynamic> decoded =
-          jsonDecode(line) as Map<String, dynamic>;
+          try {
+            final Map<String, dynamic> decoded =
+            jsonDecode(line) as Map<String, dynamic>;
 
-          if (decoded['type'] == 'answer') {
-            final chunk = decoded['answer'] as String?;
-            if (chunk != null) {
-              yield chunk;
+            if (decoded['type'] == 'answer') {
+              developer.log('===========3 ${isStreaming}',
+                name: 'ChatRepository', );
+              final chunk = decoded['answer'] as String?;
+              developer.log('===========4 ${isStreaming}',
+                name: 'ChatRepository', );
+              if (chunk != null) {
+                yield chunk;
+              }
+            } else if (decoded['type'] == 'metadata') {
+              developer.log('===========5 ${isStreaming}',
+                name: 'ChatRepository', );
+              yield '[METADATA]${jsonEncode(decoded['metadata'])}';
             }
-          } else if (decoded['type'] == 'metadata') {
-            // Yield metadata as a tagged string
-            yield '[METADATA]${jsonEncode(decoded['metadata'])}';
+          } catch (_) {
+            continue;
           }
-        } catch (_) {
-          continue;
+          await Future.delayed(const Duration(milliseconds: 40));
         }
-        // Small delay for smooth streaming
-        await Future.delayed(const Duration(milliseconds: 40));
+      } finally {
+        /// ✅ Always mark streaming ended
+        isStreaming = false;
       }
     } catch (e) {
+      isStreaming = false; // reset on error too
       yield '[Exception: $e]';
     }
   }
-
 
   /// === Helper: wrap calls with headers + error handling ===
   Future<T> _withAuthHeaders<T>(
