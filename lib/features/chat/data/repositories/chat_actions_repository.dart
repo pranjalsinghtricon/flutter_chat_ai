@@ -1,76 +1,50 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
-import 'package:http/http.dart' as http;
 
 class ChatActionsRepository {
+	final ApiClient _apiClient = ApiClient();
 	final TokenStorage _tokenStorage = TokenStorage();
 
 	Future<String> archiveChat({required String sessionId}) async {
-		return _withAuthHeaders((headers) async {
+		try {
 			final body = jsonEncode({'session_id': sessionId});
-			final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/archive');
-			final response = await http.patch(url, headers: headers, body: body);
-
-			if (response.statusCode == 200) {
-				return response.body;
-			} else {
-				throw Exception('Failed to archive chat: ${response.statusCode}');
-			}
-		}, 'archiveChat');
+			final url = 'https://stream-api-qa.iiris.com/v2/ai/chat/archive';
+			final response = await _apiClient.dio.patch(url, data: body);
+			return response.data is String ? response.data : jsonEncode(response.data);
+		} catch (e, stack) {
+			developer.log('❌ archiveChat error: $e', name: 'ChatActionsRepository', error: e, stackTrace: stack);
+			throw Exception('Error in archiveChat: $e');
+		}
 	}
 
 	Future<String> renameChat({required String sessionId, required String title}) async {
-		return _withAuthHeaders((headers) async {
+		try {
+			final url = 'https://stream-api-qa.iiris.com/v2/ai/chat/title:rename';
 			final body = jsonEncode({'session_id': sessionId, 'title': title});
-			final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/title:rename');
-			final response = await http.patch(url, headers: headers, body: body);
-
+			final response = await _apiClient.dio.patch(url, data: body);
 			if (response.statusCode == 200) {
-				return response.body;
+				return response.data is String ? response.data : jsonEncode(response.data);
 			} else {
 				throw Exception('Failed to rename chat: ${response.statusCode}');
 			}
-		}, 'renameChat');
+		} catch (e, stack) {
+			developer.log('❌ renameChat error: $e', name: 'ChatActionsRepository', error: e, stackTrace: stack);
+			throw Exception('Error in renameChat: $e');
+		}
 	}
 
 	Future<String> deleteChatSession({required String sessionId}) async {
-		return _withAuthHeaders((headers) async {
-			final url = Uri.parse(
-				'https://stream-api-qa.iiris.com/v2/ai/chat/conversation/session/$sessionId',
-			);
-			final response = await http.delete(url, headers: headers);
-
-			if (response.statusCode == 200) {
-				return response.body;
-			} else {
-				throw Exception('Failed to delete chat: ${response.statusCode}');
-			}
-		}, 'deleteChatSession');
-	}
-
-	/// 🔑 Private helper that automatically injects auth headers
-	Future<String> _withAuthHeaders(
-			Future<String> Function(Map<String, String> headers) action,
-			String actionName,
-			) async {
 		try {
-			final accessToken = await _tokenStorage.getAccessToken();
-			if (accessToken == null) throw Exception("Missing access token");
-
-			final headers = {
-				'accept': 'application/json, text/plain, */*',
-				'authorization': 'Bearer $accessToken',
-				'origin': 'https://elysia-qa.informa.com',
-				'content-type': 'application/json',
-			};
-
-			return await action(headers);
+			final url = 'https://stream-api-qa.iiris.com/v2/ai/chat/conversation/session/$sessionId';
+			final response = await _apiClient.dio.delete(url);
+			return response.data is String ? response.data : jsonEncode(response.data);
 		} catch (e, stack) {
-			developer.log('❌ $actionName error: $e',
-					name: 'ChatActionsRepository', error: e, stackTrace: stack);
-			throw Exception('Error in $actionName: $e');
+			developer.log('❌ deleteChatSession error: $e', name: 'ChatActionsRepository', error: e, stackTrace: stack);
+			throw Exception('Error in deleteChatSession: $e');
 		}
 	}
 }

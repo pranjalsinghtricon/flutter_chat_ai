@@ -5,6 +5,7 @@ import 'package:elysia/main.dart';
 import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:elysia/utiltities/navigations/navigation.dart';
 
 class ProfileLandingScreen extends ConsumerWidget {
   const ProfileLandingScreen({super.key});
@@ -66,18 +67,12 @@ class ProfileLandingScreen extends ConsumerWidget {
             onTap: () async {
               developer.log('🔴 Log out pressed', name: 'ProfilePage');
               try {
-                await Amplify.Auth.signOut();
+                // Reset auth state
+                ref.read(authStateProvider.notifier).signOut();
+                NavigationService.navigateToLogin();
               } catch (e) {
                 developer.log('❌ Sign out error: $e', name: 'ProfilePage');
               }
-              // Reset auth state
-              ref.read(authStateProvider.notifier).signOut();
-              Navigator.pop(context);
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                    (route) => false,
-              );
             },
           ),
         ],

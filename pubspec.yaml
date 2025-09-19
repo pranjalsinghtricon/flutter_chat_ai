@@ -54,6 +54,7 @@ dependencies:
   flutter_dotenv: ^6.0.0
   go_router: ^16.2.1
   flutter_native_timezone: ^2.0.0
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:

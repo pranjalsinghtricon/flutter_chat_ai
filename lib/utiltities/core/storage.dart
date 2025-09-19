@@ -14,4 +14,8 @@ class TokenStorage {
   Future<void> clearAccessToken() async {
     await _storage.delete(key: 'access_token');
   }
+
+  Future<void> clearAllStorage() async {
+    await _storage.deleteAll();
+  }
 }
