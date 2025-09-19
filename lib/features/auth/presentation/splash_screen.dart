@@ -53,21 +53,23 @@ class _SplashScreenState extends State<SplashScreen> {
 
         // 🔹 Only navigate if API returns true
         final success = await _authService.fetchUserProfile();
-        developer.log("✅ ========= User Profile Fetched: ", name: "SplashScreen");
+        developer.log("✅ ========= User Profile Fetched: 100 ", name: "SplashScreen");
         if (success) {
-          developer.log("✅ ========= User Profile Fetched: Success ", name: "SplashScreen");
+          developer.log("✅ ========= User Profile Fetched 101: Success ", name: "SplashScreen");
 
           try {
             final chats = await _chatRepository.fetchChatsFromApi();
-            developer.log("✅ ========= Prefetched chats: today=${chats.today.length}", name: "SplashScreen");
+            developer.log("✅ ========= Prefetched chats 102: today=${chats.today.length}", name: "SplashScreen");
           } catch (e) {
-            developer.log("⚠ ======== Failed to prefetch chats: $e", name: "SplashScreen");
+            developer.log("⚠ ======== Failed to prefetch chats 103: $e", name: "SplashScreen");
           }
           _fadeTo(const MainLayout(child: ChatScreen()));
         } else {
+          developer.log("✅ ========= User Profile Fetched: 201 ", name: "SplashScreen");
           _fadeTo(const LoginPage());
         }
       } else {
+        developer.log("✅ ========= User Profile Fetched: 202 ", name: "SplashScreen");
         _fadeTo(const LoginPage());
       }
     } catch (e, st) {
@@ -77,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // Try restoring from secure storage
       final storedToken = await _authService.getStoredAccessToken();
       if (storedToken != null) {
-        developer.log("🔄 Restored access token from storage", name: "SplashScreen");
+        developer.log("🔄 Restored access token from storage 108", name: "SplashScreen");
 
         // 🔹 Only navigate if API returns true
         final success = await _authService.fetchUserProfile();

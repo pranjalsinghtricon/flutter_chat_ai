@@ -4,6 +4,7 @@ import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
+import 'package:elysia/utiltities/navigations/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -76,6 +77,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             builder: (context) => const MainLayout(child: ChatScreen()),
           ),
         );
+        // developer.log("⚠ ==================================== pushReplacementNamed", name: "Login");
+        // Navigator.pushReplacementNamed(context, Routes.chat);
       });
     }
 
