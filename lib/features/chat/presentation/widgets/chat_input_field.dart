@@ -19,7 +19,8 @@ import '../../../../common_ui_components/dialog/bottom_drawer_options.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   final TextEditingController controller;
-  const ChatInputField({super.key, required this.controller});
+  final void Function()? onSend;
+  const ChatInputField({super.key, required this.controller, this.onSend});
 
   @override
   ConsumerState<ChatInputField> createState() => _ChatInputFieldState();
@@ -38,7 +39,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   void _send() {
     final text = widget.controller.text.trim();
     if (text.isNotEmpty || _attachedFile != null) {
-      ref.read(chatControllerProvider.notifier).sendMessage(text);
+      // ref.read(chatControllerProvider.notifier).sendMessage(text);
+      if (widget.onSend != null) widget.onSend!();
       widget.controller.clear();
       setState(() {
         _attachedFile = null;

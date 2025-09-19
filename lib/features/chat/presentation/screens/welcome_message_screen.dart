@@ -106,7 +106,7 @@ class _SuggestedPrompt extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: InkWell(
-        onTap: () => ref.read(chatControllerProvider.notifier).sendMessage(text),
+        onTap: () => ref.read(chatControllerProvider.notifier).sendMessage(text, ref),
         borderRadius: BorderRadius.circular(8),
         child: Container(
           width: double.infinity,

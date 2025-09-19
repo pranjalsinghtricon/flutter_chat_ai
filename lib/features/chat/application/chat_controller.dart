@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';
@@ -21,6 +23,7 @@ final chatHistoryProvider =
 );
 
 class ChatController extends StateNotifier<List<Message>> {
+  bool forceNewChat = false;
   final ChatRepository _repo;
   String? _currentSessionId;
   String? get currentSessionId => _currentSessionId;
@@ -32,6 +35,8 @@ class ChatController extends StateNotifier<List<Message>> {
 
     // We no longer upsert history locally → history is managed by API
     // But still initialize messages
+    _currentSessionId = const Uuid().v4();
+    forceNewChat = true;
     state = [];
     return _currentSessionId!;
   }
@@ -46,11 +51,13 @@ class ChatController extends StateNotifier<List<Message>> {
     state = [];
   }
 
-  Future<void> sendMessage(String content) async {
+  Future<void> sendMessage(String content, WidgetRef ref) async {
     final text = content.trim();
     if (text.isEmpty) return;
 
+    bool isNewChat = _currentSessionId == null || forceNewChat;
     _currentSessionId ??= await startNewChat(initialTitle: _titleFrom(text));
+    forceNewChat = false;
 
     final userMsg = Message(
       id: const Uuid().v4(),
@@ -73,10 +80,22 @@ class ChatController extends StateNotifier<List<Message>> {
     state = [...state, botMsg];
     await _repo.addMessage(botMsg);
 
+    bool chatAddedToToday = false;
     // Stream response from API
     _repo
         .sendPromptStream(prompt: text, sessionId: _currentSessionId!)
         .listen((chunk) async {
+      // Check for metadata chunk
+      if (chunk.startsWith('[METADATA]')) {
+        final metadataJson = chunk.substring(10);
+        final metadata = jsonDecode(metadataJson);
+        final title = metadata['title'];
+        if (title != null && title.toString().trim().isNotEmpty) {
+          ref.read(chatHistoryProvider.notifier).updateTitle(_currentSessionId!, title);
+        }
+        return;
+      }
+
       botMsg = botMsg.copyWith(content: botMsg.content + chunk);
       final copy = [...state];
       final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
@@ -85,8 +104,27 @@ class ChatController extends StateNotifier<List<Message>> {
         state = copy;
       }
       await _repo.replaceMessages(_currentSessionId!, state);
+      // Add new chat to today only after first non-empty, non-metadata chunk
+      if (isNewChat && !chatAddedToToday && !chunk.startsWith('[METADATA]') && chunk.trim().isNotEmpty) {
+        chatAddedToToday = true;
+        final chatHistory = ChatHistory(
+          sessionId: _currentSessionId!,
+          title: 'New Chat',
+          updatedOn: DateTime.now(),
+          isArchived: false,
+        );
+        final notifier = ref.read(chatHistoryProvider.notifier);
+        notifier.state = ChatSections(
+          today: [chatHistory, ...notifier.state.today],
+          yesterday: notifier.state.yesterday,
+          last7: notifier.state.last7,
+          last30: notifier.state.last30,
+          archived: notifier.state.archived,
+        );
+      }
     });
   }
+
 
   String _titleFrom(String text) {
     final t = text.replaceAll('\n', ' ').trim();

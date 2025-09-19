@@ -208,21 +208,31 @@ class ChatRepository {
           .transform(utf8.decoder)
           .transform(const LineSplitter())) {
         if (line.trim().isEmpty) continue;
+
         try {
-          final decoded = jsonDecode(line) as Map<String, dynamic>;
+          final Map<String, dynamic> decoded =
+          jsonDecode(line) as Map<String, dynamic>;
+
           if (decoded['type'] == 'answer') {
             final chunk = decoded['answer'] as String?;
-            if (chunk != null) yield chunk;
+            if (chunk != null) {
+              yield chunk;
+            }
+          } else if (decoded['type'] == 'metadata') {
+            // Yield metadata as a tagged string
+            yield '[METADATA]${jsonEncode(decoded['metadata'])}';
           }
         } catch (_) {
           continue;
         }
+        // Small delay for smooth streaming
         await Future.delayed(const Duration(milliseconds: 40));
       }
     } catch (e) {
       yield '[Exception: $e]';
     }
   }
+
 
   /// === Helper: wrap calls with headers + error handling ===
   Future<T> _withAuthHeaders<T>(

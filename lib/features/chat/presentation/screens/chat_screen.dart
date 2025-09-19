@@ -39,6 +39,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       }
     });
 
+    Future<void> _handleSendMessage() async {
+      final text = _inputController.text.trim();
+      if (text.isEmpty) return;
+      await ref.read(chatControllerProvider.notifier).sendMessage(text, ref);
+      _inputController.clear();
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -90,7 +97,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               //         "Generate catchy journal titles",
               //       ],
               //     ),
-              ChatInputField(controller: _inputController),
+              // ChatInputField(controller: _inputController),
+              ChatInputField(
+                controller: _inputController,
+                onSend: _handleSendMessage,
+              ),
             ],
           ),
         ),
