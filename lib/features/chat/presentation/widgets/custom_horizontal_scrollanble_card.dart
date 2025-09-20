@@ -1,18 +1,19 @@
+import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 
-class CustomHorizontalScrollableCard extends StatefulWidget {
-  final List<String> items;
-  final WidgetRef ref; // 🔑 add ref
-  const CustomHorizontalScrollableCard({super.key, required this.items, required this.ref});
+class CustomHorizontalScrollableCard extends ConsumerStatefulWidget {
+  final WidgetRef ref;
+
+  const CustomHorizontalScrollableCard({super.key, required this.ref});
 
   @override
-  State<CustomHorizontalScrollableCard> createState() =>
+  ConsumerState<CustomHorizontalScrollableCard> createState() =>
       _CustomHorizontalScrollableCardState();
 }
 
-class _CustomHorizontalScrollableCardState extends State<CustomHorizontalScrollableCard> {
+class _CustomHorizontalScrollableCardState extends ConsumerState<CustomHorizontalScrollableCard> {
   final PageController _pageController = PageController(viewportFraction: 0.85);
   int _currentPage = 0;
 
@@ -37,16 +38,27 @@ class _CustomHorizontalScrollableCardState extends State<CustomHorizontalScrolla
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+    final samplePrompts = authState.samplePrompts;
+
+    // ✅ Fallback to default prompts if sample prompts are empty
+    final items = samplePrompts.isNotEmpty ? samplePrompts : [
+      "Draft email to suppliers about new payment terms",
+      "Suggest tools and techniques for monitoring projects",
+      "Suggest tools and techniques",
+      "Generate catchy journal titles",
+    ];
+
     return Column(
       children: [
         SizedBox(
           height: 100,
           child: PageView.builder(
             controller: _pageController,
-            itemCount: widget.items.length,
+            itemCount: items.length,
             padEnds: false,
             itemBuilder: (context, index) {
-              final text = widget.items[index];
+              final text = items[index];
               return InkWell(
                 onTap: () => widget.ref
                     .read(chatControllerProvider.notifier)
@@ -87,7 +99,7 @@ class _CustomHorizontalScrollableCardState extends State<CustomHorizontalScrolla
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(widget.items.length, (index) {
+          children: List.generate(items.length, (index) {
             return AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4),

@@ -18,6 +18,7 @@ class AuthState {
   final String? userId;
   final Map<String, dynamic>? userInfo;
   final String? error;
+  final List<String> samplePrompts;
 
   const AuthState({
     this.isInitialized = false,
@@ -26,6 +27,7 @@ class AuthState {
     this.userId,
     this.userInfo,
     this.error,
+    this.samplePrompts = const [], // ✅ NEW: Default empty list
   });
 
   AuthState copyWith({
@@ -35,6 +37,7 @@ class AuthState {
     String? userId,
     Map<String, dynamic>? userInfo,
     String? error,
+    List<String>? samplePrompts, // ✅ NEW: Add to copyWith
   }) {
     return AuthState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -43,24 +46,22 @@ class AuthState {
       userId: userId ?? this.userId,
       userInfo: userInfo ?? this.userInfo,
       error: error,
+      samplePrompts: samplePrompts ?? this.samplePrompts, // ✅ NEW: Include in copyWith
     );
   }
 
   // Helper method to get display name
   String getDisplayName() {
     if (userInfo == null) return 'User';
-
     // Priority: full_name > cleaned email > cleaned username
     final fullName = userInfo!['full_name'] as String?;
     if (fullName != null && fullName.isNotEmpty && fullName != 'Unknown Name') {
       return fullName;
     }
-
     final email = userInfo!['email'] as String?;
     if (email != null && email.isNotEmpty) {
       return email.split('@')[0].replaceAll('.', ' ').split('_').last;
     }
-
     final username = userInfo!['username'] as String?;
     if (username != null && username.isNotEmpty) {
       String cleanUsername = username;
@@ -72,7 +73,6 @@ class AuthState {
       }
       return cleanUsername.replaceAll('.', ' ').replaceAll('_', ' ');
     }
-
     return 'User';
   }
 }
@@ -86,7 +86,6 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> _initialize() async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
       final success = await _authService.initialize();
       state = state.copyWith(
@@ -95,8 +94,8 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         isLoggedIn: success,
         userId: _authService.currentUserId,
         userInfo: _authService.userInfo,
+        samplePrompts: _authService.samplePrompts, // ✅ NEW: Get sample prompts from service
       );
-
       developer.log('🔄 Auth initialized: $success', name: 'AuthStateNotifier');
     } catch (e) {
       developer.log('❌ Auth initialization error: $e', name: 'AuthStateNotifier');
@@ -111,7 +110,6 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> signIn() async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
       final userInfo = await _authService.signIn();
       if (userInfo != null) {
@@ -120,6 +118,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
           isLoggedIn: true,
           userId: userInfo['id'],
           userInfo: userInfo,
+          samplePrompts: _authService.samplePrompts, // ✅ NEW: Update sample prompts after sign-in
         );
         developer.log('✅ Sign-in successful in state notifier', name: 'AuthStateNotifier');
       } else {
@@ -127,7 +126,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
             isLoading: false,
             error: 'Sign-in failed'
         );
-        developer.log('⚠️ Sign-in failed in state notifier', name: 'AuthStateNotifier');
+        developer.log('⚠ Sign-in failed in state notifier', name: 'AuthStateNotifier');
       }
     } catch (e) {
       developer.log('❌ Sign-in error in state notifier: $e', name: 'AuthStateNotifier');
@@ -140,10 +139,8 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> signOut() async {
     developer.log('🔴 Starting sign-out in state notifier', name: 'AuthStateNotifier');
-
     try {
       await _authService.signOut();
-
       // Reset state completely
       state = const AuthState(
         isInitialized: true,
@@ -152,12 +149,11 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         userId: null,
         userInfo: null,
         error: null,
+        samplePrompts: [], // ✅ NEW: Clear sample prompts on sign-out
       );
-
       developer.log('✅ Sign-out completed in state notifier', name: 'AuthStateNotifier');
     } catch (e) {
       developer.log('❌ Sign-out error in state notifier: $e', name: 'AuthStateNotifier');
-
       // Force reset state even on error
       state = const AuthState(
         isInitialized: true,
@@ -166,6 +162,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         userId: null,
         userInfo: null,
         error: null,
+        samplePrompts: [], // ✅ NEW: Clear sample prompts even on error
       );
     }
   }
@@ -177,17 +174,30 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   // Method to refresh profile data
   Future<void> refreshProfile() async {
     if (!state.isLoggedIn) return;
-
     state = state.copyWith(isLoading: true);
     try {
       await _authService.fetchUserProfile();
+      await _authService.fetchSamplePrompts();
       state = state.copyWith(
         isLoading: false,
         userInfo: _authService.userInfo,
+        samplePrompts: _authService.samplePrompts,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
       developer.log('❌ Profile refresh error: $e', name: 'AuthStateNotifier');
     }
   }
+
+  // //  NEW: Method to manually refresh sample prompts if we need this in future
+  // Future<void> refreshSamplePrompts() async {
+  //   if (!state.isLoggedIn) return;
+  //   try {
+  //     await _authService.fetchSamplePrompts();
+  //     state = state.copyWith(samplePrompts: _authService.samplePrompts);
+  //     developer.log('✅ Sample prompts refreshed', name: 'AuthStateNotifier');
+  //   } catch (e) {
+  //     developer.log('❌ Sample prompts refresh error: $e', name: 'AuthStateNotifier');
+  //   }
+  // }
 }

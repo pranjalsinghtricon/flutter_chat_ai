@@ -12,10 +12,12 @@ class AuthService {
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   Map<String, dynamic>? _userInfo;
+  List<String> _samplePrompts = [];
 
   bool get isLoggedIn => _userInfo != null;
   Map<String, dynamic>? get userInfo => _userInfo;
   String? get currentUserId => _userInfo?['id'];
+  List<String> get samplePrompts => _samplePrompts;
 
   Future<bool> initialize() async {
     try {
@@ -40,6 +42,9 @@ class AuthService {
           // Fetch profile information
           await fetchUserProfile();
 
+          // ✅ NEW: Fetch sample prompts after profile
+          await fetchSamplePrompts();
+
           developer.log("🔄 User session restored", name: "AuthService");
           return true;
         }
@@ -54,14 +59,18 @@ class AuthService {
         // Try to fetch profile with stored token
         await fetchUserProfile();
 
+        // ✅ NEW: Fetch sample prompts after profile
+        await fetchSamplePrompts();
+
         developer.log("🔄 Restored access token from storage", name: "AuthService");
         return true;
       }
     } catch (e) {
-      developer.log("⚠️ Initialize error: $e", name: "AuthService");
+      developer.log("⚠ Initialize error: $e", name: "AuthService");
       // Clear any corrupted data
       await _storage.delete(key: 'access_token');
       _userInfo = null;
+      _samplePrompts = [];
     }
 
     return false;
@@ -70,7 +79,6 @@ class AuthService {
   Future<Map<String, dynamic>?> signIn() async {
     try {
       developer.log('🚀 Starting Cognito Hosted UI sign-in', name: 'AuthService');
-
       const clientId = "1pii8vb7lqo9j6st8p9ke8rjsd";
 
       final res = await Amplify.Auth.signInWithWebUI(
@@ -101,6 +109,9 @@ class AuthService {
 
         // Fetch user profile after successful sign-in
         await fetchUserProfile();
+
+        // ✅ NEW: Fetch sample prompts after profile
+        await fetchSamplePrompts();
 
         developer.log('✅ Sign-in successful -> ${jsonEncode(_userInfo)}', name: 'AuthService');
         return _userInfo;
@@ -157,6 +168,58 @@ class AuthService {
     }
   }
 
+  Future<bool> fetchSamplePrompts() async {
+    try {
+      final token = getAccessToken();
+      if (token == null) {
+        developer.log('⚠ No access token for sample prompts', name: 'AuthService');
+        return false;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/prompts/sample'),
+        headers: {
+          'accept': 'application/json, text/plain, */*',
+          'authorization': 'Bearer $token',
+          'origin': 'https://elysia-qa.informa.com',
+          'user-agent': 'ElysiaClient/1.0',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        developer.log('✅ Sample Prompts Response: $jsonResponse', name: 'AuthService');
+
+        final data = jsonResponse['data'] as List<dynamic>;
+        _samplePrompts = data.map((item) => item['prompt'] as String).toList();
+
+        developer.log('✅ Sample prompts fetched: ${_samplePrompts.length} prompts', name: 'AuthService');
+        return true;
+      } else {
+        developer.log('⚠ Failed to fetch sample prompts: ${response.statusCode}', name: 'AuthService');
+        // Set fallback prompts on API failure
+        _samplePrompts = [
+          "Draft email to suppliers about new payment terms",
+          "Suggest tools and techniques for monitoring projects",
+          "Suggest tools and techniques",
+          "Generate catchy journal titles",
+        ];
+        return false;
+      }
+    } catch (e, st) {
+      developer.log('❌ Error fetching sample prompts: $e', name: 'AuthService');
+      developer.log('$st', name: 'AuthService');
+      // Set fallback prompts on error
+      _samplePrompts = [
+        "Draft email to suppliers about new payment terms",
+        "Suggest tools and techniques for monitoring projects",
+        "Suggest tools and techniques",
+        "Generate catchy journal titles",
+      ];
+      return false;
+    }
+  }
+
   Future<void> saveAccessToken(String token) async {
     await _storage.write(key: 'access_token', value: token);
     developer.log('🔐 Token saved', name: 'AuthService');
@@ -177,6 +240,7 @@ class AuthService {
 
       // Clear all stored data
       _userInfo = null;
+      _samplePrompts = [];
       await _storage.delete(key: 'access_token');
       await _storage.deleteAll(); // Clear all secure storage
 
@@ -184,9 +248,9 @@ class AuthService {
     } catch (e, st) {
       developer.log('⚠ Sign-out error: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
-
       // Force clear data even if sign out fails
       _userInfo = null;
+      _samplePrompts = [];
       await _storage.deleteAll();
     }
   }

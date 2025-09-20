@@ -31,11 +31,51 @@ class ChatSections {
   );
 }
 
+class SamplePrompt {
+  final String prompt;
+  final int promptId;
+
+  SamplePrompt({required this.prompt, required this.promptId});
+
+  factory SamplePrompt.fromJson(Map<String, dynamic> json) {
+    return SamplePrompt(
+      prompt: json['prompt'] as String,
+      promptId: json['prompt_id'] as int,
+    );
+  }
+}
+
 class ChatRepository {
   final TokenStorage _tokenStorage = TokenStorage();
 
   /// ✅ Streaming state flag
   bool isStreaming = false;
+
+  /// ✅ NEW: Fetch sample prompts from API
+  Future<List<String>> fetchSamplePrompts() async {
+    return _withAuthHeaders((headers) async {
+      final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/prompts/sample');
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        final data = body['data'] as List<dynamic>;
+
+        // Extract just the prompt text from each item
+        return data.map((item) => item['prompt'] as String).toList();
+      } else {
+        developer.log('❌ Failed to fetch sample prompts: ${response.statusCode}', name: 'ChatRepository');
+        // Return fallback prompts if API fails
+        return [
+          "Draft email to suppliers about new payment terms",
+          "Suggest tools and techniques for monitoring projects",
+          "Suggest tools and techniques",
+          "Generate catchy journal titles",
+        ];
+      }
+    }, 'fetchSamplePrompts');
+  }
 
   /// === Fetch chat list grouped by sections ===
   Future<ChatSections> fetchChatsFromApi() async {
@@ -94,8 +134,8 @@ class ChatRepository {
           for (final history in historyList) {
             final inputList = history['input'] as List? ?? [];
             final outputList = history['output'] as List? ?? [];
-            final inputText =  inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
-            final outputText =   outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
+            final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
+            final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
             final createdAt = history['createdAt'] != null
                 ? DateTime.tryParse(history['createdAt'].toString()) ?? DateTime.now()
                 : DateTime.now();
@@ -112,6 +152,7 @@ class ChatRepository {
                 createdAt: createdAt,
               ));
             }
+
             // AI message
             if (outputText.isNotEmpty) {
               result.add(Message(
@@ -126,10 +167,11 @@ class ChatRepository {
             }
           }
         }
+
         return result;
       } else if (response.statusCode == 404) {
         // ✅ No messages found yet → return empty list instead of crashing
-        developer.log("ℹ️ No messages yet for session $sessionId",
+        developer.log("ℹ No messages yet for session $sessionId",
             name: "ChatRepository");
         return [];
       } else {
@@ -202,23 +244,25 @@ class ChatRepository {
         ..body = body;
 
       final response = await request.send();
+
       if (response.statusCode != 200) {
         yield '[Exception: HTTP ${response.statusCode}]';
         return;
       }
+
       /// ✅ Mark streaming started
       isStreaming = true;
+
       try {
         developer.log('===========1 ${isStreaming}',
-            name: 'ChatRepository', );
-
+          name: 'ChatRepository', );
         await for (final line in response.stream
             .transform(utf8.decoder)
             .transform(const LineSplitter())) {
           if (line.trim().isEmpty) continue;
+
           developer.log('===========2 ${isStreaming}',
             name: 'ChatRepository', );
-
           try {
             final Map<String, dynamic> decoded =
             jsonDecode(line) as Map<String, dynamic>;
@@ -240,6 +284,7 @@ class ChatRepository {
           } catch (_) {
             continue;
           }
+
           await Future.delayed(const Duration(milliseconds: 40));
         }
       } finally {
@@ -280,6 +325,7 @@ class ChatRepository {
   String _decodeUserId(String accessToken) {
     final parts = accessToken.split('.');
     if (parts.length != 3) throw Exception("Invalid JWT token");
+
     final payload =
     utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
     return jsonDecode(payload)['sub'] as String;

@@ -20,6 +20,8 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _inputController = TextEditingController();
+  final FocusNode _inputFocusNode = FocusNode();
+  bool _isInputFocused = false;
 
   @override
   void initState() {
@@ -27,11 +29,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     _inputController.addListener(() {
       setState(() {});
     });
+
+    _inputFocusNode.addListener(() {
+      setState(() {
+        _isInputFocused = _inputFocusNode.hasFocus;
+      });
+    });
   }
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    _inputFocusNode.dispose(); // ✅ NEW: Dispose focus node
+    _scrollController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -41,6 +59,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     Future<void> _handleSendMessage() async {
       final text = _inputController.text.trim();
       if (text.isEmpty) return;
+
       await ref.read(chatControllerProvider.notifier).sendMessage(text, ref);
       _inputController.clear();
     }
@@ -73,8 +92,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
               ),
               if (messages.isEmpty)
-
-                if (_inputController.text.isEmpty)
+                if (!_isInputFocused)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Row(
@@ -88,17 +106,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
                   )
                 else
+
                   CustomHorizontalScrollableCard(
-                    items: const [
-                      "Draft email to suppliers about new payment terms",
-                      "Suggest tools and techniques for monitoring projects",
-                      "Suggest tools and techniques",
-                      "Suggest tools and techniques for monitoring projects",
-                      "Generate catchy journal titles",
-                    ],
                     ref: ref, // 🔑 pass ref here
                   ),
-              ChatInputField(controller: _inputController,  onSend: _handleSendMessage,),
+              ChatInputField(
+                controller: _inputController,
+                focusNode: _inputFocusNode,
+                onSend: _handleSendMessage,
+              ),
             ],
           ),
         ),

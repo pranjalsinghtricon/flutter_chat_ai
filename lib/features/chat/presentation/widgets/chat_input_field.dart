@@ -19,8 +19,9 @@ import '../../../../common_ui_components/dialog/bottom_drawer_options.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final void Function()? onSend;
-  const ChatInputField({super.key, required this.controller, this.onSend});
+  const ChatInputField({super.key, required this.controller,   this.focusNode, this.onSend});
 
   @override
   ConsumerState<ChatInputField> createState() => _ChatInputFieldState();
@@ -382,6 +383,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                             Expanded(
                               child: TextField(
                                 controller: widget.controller,
+                                focusNode: widget.focusNode,
                                 maxLength: 2000,
                                 maxLines: 1,
                                 onChanged: (_) => setState(() {}),
@@ -421,8 +423,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                               //   },
                               //   splashRadius: 20,
                               // ),
-
-
                             ),
                           ],
                         ),
