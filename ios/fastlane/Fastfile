@@ -12,7 +12,6 @@
 
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
-
 default_platform(:ios)
 
 platform :ios do
@@ -22,26 +21,24 @@ platform :ios do
     key_filepath: ENV['FASTLANE_KEY_FILE'],
     in_house: false
   )
+
+  desc "Push a new beta build to TestFlight"
   lane :beta do
     automatic_code_signing(
       use_automatic_signing: true,
       team_id: "UCH89QLGDN",
       bundle_identifier: "com.informa.elysia"
     )
+
     increment_build_number(xcodeproj: "Runner.xcodeproj")
     
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "com.informa.elysia" => "match AppStore com.informa.elysia"
-        }
-      },
       xcargs: "-allowProvisioningUpdates"
     )
-    
+
     upload_to_testflight(
       api_key: api_key,
       skip_waiting_for_build_processing: true
