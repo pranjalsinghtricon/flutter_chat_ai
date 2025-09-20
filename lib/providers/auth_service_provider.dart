@@ -1,8 +1,7 @@
-import 'package:elysia/features/auth/service/auth_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:elysia/features/auth/service/auth_service.dart';
 import 'dart:developer' as developer;
 
-// ================== Providers ==================
 final authServiceProvider = Provider<AuthService>((ref) {
   return AuthService();
 });
@@ -13,12 +12,6 @@ StateNotifierProvider<AuthStateNotifier, AuthState>((ref) {
   return AuthStateNotifier(authService);
 });
 
-final userInfoProvider = Provider<Map<String, dynamic>?>((ref) {
-  final authState = ref.watch(authStateProvider);
-  return authState.userInfo;
-});
-
-// ================== Auth State ==================
 class AuthState {
   final bool isInitialized;
   final bool isLoading;
@@ -55,7 +48,6 @@ class AuthState {
   }
 }
 
-// ================== Notifier ==================
 class AuthStateNotifier extends StateNotifier<AuthState> {
   final AuthService _authService;
 
@@ -65,85 +57,35 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
 
   Future<void> _initialize() async {
     state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final success = await _authService.initialize();
-      if (success) {
-        state = state.copyWith(
-          isInitialized: true,
-          isLoading: false,
-          isLoggedIn: _authService.isLoggedIn,
-          userId: _authService.currentUserId,
-          userInfo: _authService.userInfo,
-        );
-      } else {
-        state = state.copyWith(
-          isInitialized: true,
-          isLoading: false,
-          isLoggedIn: false,
-          error: 'Failed to initialize authentication service',
-        );
-      }
-    } catch (e) {
-      state = state.copyWith(
-        isInitialized: true,
-        isLoading: false,
-        error: 'Initialization error: $e',
-      );
-    }
+    final success = await _authService.initialize();
+    state = state.copyWith(
+      isInitialized: true,
+      isLoading: false,
+      isLoggedIn: success,
+      userId: _authService.currentUserId,
+      userInfo: _authService.userInfo,
+    );
   }
 
   Future<void> signIn() async {
     state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      final userInfo = await _authService.signIn();
-      developer.log(' ${userInfo}',
-          name: 'Auth Service provider');
-      if (userInfo != null) {
-        state = state.copyWith(
-          isInitialized: true,
-          isLoading: false,
-          isLoggedIn: true,
-          userId: userInfo['id'],
-          userInfo: userInfo,
-        );
-        await _authService.fetchUserProfile();
-      } else {
-        state = state.copyWith(
-          isInitialized: true,
-          isLoading: false,
-          error: 'Sign-in failed: No user information received',
-        );
-      }
-    } catch (e) {
+    final userInfo = await _authService.signIn();
+    if (userInfo != null) {
       state = state.copyWith(
-        isInitialized: true,
         isLoading: false,
-        error: 'Sign-in error: $e',
+        isLoggedIn: true,
+        userId: userInfo['id'],
+        userInfo: userInfo,
       );
+      await _authService.fetchUserProfile();
+    } else {
+      state = state.copyWith(isLoading: false, error: 'Sign-in failed');
     }
   }
 
   Future<void> signOut() async {
-    state = state.copyWith(isLoading: true, error: null);
-
-    try {
-      await _authService.signOut();
-      state = state.copyWith(
-        isInitialized: true,
-        isLoading: false,
-        isLoggedIn: false,
-        userId: null,
-        userInfo: null,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isInitialized: true,
-        isLoading: false,
-        error: 'Sign-out error: $e',
-      );
-    }
+    await _authService.signOut();
+    state = state.copyWith(isLoggedIn: false, userId: null, userInfo: null);
   }
 
   void clearError() {

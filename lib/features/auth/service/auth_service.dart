@@ -13,7 +13,6 @@ class AuthService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
   Map<String, dynamic>? _userInfo;
 
-  bool get isInitialized => true;
   bool get isLoggedIn => _userInfo != null;
   Map<String, dynamic>? get userInfo => _userInfo;
   String? get currentUserId => _userInfo?['id'];
@@ -32,9 +31,7 @@ class AuthService {
   Future<Map<String, dynamic>?> signIn() async {
     try {
       developer.log('🚀 Starting Cognito Hosted UI sign-in', name: 'AuthService');
-
-      const clientId = "clientId"; // Replace with real app client id if needed
-
+      const clientId = "clientId"; // replace with real app client id if needed
       final res = await Amplify.Auth.signInWithWebUI(
         provider: AuthProvider.oidc("Azure-SSO", clientId),
         options: const SignInWithWebUIOptions(
@@ -46,8 +43,7 @@ class AuthService {
 
       if (res.isSignedIn) {
         final user = await Amplify.Auth.getCurrentUser();
-        final session =
-        await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
+        final session = await Amplify.Auth.fetchAuthSession() as CognitoAuthSession;
         final tokens = session.userPoolTokensResult.valueOrNull;
 
         _userInfo = {
@@ -62,11 +58,8 @@ class AuthService {
           await saveAccessToken(tokens!.accessToken.raw);
         }
 
-        developer.log(
-          '✅ Sign-in successful -> ${jsonEncode(_userInfo)}',
-          name: 'AuthService',
-        );
-
+        developer.log('✅ Sign-in successful -> ${jsonEncode(_userInfo)}',
+            name: 'AuthService');
         return _userInfo;
       }
 
@@ -80,62 +73,35 @@ class AuthService {
   }
 
   Future<bool> fetchUserProfile() async {
-    developer.log("✅ ========= User Profile Fetched: 6 ", name: "AuthService");
     try {
-      developer.log("✅ ========= User Profile Fetched: 7 ", name: "AuthService");
       final token = getAccessToken();
-      if (token == null) {
-        developer.log("✅ ========= User Profile Fetched: 8", name: "AuthService");
-        developer.log('❌ Access token not available', name: 'AuthService');
-        return false;
-      }
-
-      developer.log("✅ ========= User Profile Fetched: 9", name: "AuthService");
-      developer.log(
-        'Access token available ======= Inside self api',
-        name: 'AuthService',
-      );
+      if (token == null) return false;
 
       final response = await http.get(
         Uri.parse('https://stream-api-qa.iiris.com/v2/ai/profile/self'),
         headers: {
-          'accept': 'application/json, text/plain, */*',
+          'accept': 'application/json',
           'authorization': 'Bearer $token',
-          'origin': 'https://elysia-qa.informa.com',
         },
       );
 
       if (response.statusCode == 200) {
-        developer.log("✅ ========= User Profile Fetched: 10", name: "AuthService");
         final jsonResponse = jsonDecode(response.body);
         developer.log('✅ Profile Response: $jsonResponse', name: 'AuthService');
-        developer.log("✅ ========= User Profile Fetched: 11", name: "AuthService");
-
-
         final data = jsonResponse['data'] as List<dynamic>;
         if (data.isNotEmpty) {
-          developer.log("✅ ========= User Profile Fetched: 12", name: "AuthService");
           final userDoc = data[0]['doc'];
-          final fullName = userDoc['full_name'] as String? ?? 'Unknown Name';
-
-          _userInfo?['full_name'] = fullName;
-          developer.log("✅ ========= User Profile Fetched: 13", name: "AuthService");
+          _userInfo?['full_name'] = userDoc['full_name'] ?? 'Unknown Name';
         }
         return true;
       } else {
-        developer.log("✅ ========= User Profile Fetched: 14", name: "AuthService");
-        developer.log(
-          '⚠ Failed to fetch profile: ${response.statusCode} ${response.body}',
-          name: 'AuthService',
-        );
-        developer.log("✅ ========= User Profile Fetched: 15", name: "AuthService");
+        developer.log('⚠ Failed to fetch profile: ${response.statusCode}',
+            name: 'AuthService');
         return false;
       }
     } catch (e, st) {
-      developer.log("✅ ========= User Profile Fetched: 16", name: "AuthService");
       developer.log('❌ Error fetching profile: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
-      developer.log("✅ ========= User Profile Fetched: 17", name: "AuthService");
       return false;
     }
   }

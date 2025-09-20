@@ -1,12 +1,11 @@
-import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:elysia/providers/auth_service_provider.dart';
-import 'package:elysia/utiltities/consts/color_constants.dart';
-import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
-import 'package:elysia/main.dart';
-import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:elysia/providers/auth_service_provider.dart';
+import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
+import 'package:elysia/main.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'dart:developer' as developer;
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -25,38 +24,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void initState() {
     super.initState();
 
-    // Show background after 1s
-    Future.delayed(const Duration(milliseconds: 1500), () {
-      setState(() {
-        _showBackground = true;
-      });
+    // Animate background fade in
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() => _showBackground = true);
+      }
     });
 
-    // Animate logo upwards after 1s
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        _logoMovedUp = true;
-      });
+    // Move logo up
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        setState(() => _logoMovedUp = true);
+      }
     });
 
-    // Show welcome + button after 2s
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _showContent = true;
-      });
+    // Show content
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      if (mounted) {
+        setState(() => _showContent = true);
+      }
     });
-
-    _logAuthSession();
-  }
-
-  Future<void> _logAuthSession() async {
-    try {
-      final AuthSession session = await Amplify.Auth.fetchAuthSession();
-      developer.log('🔑 Auth Session isSignedIn: ${session.isSignedIn}',
-          name: 'LoginPage');
-    } catch (e) {
-      developer.log('❌ Error fetching auth session: $e', name: 'LoginPage');
-    }
   }
 
   @override
@@ -68,24 +55,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final double initialTop = (screenHeight / 2) - (logoSize / 2);
     final double targetTop = screenHeight * 0.15;
 
-    if (authState.isLoggedIn && authState.userInfo != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await ref.read(authServiceProvider).fetchUserProfile();
+    ref.listen<AuthState>(authStateProvider, (prev, next) {
+      if (next.isLoggedIn && next.userInfo != null) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const MainLayout(child: ChatScreen()),
+            builder: (_) => const MainLayout(child: ChatScreen()),
           ),
         );
-        // developer.log("⚠ ==================================== pushReplacementNamed", name: "Login");
-        // Navigator.pushReplacementNamed(context, Routes.chat);
-      });
-    }
+      }
+    });
 
     return Scaffold(
       backgroundColor: ColorConst.elysiaBackgroundBlue,
       body: Stack(
         children: [
-          // === Half Circular White Background (fade in after 1s) ===
+          // === Half Circular White Background ===
           AnimatedOpacity(
             duration: const Duration(milliseconds: 2000),
             opacity: _showBackground ? 1 : 0,

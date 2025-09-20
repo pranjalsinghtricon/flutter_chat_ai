@@ -1,5 +1,4 @@
 import 'dart:developer' as developer;
-import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
@@ -12,24 +11,31 @@ import '../main.dart';
 import '../features/chat/presentation/screens/chat_screen.dart';
 import '../features/chat/application/chat_controller.dart';
 import '../features/chat/data/models/chat_model.dart';
-import '../common_ui_components/buttons/custom_icon_text_outlined_button.dart';
 import '../common_ui_components/expandable_tile/custom_expandable_tile.dart';
+import 'dart:developer' as developer;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
- class GlobalAppDrawer extends ConsumerWidget {
+class GlobalAppDrawer extends ConsumerWidget {
   const GlobalAppDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chats = ref.watch(chatHistoryProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final authState = ref.watch(authStateProvider);
 
-    final userInfo = ref.watch(userInfoProvider);
-    final userFullName = userInfo?['full_name'] ?? 'Unknown User';
+// 🔎 Debugging output
+    developer.log("AuthState -------- ----- - -- - - : $authState", name: "LoginPage");
+    developer.log("AuthState.userInfo ------ - - -- -- -- - - --  -: ${authState.userInfo}", name: "LoginPage");
+
+    final userFullName =
+        authState.userInfo?['full_name'] ??
+            authState.userInfo?['username'] ??
+            'User';
 
     String getInitials(String name) {
-      final parts = name.split(' ');
+      final parts = name.trim().split(' ');
       if (parts.isEmpty) return '';
       if (parts.length == 1) return parts[0][0].toUpperCase();
       return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -52,9 +58,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
     }
 
     return Drawer(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.zero,
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: SafeArea(
         child: Column(
           children: [
@@ -117,14 +121,13 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                           MaterialPageRoute(
                             settings: const RouteSettings(name: '/chat'),
                             builder: (_) =>
-                                const MainLayout(child: ChatScreen()),
+                            const MainLayout(child: ChatScreen()),
                           ),
                         );
                       }
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                       child: Row(
                         children: [
                           SvgPicture.asset(
@@ -133,8 +136,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                             height: 20,
                             color: const Color(0xFF525A5C),
                           ),
-                          const SizedBox(
-                              width: 20),
+                          const SizedBox(width: 20),
                           const Text(
                             'New Chat',
                             style: TextStyle(
@@ -146,17 +148,11 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                       ),
                     ),
                   ),
-                  SizedBox(height: 10,),
-
-                  const Divider(
-                    color: Color(0xFFDADADA),
-                    thickness: 1,
-                    height: 1,
-                  ),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 10),
+                  const Divider(color: Color(0xFFDADADA), thickness: 1, height: 1),
+                  const SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 18, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                     child: Row(
                       children: [
                         SvgPicture.asset(
@@ -164,8 +160,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                           width: 20,
                           height: 20,
                         ),
-                        const SizedBox(
-                            width: 20),
+                        const SizedBox(width: 20),
                         const Text(
                           'Chat History',
                           style: TextStyle(
@@ -300,15 +295,11 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
                 ],
               ),
             ),
-            const Divider(
-              color: Color(0xFFDADADA),
-              thickness: 1,
-              height: 1,
-            ),
+            const Divider(color: Color(0xFFDADADA), thickness: 1, height: 1),
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: ColorConst.primaryColor,
-                child: Text(getInitials(userFullName), ),
+                child: Text(getInitials(userFullName)),
               ),
               title: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -352,6 +343,26 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
             //     value ? ThemeMode.dark : ThemeMode.light;
             //   },
             // ),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text(
+                'Sign Out',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onTap: () async {
+                developer.log('🔴 Sign out pressed', name: 'GlobalAppDrawer');
+                await ref.read(authStateProvider.notifier).signOut();
+                Navigator.pop(context); // Close drawer
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                      (route) => false,
+                );
+              },
+            ),
           ],
         ),
       ),

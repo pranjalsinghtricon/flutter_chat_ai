@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'amplifyconfiguration.dart';
-import 'features/auth/presentation/login.dart';
 import 'features/auth/presentation/splash_screen.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
@@ -16,7 +15,6 @@ final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -40,11 +38,10 @@ class _MyAppState extends State<MyApp> {
       final authPlugin = AmplifyAuthCognito();
       await Amplify.addPlugin(authPlugin);
       await Amplify.configure(amplifyconfig);
-      setState(() {
-        _isAmplifyConfigured = true;
-      });
+      setState(() => _isAmplifyConfigured = true);
       developer.log('✅ Amplify configured successfully', name: 'Main');
     } on AmplifyAlreadyConfiguredException {
+      setState(() => _isAmplifyConfigured = true);
       developer.log('⚠ Amplify already configured.', name: 'Main');
     } catch (e) {
       developer.log('⚠ Amplify configuration error: $e', name: 'Main');
@@ -62,7 +59,6 @@ class _MyAppState extends State<MyApp> {
         darkTheme: AppTheme.darkTheme,
         themeMode: themeMode,
         home: _isAmplifyConfigured
-          // const MainLayout(child: ChatScreen())
             ? const SplashScreen()
             : const Scaffold(
           body: Center(child: CircularProgressIndicator()),

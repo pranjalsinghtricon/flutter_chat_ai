@@ -11,8 +11,9 @@ class WelcomeMessageScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userInfo = ref.watch(userInfoProvider);
-    final userFullName = userInfo?['full_name'] ?? 'Unknown User';
+    final authState = ref.watch(authStateProvider);
+    final userFullName =
+        authState.userInfo?['full_name'] ?? authState.userInfo?['username'] ?? 'User';
 
     // return Padding(
     //   padding: const EdgeInsets.all(24.0),
@@ -71,7 +72,6 @@ class WelcomeMessageScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -90,6 +90,36 @@ class WelcomeMessageScreen extends ConsumerWidget {
               color: Colors.black87,
             ),
           ),
+          const SizedBox(height: 16),
+          const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
+          const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
+          const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
+          const _SuggestedPrompt('How will One Informa be measured?'),
+          const SizedBox(height: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                AssetConsts.iconShield,
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Your personal and company data are protected in this chat',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
