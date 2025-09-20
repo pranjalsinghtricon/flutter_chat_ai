@@ -1,5 +1,6 @@
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:elysia/providers/auth_service_provider.dart';
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
@@ -34,7 +35,7 @@ class WelcomeMessageScreen extends ConsumerWidget {
     //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
     //       ),
     //       const SizedBox(height: 5),
-    //       const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
+    //       const _SuggestedPrompt('How are you'),
     //       const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
     //       const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
     //       const _SuggestedPrompt('How will One Informa be measured?'),
@@ -90,36 +91,36 @@ class WelcomeMessageScreen extends ConsumerWidget {
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 16),
-          const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
-          const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
-          const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
-          const _SuggestedPrompt('How will One Informa be measured?'),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                AssetConsts.iconShield,
-                width: 22,
-                height: 22,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Your personal and company data are protected in this chat',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          )
+          // const SizedBox(height: 16),
+          // const _SuggestedPrompt('How will One Informa improve career mobility within Informa?'),
+          // const _SuggestedPrompt('Generate 5 catchy titles for a new journal in neuroscience'),
+          // const _SuggestedPrompt('Draft email to suppliers about new payment terms'),
+          // const _SuggestedPrompt('How will One Informa be measured?'),
+          // const SizedBox(height: 16),
+          // Row(
+          //   crossAxisAlignment: CrossAxisAlignment.center,
+          //   children: [
+          //     SvgPicture.asset(
+          //       AssetConsts.iconShield,
+          //       width: 22,
+          //       height: 22,
+          //       colorFilter: ColorFilter.mode(
+          //         Theme.of(context).colorScheme.onSurface,
+          //         BlendMode.srcIn,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 8),
+          //     const Expanded(
+          //       child: Text(
+          //         'Your personal and company data are protected in this chat',
+          //         style: TextStyle(
+          //           fontSize: 13,
+          //           fontWeight: FontWeight.w500,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // )
         ],
       ),
     );

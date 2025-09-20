@@ -65,16 +65,14 @@ class ProfileLandingScreen extends ConsumerWidget {
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               developer.log('🔴 Log out pressed', name: 'ProfilePage');
-
               try {
                 await Amplify.Auth.signOut();
               } catch (e) {
                 developer.log('❌ Sign out error: $e', name: 'ProfilePage');
               }
-
               // Reset auth state
               ref.read(authStateProvider.notifier).signOut();
-
+              Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginPage()),
