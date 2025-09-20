@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:elysia/providers/auth_service_provider.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
+import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/main.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
@@ -23,6 +24,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
+
+    // Clear any existing chat data when coming to login
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatControllerProvider.notifier).clearAllChatData();
+      // ref.read(chatHistoryProvider.notifier).clearAllHistory();
+    });
 
     // Animate background fade in
     Future.delayed(const Duration(milliseconds: 800), () {
@@ -50,13 +57,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
     final screenHeight = MediaQuery.of(context).size.height;
-
     const double logoSize = 100;
     final double initialTop = (screenHeight / 2) - (logoSize / 2);
     final double targetTop = screenHeight * 0.15;
 
+    // Listen for auth state changes
     ref.listen<AuthState>(authStateProvider, (prev, next) {
-      if (next.isLoggedIn && next.userInfo != null) {
+      if (next.isLoggedIn && next.userInfo != null && mounted) {
+        developer.log("✅ Login successful, navigating to chat", name: "LoginPage");
+
+        // Navigate to main screen with chat
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => const MainLayout(child: ChatScreen()),
@@ -141,11 +151,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onPressed: authState.isLoading || !authState.isInitialized
                             ? null
                             : () async {
-                          developer.log('🔵 Sign in button pressed',
-                              name: 'LoginPage');
-                          await ref
-                              .read(authStateProvider.notifier)
-                              .signIn();
+                          developer.log('🔵 Sign in button pressed', name: 'LoginPage');
+                          await ref.read(authStateProvider.notifier).signIn();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0F80A8),
@@ -185,6 +192,39 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                       ),
                     ),
+
+                    // Show error if any
+                    if (authState.error != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        margin: const EdgeInsets.symmetric(horizontal: 32),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                authState.error!,
+                                style: TextStyle(
+                                  color: Colors.red.shade700,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () => ref.read(authStateProvider.notifier).clearError(),
+                              child: const Text('Dismiss'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -1,40 +1,32 @@
 import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 
-
-final chatRepositoryProvider =
-Provider<ChatRepository>((ref) => ChatRepository());
+final chatRepositoryProvider = Provider<ChatRepository>((ref) => ChatRepository());
 
 /// Holds the in-memory messages for the *currently open* session.
-final chatControllerProvider =
-StateNotifierProvider<ChatController, List<Message>>(
+final chatControllerProvider = StateNotifierProvider<ChatController, List<Message>>(
       (ref) => ChatController(ref.read(chatRepositoryProvider)),
 );
 
 /// Holds the list of chat histories (sessions).
-final chatHistoryProvider =
-    StateNotifierProvider<ChatHistoryController, ChatSections>(
-  (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
+final chatHistoryProvider = StateNotifierProvider<ChatHistoryController, ChatSections>(
+      (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
 );
 
 class ChatController extends StateNotifier<List<Message>> {
   bool forceNewChat = false;
   final ChatRepository _repo;
   String? _currentSessionId;
+
   String? get currentSessionId => _currentSessionId;
 
   ChatController(this._repo) : super([]);
 
   Future<String> startNewChat({String initialTitle = 'New Conversation'}) async {
-    _currentSessionId = const Uuid().v4();
-
-    // We no longer upsert history locally → history is managed by API
-    // But still initialize messages
     _currentSessionId = const Uuid().v4();
     forceNewChat = true;
     state = [];
@@ -43,12 +35,26 @@ class ChatController extends StateNotifier<List<Message>> {
 
   Future<void> loadSession(String sessionId) async {
     _currentSessionId = sessionId;
-    final messages = await _repo.getMessages(sessionId);
-    state = messages;
+    try {
+      final messages = await _repo.getMessages(sessionId);
+      state = messages;
+    } catch (e) {
+      // If session loading fails, start fresh
+      state = [];
+    }
   }
 
   void resetChatViewOnly() {
     state = [];
+    _currentSessionId = null;
+    forceNewChat = false;
+  }
+
+  // Method to completely clear all chat data (for sign out)
+  void clearAllChatData() {
+    state = [];
+    _currentSessionId = null;
+    forceNewChat = false;
   }
 
   Future<void> sendMessage(String content, WidgetRef ref) async {
@@ -66,6 +72,7 @@ class ChatController extends StateNotifier<List<Message>> {
       isUser: true,
       createdAt: DateTime.now(),
     );
+
     state = [...state, userMsg];
     await _repo.addMessage(userMsg);
 
@@ -77,14 +84,14 @@ class ChatController extends StateNotifier<List<Message>> {
       isUser: false,
       createdAt: DateTime.now(),
     );
+
     state = [...state, botMsg];
     await _repo.addMessage(botMsg);
 
     bool chatAddedToToday = false;
+
     // Stream response from API
-    _repo
-        .sendPromptStream(prompt: text, sessionId: _currentSessionId!)
-        .listen((chunk) async {
+    _repo.sendPromptStream(prompt: text, sessionId: _currentSessionId!).listen((chunk) async {
       // Check for metadata chunk
       if (chunk.startsWith('[METADATA]')) {
         final metadataJson = chunk.substring(10);
@@ -103,7 +110,9 @@ class ChatController extends StateNotifier<List<Message>> {
         copy[lastIndex] = botMsg;
         state = copy;
       }
+
       await _repo.replaceMessages(_currentSessionId!, state);
+
       // Add new chat to today only after first non-empty, non-metadata chunk
       if (isNewChat && !chatAddedToToday && !chunk.startsWith('[METADATA]') && chunk.trim().isNotEmpty) {
         chatAddedToToday = true;
@@ -113,6 +122,7 @@ class ChatController extends StateNotifier<List<Message>> {
           updatedOn: DateTime.now(),
           isArchived: false,
         );
+
         final notifier = ref.read(chatHistoryProvider.notifier);
         notifier.state = ChatSections(
           today: [chatHistory, ...notifier.state.today],
@@ -125,7 +135,6 @@ class ChatController extends StateNotifier<List<Message>> {
     });
   }
 
-
   String _titleFrom(String text) {
     final t = text.replaceAll('\n', ' ').trim();
     return t.length <= 40 ? t : '${t.substring(0, 37)}...';
@@ -134,6 +143,7 @@ class ChatController extends StateNotifier<List<Message>> {
 
 class ChatHistoryController extends StateNotifier<ChatSections> {
   final ChatRepository _repo;
+
   ChatHistoryController(this._repo) : super(ChatSections.empty()) {
     loadChats();
   }
@@ -146,9 +156,18 @@ class ChatHistoryController extends StateNotifier<ChatSections> {
     }
   }
 
+  // Method to clear all chat history (for sign out)
+  // void clearAllHistory() {
+  //   state = ChatSections.empty();
+  // }
+  //
+  // // Method to refresh chat history
+  // Future<void> refreshChats() async {
+  //   await loadChats();
+  // }
+
   void updateArchiveStatus(String sessionId) {
     ChatHistory? chatToArchive;
-
     List<ChatHistory> removeAndUpdate(List<ChatHistory> list) {
       return list.where((chat) {
         if (chat.sessionId == sessionId) {
@@ -170,21 +189,18 @@ class ChatHistoryController extends StateNotifier<ChatSections> {
 
   void updateTitle(String sessionId, String newTitle) {
     state = _mapChats(
-      (chat) => chat.sessionId == sessionId
-          ? chat.copyWith(title: newTitle)
-          : chat,
+          (chat) => chat.sessionId == sessionId ? chat.copyWith(title: newTitle) : chat,
     );
   }
 
   void deleteChat(String sessionId) {
     state = _mapChats(
-      (chat) => chat.sessionId == sessionId ? null : chat,
+          (chat) => chat.sessionId == sessionId ? null : chat,
       removeNulls: true,
     );
   }
 
-  ChatSections _mapChats(ChatHistory? Function(ChatHistory) transform,
-      {bool removeNulls = false}) {
+  ChatSections _mapChats(ChatHistory? Function(ChatHistory) transform, {bool removeNulls = false}) {
     List<ChatHistory> apply(List<ChatHistory> list) {
       final mapped = list.map(transform).toList();
       return removeNulls ? mapped.whereType<ChatHistory>().toList() : mapped.cast<ChatHistory>();

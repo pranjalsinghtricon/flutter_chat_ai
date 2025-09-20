@@ -12,7 +12,6 @@ import '../features/chat/presentation/screens/chat_screen.dart';
 import '../features/chat/application/chat_controller.dart';
 import '../features/chat/data/models/chat_model.dart';
 import '../common_ui_components/expandable_tile/custom_expandable_tile.dart';
-import 'dart:developer' as developer;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -25,18 +24,12 @@ class GlobalAppDrawer extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final authState = ref.watch(authStateProvider);
 
-// 🔎 Debugging output
-    developer.log("AuthState -------- ----- - -- - - : $authState", name: "LoginPage");
-    developer.log("AuthState.userInfo ------ - - -- -- -- - - --  -: ${authState.userInfo}", name: "LoginPage");
-
-    final userFullName =
-        authState.userInfo?['full_name'] ??
-            authState.userInfo?['username'] ??
-            'User';
+    // Use the new display name method
+    final userDisplayName = authState.getDisplayName();
 
     String getInitials(String name) {
       final parts = name.trim().split(' ');
-      if (parts.isEmpty) return '';
+      if (parts.isEmpty) return 'U';
       if (parts.length == 1) return parts[0][0].toUpperCase();
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
@@ -56,6 +49,56 @@ class GlobalAppDrawer extends ConsumerWidget {
         );
       }
     }
+
+    // Future<void> handleSignOut() async {
+    //   try {
+    //     developer.log('🔴 Sign out initiated from drawer', name: 'GlobalAppDrawer');
+    //
+    //     // Close the drawer first
+    //     Navigator.of(context, rootNavigator: true).pop();
+    //
+    //     // Clear chat data
+    //     ref.read(chatControllerProvider.notifier).clearAllChatData();
+    //     // ref.read(chatHistoryProvider.notifier).clearAllHistory();
+    //
+    //     // Sign out from auth service
+    //     await ref.read(authStateProvider.notifier).signOut();
+    //
+    //     // Navigate to login page and clear navigation stack
+    //     Navigator.of(context).pushAndRemoveUntil(
+    //       MaterialPageRoute(builder: (_) => const LoginPage()),
+    //           (route) => false,
+    //     );
+    //
+    //     developer.log('✅ Sign out completed successfully', name: 'GlobalAppDrawer');
+    //   } catch (e) {
+    //     developer.log('❌ Sign out error: $e', name: 'GlobalAppDrawer');
+    //
+    //     // Show error dialog
+    //     if (context.mounted) {
+    //       showDialog(
+    //         context: context,
+    //         builder: (context) => AlertDialog(
+    //           title: const Text('Sign Out Error'),
+    //           content: Text('Failed to sign out properly: $e'),
+    //           actions: [
+    //             TextButton(
+    //               onPressed: () {
+    //                 Navigator.of(context).pop();
+    //                 // Force navigate to login even on error
+    //                 Navigator.of(context).pushAndRemoveUntil(
+    //                   MaterialPageRoute(builder: (_) => const LoginPage()),
+    //                       (route) => false,
+    //                 );
+    //               },
+    //               child: const Text('OK'),
+    //             ),
+    //           ],
+    //         ),
+    //       );
+    //     }
+    //   }
+    // }
 
     return Drawer(
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -120,8 +163,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                           context,
                           MaterialPageRoute(
                             settings: const RouteSettings(name: '/chat'),
-                            builder: (_) =>
-                            const MainLayout(child: ChatScreen()),
+                            builder: (_) => const MainLayout(child: ChatScreen()),
                           ),
                         );
                       }
@@ -148,9 +190,12 @@ class GlobalAppDrawer extends ConsumerWidget {
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 10),
                   const Divider(color: Color(0xFFDADADA), thickness: 1, height: 1),
                   const SizedBox(height: 10),
+
+                  // Chat History Header
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                     child: Row(
@@ -295,21 +340,34 @@ class GlobalAppDrawer extends ConsumerWidget {
                 ],
               ),
             ),
+
+            // Bottom section with user profile and sign out
             const Divider(color: Color(0xFFDADADA), thickness: 1, height: 1),
+
+            // User Profile Section
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: ColorConst.primaryColor,
-                child: Text(getInitials(userFullName)),
+                child: Text(
+                  getInitials(userDisplayName),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               title: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    userFullName,
-                    style: const TextStyle(
-                      color: ColorConst.primaryBlack,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  Flexible(
+                    child: Text(
+                      userDisplayName,
+                      style: const TextStyle(
+                        color: ColorConst.primaryBlack,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -326,7 +384,6 @@ class GlobalAppDrawer extends ConsumerWidget {
                 );
               },
             ),
-            // SwitchListTile(
             //   title: Text(
             //     "Dark Mode",
             //     style: TextStyle(
@@ -343,26 +400,19 @@ class GlobalAppDrawer extends ConsumerWidget {
             //     value ? ThemeMode.dark : ThemeMode.light;
             //   },
             // ),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text(
-                'Sign Out',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onTap: () async {
-                developer.log('🔴 Sign out pressed', name: 'GlobalAppDrawer');
-                await ref.read(authStateProvider.notifier).signOut();
-                Navigator.pop(context); // Close drawer
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                      (route) => false,
-                );
-              },
-            ),
+
+            // Sign Out Button
+            // ListTile(
+            //   leading: const Icon(Icons.logout, color: Colors.redAccent),
+            //   title: const Text(
+            //     'Sign Out',
+            //     style: TextStyle(
+            //       fontSize: 14,
+            //       fontWeight: FontWeight.w600,
+            //     ),
+            //   ),
+            //   onTap: handleSignOut,
+            // ),
           ],
         ),
       ),
