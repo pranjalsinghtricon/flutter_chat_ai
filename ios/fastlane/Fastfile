@@ -23,6 +23,11 @@ platform :ios do
     in_house: false
   )
   lane :beta do
+    match(
+      type: "appstore",
+      app_identifier: "com.informa.elysia",
+      readonly: true
+    )
     increment_build_number(xcodeproj: "Runner.xcodeproj")
     
     build_app(
