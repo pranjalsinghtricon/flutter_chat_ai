@@ -24,9 +24,10 @@ platform :ios do
 
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    automatic_code_signing(
-      use_automatic_signing: true,
-      team_id: "UCH89QLGDN",
+   update_code_signing_settings(
+        use_automatic_signing: true,
+        targets: ["Runner", "RunnerTests"],
+        team_id: "UCH89QLGDN"
       bundle_identifier: "com.informa.elysia"
     )
 
