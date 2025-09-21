@@ -24,15 +24,14 @@ platform :ios do
 
   desc "Push a new beta build to TestFlight"
   lane :beta do
-   update_code_signing_settings(
-    use_automatic_signing: true,
-    targets: ["Runner", "RunnerTests"],
-    team_id: "UCH89QLGDN",
-    bundle_identifier: "com.informa.elysia"
-)
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      targets: ["Runner", "RunnerTests"],
+      team_id: "UCH89QLGDN"
+    )
 
     increment_build_number(xcodeproj: "Runner.xcodeproj")
-    
+
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
