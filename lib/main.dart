@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'amplifyconfiguration.dart';
+import 'features/auth/presentation/login.dart';
+import 'utiltities/navigations/navigation.dart';
 import 'features/auth/presentation/splash_screen.dart';
 import 'widgets/global_appbar.dart';
 import 'widgets/global_app_drawer.dart';
@@ -53,6 +55,7 @@ class _MyAppState extends State<MyApp> {
     return Consumer(builder: (context, ref, _) {
       final themeMode = ref.watch(themeModeProvider);
       return MaterialApp(
+        navigatorKey: NavigationService.navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Elysia',
         theme: AppTheme.lightTheme,

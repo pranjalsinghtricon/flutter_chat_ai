@@ -2,15 +2,17 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
+import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
+import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
+  final TokenStorage _tokenStorage = TokenStorage();
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
   Map<String, dynamic>? _userInfo;
   List<String> _samplePrompts = [];
 
@@ -68,7 +70,7 @@ class AuthService {
     } catch (e) {
       developer.log("⚠ Initialize error: $e", name: "AuthService");
       // Clear any corrupted data
-      await _storage.delete(key: 'access_token');
+      await _tokenStorage.clearAccessToken();
       _userInfo = null;
       _samplePrompts = [];
     }
@@ -128,20 +130,14 @@ class AuthService {
 
   Future<bool> fetchUserProfile() async {
     try {
-      final token = getAccessToken();
-      if (token == null) return false;
-
-      final response = await http.get(
-        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/profile/self'),
-        headers: {
-          'accept': 'application/json',
-          'authorization': 'Bearer $token',
-        },
-      );
+      final apiClient = ApiClient();
+      final url = APIEndpoints.getUserProfile;
+      final response = await apiClient.dio.get(url);
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        developer.log('✅ Profile Response: $jsonResponse', name: 'AuthService');
+        final jsonResponse = response.data is String
+            ? jsonDecode(response.data)
+            : response.data;
 
         final data = jsonResponse['data'] as List<dynamic>;
         if (data.isNotEmpty) {
@@ -158,11 +154,10 @@ class AuthService {
         }
         return true;
       } else {
-        developer.log('⚠ Failed to fetch profile: ${response.statusCode}', name: 'AuthService');
         return false;
       }
     } catch (e, st) {
-      developer.log('❌ Error fetching profile: $e', name: 'AuthService');
+      developer.log('❌ Error fetching user profile: $e', name: 'AuthService');
       developer.log('$st', name: 'AuthService');
       return false;
     }
@@ -170,24 +165,15 @@ class AuthService {
 
   Future<bool> fetchSamplePrompts() async {
     try {
-      final token = getAccessToken();
-      if (token == null) {
-        developer.log('⚠ No access token for sample prompts', name: 'AuthService');
-        return false;
-      }
+      final apiClient = ApiClient();
+      final url = APIEndpoints.getSamplePrompts;
 
-      final response = await http.get(
-        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/prompts/sample'),
-        headers: {
-          'accept': 'application/json, text/plain, */*',
-          'authorization': 'Bearer $token',
-          'origin': 'https://elysia-qa.informa.com',
-          'user-agent': 'ElysiaClient/1.0',
-        },
-      );
+      final response = await apiClient.dio.get(url);
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
+        final jsonResponse = jsonDecode(response.data is String
+            ? response.data
+            : jsonEncode(response.data));
         developer.log('✅ Sample Prompts Response: $jsonResponse', name: 'AuthService');
 
         final data = jsonResponse['data'] as List<dynamic>;
@@ -221,12 +207,12 @@ class AuthService {
   }
 
   Future<void> saveAccessToken(String token) async {
-    await _storage.write(key: 'access_token', value: token);
+    await _tokenStorage.saveAccessToken(token);
     developer.log('🔐 Token saved', name: 'AuthService');
   }
 
   Future<String?> getStoredAccessToken() async {
-    return await _storage.read(key: 'access_token');
+    return await _tokenStorage.getAccessToken();
   }
 
   Future<void> signOut() async {
@@ -241,8 +227,8 @@ class AuthService {
       // Clear all stored data
       _userInfo = null;
       _samplePrompts = [];
-      await _storage.delete(key: 'access_token');
-      await _storage.deleteAll(); // Clear all secure storage
+      await _tokenStorage.clearAccessToken();
+      await _tokenStorage.clearAllStorage();
 
       developer.log('✅ Signed out and all data cleared', name: 'AuthService');
     } catch (e, st) {
@@ -251,11 +237,9 @@ class AuthService {
       // Force clear data even if sign out fails
       _userInfo = null;
       _samplePrompts = [];
-      await _storage.deleteAll();
+      await _tokenStorage.clearAllStorage();
     }
   }
-
-  String? getAccessToken() => _userInfo?['accessToken'] as String?;
 
   // Helper method to get display name
   String getDisplayName() {
