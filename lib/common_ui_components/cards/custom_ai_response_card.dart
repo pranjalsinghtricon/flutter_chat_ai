@@ -35,6 +35,7 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
   bool _showFeedback = false;
+  bool _hasReceivedMetadata = false; // Track if we've received metadata (streaming complete)
 
   void _toggleFeedback() {
     setState(() {
@@ -54,11 +55,21 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
 
   @override
   Widget build(BuildContext context) {
-    // Check if this specific message is currently streaming
     final chatRepository = ref.watch(chatRepositoryProvider);
     final isCurrentlyStreaming = chatRepository.isStreaming && widget.message.content.isEmpty;
 
+    // Check if this is the last message and streaming has finished
+    final isStreamingForThisMessage = chatRepository.isStreaming &&
+        widget.message.content.isNotEmpty &&
+        !widget.message.isUser;
+
+    // Show feedback when streaming is complete and message has content
+    final shouldShowFeedbackButtons = !chatRepository.isStreaming &&
+        widget.message.content.isNotEmpty &&
+        !widget.message.isUser;
+
     debugPrint("📡 =====  isCurrentlyStreaming in MessageBubble: $isCurrentlyStreaming ====");
+    debugPrint("📡 =====  shouldShowFeedbackButtons: $shouldShowFeedbackButtons ====");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,27 +79,28 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              isCurrentlyStreaming
+              isCurrentlyStreaming || isStreamingForThisMessage
                   ? SvgPicture.asset(
-          AssetConsts.elysiaBrainLoaderSvg,
-            width: 22,
-            height: 22,
-          )
-                  : SvgPicture.asset(
                 AssetConsts.elysiaBrainLoaderSvg,
+                width: 22,
+                height: 22,
+              )
+                  : SvgPicture.asset(
+                AssetConsts.elysiaBrainSvg,
                 width: 22,
                 height: 22,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  isCurrentlyStreaming
+                  (isCurrentlyStreaming || isStreamingForThisMessage)
                       ? "Elysia is generating response..."
                       : "Elysia's response",
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight:
-                    isCurrentlyStreaming ? FontWeight.w400 : FontWeight.w600,
+                    fontWeight: (isCurrentlyStreaming || isStreamingForThisMessage)
+                        ? FontWeight.w400
+                        : FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -97,13 +109,15 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
           ),
         ),
 
-        if (!isCurrentlyStreaming && widget.message.content.isNotEmpty)
+        // Show content when available
+        if (widget.message.content.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
-        if (isCurrentlyStreaming && widget.message.content.isNotEmpty)
+        // Show feedback buttons only when streaming is completely done
+        if (shouldShowFeedbackButtons)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
@@ -129,6 +143,23 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             ),
           ),
 
+        // Centered disclaimer message - only show when feedback buttons are shown
+        // if (shouldShowFeedbackButtons)
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        //     child: Center(
+        //       child: Text(
+        //         "Elysia responses may be inaccurate. Know more about how your data is processed here",
+        //         textAlign: TextAlign.center,
+        //         style: TextStyle(
+        //           fontSize: 12,
+        //           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+
+        // Show feedback card when toggled
         if (_showFeedback)
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

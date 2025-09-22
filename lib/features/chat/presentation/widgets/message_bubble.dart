@@ -42,28 +42,31 @@ class MessageBubble extends StatelessWidget {
 
         // Privacy statement - only show at the end of the last AI message
         if (showPrivacyStatement)
-          Padding(
-            padding: const EdgeInsets.only(top: 5, left: 12, right: 12),
-            child: RichText(
-              text: TextSpan(
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-                children: [
-                  const TextSpan(
-                    text: 'Elysia responses may be inaccurate. Know more about how your data is processed ',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Center(
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    children: [
+                      const TextSpan(
+                        text: 'Elysia responses may be inaccurate. Know more about how your data is processed ',
+                      ),
+                      TextSpan(
+                        text: 'here',
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: TapGestureRecognizer()..onTap = _launchUrl,
+                      ),
+                      const TextSpan(text: '.'),
+                    ],
                   ),
-                  TextSpan(
-                    text: 'here',
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = _launchUrl,
-                  ),
-                  const TextSpan(text: '.'),
-                ],
+                ),
               ),
             ),
-          ),
       ],
     );
   }
