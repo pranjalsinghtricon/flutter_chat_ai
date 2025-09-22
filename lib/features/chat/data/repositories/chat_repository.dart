@@ -7,6 +7,8 @@ import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
 import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
 import 'package:elysia/utiltities/jwt-token.dart/decodeJWT.dart'; // JWTDecoder
 import 'package:elysia/utiltities/data-time/timezone.dart';
+import '../../../../utiltities/core/storage.dart';
+import '../../../../utiltities/data-time/timezone.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
@@ -200,7 +202,13 @@ class ChatRepository {
         "default_name_of_model": "gpt-4o",
         "name_of_model": "gpt-4o"
       };
+
+      // 🚀 Log request body
+      developer.log("📤 Sending request body: ${jsonEncode(body)}", name: "ChatRepository");
+
+      /// ✅ Mark streaming started
       isStreaming = true;
+      String fullResponse = "";
 
       try {
         final response = await _apiClient.dio.post(
@@ -208,20 +216,35 @@ class ChatRepository {
           data: jsonEncode(body),
           options: Options(responseType: ResponseType.stream),
         );
+
+        developer.log("✅ Streaming started", name: "ChatRepository");
+
         final stream = response.data.stream.cast<List<int>>().transform(utf8.decoder).transform(const LineSplitter());
         await for (final line in stream) {
           if (line.trim().isEmpty) continue;
+
+          // 👀 Log raw API response line
+          developer.log("📥 RAW LINE: $line", name: "ChatRepository");
+
           try {
             final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
+
+            developer.log("🔎 Decoded JSON: $decoded", name: "ChatRepository");
+
             if (decoded['type'] == 'answer') {
               final chunk = decoded['answer'] as String?;
               if (chunk != null) {
+                developer.log("✂️ ANSWER CHUNK: $chunk", name: "ChatRepository");
+                fullResponse += chunk;
                 yield chunk;
               }
             } else if (decoded['type'] == 'metadata') {
+              final metadata = jsonEncode(decoded['metadata']);
+              developer.log("📊 METADATA: $metadata", name: "ChatRepository");
               yield '[METADATA]${jsonEncode(decoded['metadata'])}';
             }
-          } catch (_) {
+          } catch (err) {
+            developer.log("⚠️ Failed to decode line: $line", name: "ChatRepository", error: err);
             continue;
           }
 
@@ -229,9 +252,11 @@ class ChatRepository {
         }
       } finally {
         isStreaming = false;
+        developer.log("🏁 Streaming ended. FULL RESPONSE: $fullResponse", name: "ChatRepository");
       }
     } catch (e) {
       isStreaming = false;
+      developer.log("💥 Exception in sendPromptStream: $e", name: "ChatRepository", error: e);
       yield '[Exception: $e]';
     }
   }
