@@ -8,4 +8,5 @@ class ColorConst {
   static const primaryBlack = Color(0xFF002244);
   static const primaryWhite = Color(0xFFFFFFFF);
   static const primaryChatQueryResponse = Color(0xFFE4EFF3);
+  static const errorChatResponse = Color(0xFFA4A4A4);
 }

@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
+import 'package:elysia/utiltities/consts/error_messages.dart';
 
 final chatRepositoryProvider = Provider<ChatRepository>((ref) => ChatRepository());
 
@@ -92,6 +93,26 @@ class ChatController extends StateNotifier<List<Message>> {
 
     // Stream response from API
     _repo.sendPromptStream(prompt: text, sessionId: _currentSessionId!).listen((chunk) async {
+      // If chunk contains an exception, show generic error message
+      if (chunk.startsWith('[Exception:')) {
+        final errorMsg = Message(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          sessionId: _currentSessionId!,
+          content: ErrorMessages.SOMETHING_WENT_WRONG,
+          isUser: false,
+          createdAt: DateTime.now(),
+        );
+        final copy = [...state];
+        final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+        if (lastIndex != -1) {
+          copy[lastIndex] = errorMsg;
+          state = copy;
+        } else {
+          state = [...state, errorMsg];
+        }
+        return;
+      }
+
       // Check for metadata chunk
       if (chunk.startsWith('[METADATA]')) {
         final metadataJson = chunk.substring(10);
