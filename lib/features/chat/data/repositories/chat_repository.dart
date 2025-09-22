@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'package:http/http.dart' as http;
-import '../../../../utiltities/core/storage.dart'; // ✅ TokenStorage
-import '../../../../utiltities/data-time/timezone.dart';
+import 'package:dio/dio.dart';
+import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
+import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
+import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
+import 'package:elysia/utiltities/jwt-token.dart/decodeJWT.dart'; // JWTDecoder
+import 'package:elysia/utiltities/data-time/timezone.dart';
 import '../models/chat_model.dart';
 import '../models/message_model.dart';
 
@@ -47,51 +50,23 @@ class SamplePrompt {
 
 class ChatRepository {
   final TokenStorage _tokenStorage = TokenStorage();
+  final ApiClient _apiClient = ApiClient();
+  final JWTDecoder _jwtDecoder = JWTDecoder();
 
   /// ✅ Streaming state flag
   bool isStreaming = false;
 
-  /// ✅ NEW: Fetch sample prompts from API
-  Future<List<String>> fetchSamplePrompts() async {
-    return _withAuthHeaders((headers) async {
-      final url = Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/prompts/sample');
-
-      final response = await http.get(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        final data = body['data'] as List<dynamic>;
-
-        // Extract just the prompt text from each item
-        return data.map((item) => item['prompt'] as String).toList();
-      } else {
-        developer.log('❌ Failed to fetch sample prompts: ${response.statusCode}', name: 'ChatRepository');
-        // Return fallback prompts if API fails
-        return [
-          "Draft email to suppliers about new payment terms",
-          "Suggest tools and techniques for monitoring projects",
-          "Suggest tools and techniques",
-          "Generate catchy journal titles",
-        ];
-      }
-    }, 'fetchSamplePrompts');
-  }
-
   /// === Fetch chat list grouped by sections ===
   Future<ChatSections> fetchChatsFromApi() async {
-    return _withAuthHeaders((headers) async {
-      final accessToken = headers['authorization']!.replaceFirst('Bearer ', '');
-      final userId = _decodeUserId(accessToken);
+    try {
+      final accessToken = await _tokenStorage.getAccessToken();
+      if (accessToken == null || accessToken.isEmpty) throw Exception("Missing access token");
+      final userId = await _jwtDecoder.getUserId(accessToken);
       final timezone = await getLocalTimezone();
-
-      final url = Uri.parse(
-        'https://stream-api-qa.iiris.com/v2/ai/chat/users/$userId/conversations?timezone=$timezone',
-      );
-
-      final response = await http.get(url, headers: headers);
-
+      final url = '${APIEndpoints.chatHistory}/$userId/conversations?timezone=$timezone';
+      final response = await _apiClient.dio.get(url);
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
+        final body = response.data is String ? jsonDecode(response.data) : response.data;
         final data = body['data'] as Map<String, dynamic>;
 
         return ChatSections(
@@ -114,21 +89,21 @@ class ChatRepository {
       } else {
         throw Exception('Failed to load chats: ${response.statusCode}');
       }
-    }, 'fetchChatsFromApi');
+    } catch (e, stack) {
+      developer.log('❌ fetchChatsFromApi error: $e', name: 'ChatRepository', error: e, stackTrace: stack);
+      throw Exception('Error in fetchChatsFromApi: $e');
+    }
   }
 
   /// === Fetch messages for a given session ===
   Future<List<Message>> getMessages(String sessionId) async {
-    return _withAuthHeaders((headers) async {
-      final url =
-      Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/session/$sessionId');
-      final response = await http.get(url, headers: headers);
-
+    try {
+      final url = '${APIEndpoints.chatSessionMessages}/$sessionId';
+      final response = await _apiClient.dio.get(url);
       if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
+        final body = response.data is String ? jsonDecode(response.data) : response.data;
         final List<Message> result = [];
         final dataList = body['data'] as List? ?? [];
-
         for (final session in dataList) {
           final historyList = session['history'] as List? ?? [];
           for (final history in historyList) {
@@ -139,7 +114,6 @@ class ChatRepository {
             final createdAt = history['createdAt'] != null
                 ? DateTime.tryParse(history['createdAt'].toString()) ?? DateTime.now()
                 : DateTime.now();
-
             // User message
             if (inputText.isNotEmpty) {
               result.add(Message(
@@ -173,11 +147,15 @@ class ChatRepository {
         // ✅ No messages found yet → return empty list instead of crashing
         developer.log("ℹ No messages yet for session $sessionId",
             name: "ChatRepository");
+        developer.log("ℹ️ No messages yet for session $sessionId", name: "ChatRepository");
         return [];
       } else {
         throw Exception('Failed to load messages: ${response.statusCode}');
       }
-    }, 'getMessages');
+    } catch (e, stack) {
+      developer.log('❌ getMessages error: $e', name: 'ChatRepository', error: e, stackTrace: stack);
+      throw Exception('Error in getMessages: $e');
+    }
   }
 
   Future<void> addMessage(Message m) async {
@@ -194,21 +172,8 @@ class ChatRepository {
     required String sessionId,
   }) async* {
     try {
-      final accessToken = await _tokenStorage.getAccessToken();
-      if (accessToken == null) {
-        yield '[Exception: Missing access token]';
-        return;
-      }
-
-      final headers = {
-        'accept': '*/*',
-        'authorization': 'Bearer $accessToken',
-        'content-type': 'application/json',
-        'origin': 'https://elysia-qa.informa.com',
-        'user-agent': 'ElysiaClient/1.0',
-      };
-
-      final body = jsonEncode({
+      final url = APIEndpoints.chatStreamCompletion;
+      final body = {
         "appId": "e3a5c706-7a5e-4550-bbb0-db535b1eb381",
         "query": prompt,
         "model": "azure",
@@ -234,51 +199,26 @@ class ChatRepository {
         "default_response_language": "English (US)",
         "default_name_of_model": "gpt-4o",
         "name_of_model": "gpt-4o"
-      });
-
-      final request = http.Request(
-        'POST',
-        Uri.parse('https://stream-api-qa.iiris.com/v2/ai/chat/stream/completion'),
-      )
-        ..headers.addAll(headers)
-        ..body = body;
-
-      final response = await request.send();
-
-      if (response.statusCode != 200) {
-        yield '[Exception: HTTP ${response.statusCode}]';
-        return;
-      }
-
-      /// ✅ Mark streaming started
+      };
       isStreaming = true;
 
       try {
-        developer.log('===========1 ${isStreaming}',
-          name: 'ChatRepository', );
-        await for (final line in response.stream
-            .transform(utf8.decoder)
-            .transform(const LineSplitter())) {
+        final response = await _apiClient.dio.post(
+          url,
+          data: jsonEncode(body),
+          options: Options(responseType: ResponseType.stream),
+        );
+        final stream = response.data.stream.cast<List<int>>().transform(utf8.decoder).transform(const LineSplitter());
+        await for (final line in stream) {
           if (line.trim().isEmpty) continue;
-
-          developer.log('===========2 ${isStreaming}',
-            name: 'ChatRepository', );
           try {
-            final Map<String, dynamic> decoded =
-            jsonDecode(line) as Map<String, dynamic>;
-
+            final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
             if (decoded['type'] == 'answer') {
-              developer.log('===========3 ${isStreaming}',
-                name: 'ChatRepository', );
               final chunk = decoded['answer'] as String?;
-              developer.log('===========4 ${isStreaming}',
-                name: 'ChatRepository', );
               if (chunk != null) {
                 yield chunk;
               }
             } else if (decoded['type'] == 'metadata') {
-              developer.log('===========5 ${isStreaming}',
-                name: 'ChatRepository', );
               yield '[METADATA]${jsonEncode(decoded['metadata'])}';
             }
           } catch (_) {
@@ -288,46 +228,11 @@ class ChatRepository {
           await Future.delayed(const Duration(milliseconds: 40));
         }
       } finally {
-        /// ✅ Always mark streaming ended
         isStreaming = false;
       }
     } catch (e) {
-      isStreaming = false; // reset on error too
+      isStreaming = false;
       yield '[Exception: $e]';
     }
-  }
-
-  /// === Helper: wrap calls with headers + error handling ===
-  Future<T> _withAuthHeaders<T>(
-      Future<T> Function(Map<String, String> headers) action,
-      String actionName,
-      ) async {
-    try {
-      final accessToken = await _tokenStorage.getAccessToken();
-      if (accessToken == null) throw Exception("Missing access token");
-
-      final headers = {
-        'accept': 'application/json, text/plain, */*',
-        'authorization': 'Bearer $accessToken',
-        'origin': 'https://elysia-qa.informa.com',
-        'user-agent': 'ElysiaClient/1.0',
-      };
-
-      return await action(headers);
-    } catch (e, stack) {
-      developer.log('❌ $actionName error: $e',
-          name: 'ChatRepository', error: e, stackTrace: stack);
-      throw Exception('Error in $actionName: $e');
-    }
-  }
-
-  /// === Helper: extract userId from JWT ===
-  String _decodeUserId(String accessToken) {
-    final parts = accessToken.split('.');
-    if (parts.length != 3) throw Exception("Invalid JWT token");
-
-    final payload =
-    utf8.decode(base64Url.decode(base64Url.normalize(parts[1])));
-    return jsonDecode(payload)['sub'] as String;
   }
 }
