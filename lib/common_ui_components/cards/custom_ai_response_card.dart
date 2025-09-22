@@ -34,7 +34,6 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
-
   bool _showFeedback = false;
 
   void _toggleFeedback() {
