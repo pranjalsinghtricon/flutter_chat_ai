@@ -1,3 +1,4 @@
+import 'package:elysia/common_ui_components/cards/simple-brain-loader.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +69,14 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                AssetConsts.elysiaBrainSvg,
+              isCurrentlyStreaming
+                  ? SvgPicture.asset(
+          AssetConsts.elysiaBrainLoaderSvg,
+            width: 22,
+            height: 22,
+          )
+                  : SvgPicture.asset(
+                AssetConsts.elysiaBrainLoaderSvg,
                 width: 22,
                 height: 22,
               ),
@@ -97,7 +104,7 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
-        if (!isCurrentlyStreaming && widget.message.content.isNotEmpty)
+        if (isCurrentlyStreaming && widget.message.content.isNotEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
