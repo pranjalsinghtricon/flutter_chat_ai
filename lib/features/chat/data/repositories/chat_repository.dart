@@ -243,45 +243,58 @@ class ChatRepository {
         ..headers.addAll(headers)
         ..body = body;
 
+      // 🚀 Log request body
+      developer.log("📤 Sending request body: $body", name: "ChatRepository");
+
       final response = await request.send();
 
       if (response.statusCode != 200) {
+        developer.log("❌ HTTP Error: ${response.statusCode}",
+            name: "ChatRepository");
         yield '[Exception: HTTP ${response.statusCode}]';
         return;
       }
 
       /// ✅ Mark streaming started
       isStreaming = true;
+      String fullResponse = "";
 
       try {
-        developer.log('===========1 ${isStreaming}',
-          name: 'ChatRepository', );
+        developer.log("✅ Streaming started", name: "ChatRepository");
+
         await for (final line in response.stream
             .transform(utf8.decoder)
             .transform(const LineSplitter())) {
           if (line.trim().isEmpty) continue;
 
-          developer.log('===========2 ${isStreaming}',
-            name: 'ChatRepository', );
+          // 👀 Log raw API response line
+          developer.log("📥 RAW LINE: $line", name: "ChatRepository");
+
           try {
             final Map<String, dynamic> decoded =
             jsonDecode(line) as Map<String, dynamic>;
+
+            developer.log("🔎 Decoded JSON: $decoded",
+                name: "ChatRepository");
 
             if (decoded['type'] == 'answer') {
               developer.log('===========3 ${isStreaming}',
                 name: 'ChatRepository', );
               final chunk = decoded['answer'] as String?;
-              developer.log('===========4 ${isStreaming}',
-                name: 'ChatRepository', );
               if (chunk != null) {
+                developer.log("✂️ ANSWER CHUNK: $chunk",
+                    name: "ChatRepository");
+                fullResponse += chunk;
                 yield chunk;
               }
             } else if (decoded['type'] == 'metadata') {
-              developer.log('===========5 ${isStreaming}',
-                name: 'ChatRepository', );
-              yield '[METADATA]${jsonEncode(decoded['metadata'])}';
+              final metadata = jsonEncode(decoded['metadata']);
+              developer.log("📊 METADATA: $metadata", name: "ChatRepository");
+              yield '[METADATA]$metadata';
             }
-          } catch (_) {
+          } catch (err) {
+            developer.log("⚠️ Failed to decode line: $line",
+                name: "ChatRepository", error: err);
             continue;
           }
 
@@ -290,9 +303,13 @@ class ChatRepository {
       } finally {
         /// ✅ Always mark streaming ended
         isStreaming = false;
+        developer.log("🏁 Streaming ended. FULL RESPONSE: $fullResponse",
+            name: "ChatRepository");
       }
     } catch (e) {
       isStreaming = false; // reset on error too
+      developer.log("💥 Exception in sendPromptStream: $e",
+          name: "ChatRepository", error: e);
       yield '[Exception: $e]';
     }
   }
