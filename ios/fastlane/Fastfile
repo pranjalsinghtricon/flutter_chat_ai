@@ -27,7 +27,8 @@ platform :ios do
     match(
       type: "appstore",
       api_key: api_key,
-      readonly: false,
+      storage_mode:"local",
+      readonly: true,
       app_identifier: "com.informa.elysia"
     )
 
