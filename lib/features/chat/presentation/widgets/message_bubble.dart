@@ -1,6 +1,8 @@
 import 'package:elysia/common_ui_components/cards/custom_ai_response_card.dart';
 import 'package:elysia/common_ui_components/cards/custom_user_query_card.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
+import 'package:elysia/utiltities/consts/error_messages.dart';
+import 'package:elysia/common_ui_components/error_messages/response_error.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -27,18 +29,25 @@ class MessageBubble extends StatelessWidget {
     }
   }
 
+  Widget _buildMessageWidget() {
+    if (message.isUser) {
+      return CustomUserQueryCard(message: message.content);
+    } else if (message.content == ErrorMessages.SOMETHING_WENT_WRONG) {
+      return ResponseError(message: message.content);
+    } else {
+      return CustomAiResponseCard(
+        message: message,
+        isStreaming: false,
+        onMessageUpdated: null,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (message.isUser)
-          CustomUserQueryCard(message: message.content)
-        else
-          CustomAiResponseCard(
-            message: message,
-            isStreaming: false,
-            onMessageUpdated: null,
-          ),
+        _buildMessageWidget(),
 
         // Privacy statement - only show at the end of the last AI message
         if (showPrivacyStatement)

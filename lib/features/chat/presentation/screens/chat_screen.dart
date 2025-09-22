@@ -27,6 +27,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
+      // Clear the input field when the chat screen is opened
+      _inputController.clear();
     _inputController.addListener(() {
       setState(() {});
     });

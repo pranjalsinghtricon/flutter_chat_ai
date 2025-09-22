@@ -38,16 +38,15 @@ class GlobalAppDrawer extends ConsumerWidget {
     final currentRouteName = ModalRoute.of(context)?.settings.name;
 
     void openChat(ChatHistory chat) async {
-      Navigator.of(context, rootNavigator: true).pop();
+      navigatorKey.currentState?.pop();
       await ref.read(chatControllerProvider.notifier).loadSession(chat.sessionId);
-      if (currentRouteName != '/chat') {
-        navigatorKey.currentState?.pushReplacement(
-          MaterialPageRoute(
-            settings: const RouteSettings(name: '/chat'),
-            builder: (_) => const MainLayout(child: ChatScreen()),
-          ),
-        );
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          settings: const RouteSettings(name: '/chat'),
+          builder: (_) => const MainLayout(child: ChatScreen()),
+        ),
+      );
     }
 
     // Future<void> handleSignOut() async {
@@ -151,6 +150,8 @@ class GlobalAppDrawer extends ConsumerWidget {
 
                   InkWell(
                     onTap: () async {
+                      // Reset chat view to ensure a fresh instance
+                      ref.read(chatControllerProvider.notifier).resetChatViewOnly();
                       final sessionId = await ref
                           .read(chatControllerProvider.notifier)
                           .startNewChat();
@@ -158,15 +159,14 @@ class GlobalAppDrawer extends ConsumerWidget {
                           .read(chatControllerProvider.notifier)
                           .loadSession(sessionId);
                       Navigator.pop(context);
-                      if (ModalRoute.of(context)?.settings.name != '/chat') {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            settings: const RouteSettings(name: '/chat'),
-                            builder: (_) => const MainLayout(child: ChatScreen()),
-                          ),
-                        );
-                      }
+                      // Always create a new instance of ChatScreen
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          settings: const RouteSettings(name: '/chat'),
+                          builder: (_) => const MainLayout(child: ChatScreen()),
+                        ),
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
