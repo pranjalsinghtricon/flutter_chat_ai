@@ -54,22 +54,18 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     );
   }
 
+// In your CustomAiResponseCard build method, replace the shouldShowFeedbackButtons logic with this:
+
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatRepositoryProvider);
 
-    // Check if THIS specific message is currently streaming
     final isThisMessageStreaming = chatState.isStreaming &&
         chatState.streamingMessageId == widget.message.id;
 
-    // Show as empty and streaming if this message is being streamed and has no content yet
     final isCurrentlyStreaming = isThisMessageStreaming && widget.message.content.isEmpty;
 
-    // Show feedback buttons only when:
-    // 1. NOT currently streaming any message
-    // 2. This message has content
-    // 3. This message is not from user
-    final shouldShowFeedbackButtons = !chatState.isStreaming &&
+    final shouldShowFeedbackButtons = !isThisMessageStreaming &&
         widget.message.content.isNotEmpty &&
         !widget.message.isUser;
 
@@ -88,8 +84,8 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               isCurrentlyStreaming || isThisMessageStreaming
-                  ?       const SimpleBrainLoader(
-                size: 12, // Slightly larger to accommodate the circle
+                  ? const SimpleBrainLoader(
+                size: 14,
                 showCircle: true,
               )
                   : SvgPicture.asset(
@@ -104,10 +100,10 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
                       ? "Elysia is generating response..."
                       : "Elysia's response",
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: (isCurrentlyStreaming || isThisMessageStreaming)
                         ? FontWeight.w400
-                        : FontWeight.w600,
+                        : FontWeight.w400,
                     color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
@@ -123,6 +119,7 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
+        // FIXED: Now feedback buttons will show for all completed messages, even when streaming a new one
         if (shouldShowFeedbackButtons)
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -157,23 +154,6 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
               ],
             ),
           ),
-
-
-        // Centered disclaimer message - only show when feedback buttons are shown
-        // if (shouldShowFeedbackButtons)
-        //   Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        //     child: Center(
-        //       child: Text(
-        //         "Elysia responses may be inaccurate. Know more about how your data is processed here",
-        //         textAlign: TextAlign.center,
-        //         style: TextStyle(
-        //           fontSize: 12,
-        //           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-        //         ),
-        //       ),
-        //     ),
-        //   ),
 
         // Show feedback card when toggled
         if (_showFeedback)

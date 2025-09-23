@@ -12,8 +12,8 @@ class CustomCardIconButton extends StatelessWidget {
     required this.onPressed,
     required this.icon,
     required this.tooltip,
-    this.iconColor,        // Optional colors
-    this.backgroundColor,  // Optional colors
+    this.iconColor,
+    this.backgroundColor,
   }) : super(key: key);
 
   @override
