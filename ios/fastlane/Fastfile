@@ -33,7 +33,6 @@ platform :ios do
       team_id: "128102481",   
       targets: ["Runner"]
     )
-    sigh(api_key: api_key, force: true)
      
 
     build_app(
