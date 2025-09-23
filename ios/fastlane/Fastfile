@@ -25,8 +25,16 @@ platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :beta do
     increment_build_number(xcodeproj: "Runner.xcodeproj")
+
+
+    update_code_signing_settings(
+      path: "Runner.xcodeproj",
+      use_automatic_signing: true,
+      api_key: api_key,
+      team_id: "128102481"   
+      targets: ["Runner"]
+    )
      
-     sigh(api_key: api_key, force: true)
 
     build_app(
       workspace: "Runner.xcworkspace",
