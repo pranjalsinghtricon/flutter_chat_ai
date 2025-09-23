@@ -30,8 +30,8 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      allow_provisioning_updates: true,
-      clean:true
+      clean:true,
+      xcargs:"-allowProvisioningUpdates"
     )
 
     upload_to_testflight(
