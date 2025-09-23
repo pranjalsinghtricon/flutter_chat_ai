@@ -4,9 +4,9 @@ import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
-import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
-import 'package:elysia/utiltities/jwt-token.dart/decodeJWT.dart'; // JWTDecoder
+import 'package:elysia/utiltities/core/storage.dart';
 import 'package:elysia/utiltities/data-time/timezone.dart';
+import 'package:elysia/utiltities/jwt-token/decodeJWT.dart';
 import '../../../../utiltities/core/storage.dart';
 import '../../../../utiltities/data-time/timezone.dart';
 import '../models/chat_model.dart';
