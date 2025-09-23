@@ -14,7 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CustomAiResponseCard extends ConsumerStatefulWidget {
   final Message message;
-  final bool isStreaming;
+  final bool isStreaming; // This parameter can be removed now
   final ValueChanged<Message>? onMessageUpdated;
 
   const CustomAiResponseCard({
@@ -35,8 +35,8 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
+
   bool _showFeedback = false;
-  bool _hasReceivedMetadata = false; // Track if we've received metadata (streaming complete)
 
   void _toggleFeedback() {
     setState(() {
@@ -56,21 +56,28 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
 
   @override
   Widget build(BuildContext context) {
-    final chatRepository = ref.watch(chatRepositoryProvider);
-    final isCurrentlyStreaming = chatRepository.isStreaming && widget.message.content.isEmpty;
+    final chatState = ref.watch(chatRepositoryProvider);
 
-    // Check if this is the last message and streaming has finished
-    final isStreamingForThisMessage = chatRepository.isStreaming &&
+    // Check if THIS specific message is currently streaming
+    final isThisMessageStreaming = chatState.isStreaming &&
+        chatState.streamingMessageId == widget.message.id;
+
+    // Show as empty and streaming if this message is being streamed and has no content yet
+    final isCurrentlyStreaming = isThisMessageStreaming && widget.message.content.isEmpty;
+
+    // Show feedback buttons only when:
+    // 1. NOT currently streaming any message
+    // 2. This message has content
+    // 3. This message is not from user
+    final shouldShowFeedbackButtons = !chatState.isStreaming &&
         widget.message.content.isNotEmpty &&
         !widget.message.isUser;
 
-    // Show feedback when streaming is complete and message has content
-    final shouldShowFeedbackButtons = !chatRepository.isStreaming &&
-        widget.message.content.isNotEmpty &&
-        !widget.message.isUser;
-
-    debugPrint("📡 =====  isCurrentlyStreaming in MessageBubble: $isCurrentlyStreaming ====");
-    debugPrint("📡 =====  shouldShowFeedbackButtons: $shouldShowFeedbackButtons ====");
+    debugPrint("📡 ===== Message ID: ${widget.message.id} =====");
+    debugPrint("📡 ===== isCurrentlyStreaming: $isCurrentlyStreaming =====");
+    debugPrint("📡 ===== isThisMessageStreaming: $isThisMessageStreaming =====");
+    debugPrint("📡 ===== shouldShowFeedbackButtons: $shouldShowFeedbackButtons =====");
+    debugPrint("📡 ===== streamingMessageId: ${chatState.streamingMessageId} =====");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,11 +87,10 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              isCurrentlyStreaming || isStreamingForThisMessage
-                  ? SvgPicture.asset(
-                AssetConsts.elysiaBrainLoaderSvg,
-                width: 22,
-                height: 22,
+              isCurrentlyStreaming || isThisMessageStreaming
+                  ?       const SimpleBrainLoader(
+                size: 12, // Slightly larger to accommodate the circle
+                showCircle: true,
               )
                   : SvgPicture.asset(
                 AssetConsts.elysiaBrainSvg,
@@ -94,12 +100,12 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  (isCurrentlyStreaming || isStreamingForThisMessage)
+                  (isCurrentlyStreaming || isThisMessageStreaming)
                       ? "Elysia is generating response..."
                       : "Elysia's response",
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight: (isCurrentlyStreaming || isStreamingForThisMessage)
+                    fontWeight: (isCurrentlyStreaming || isThisMessageStreaming)
                         ? FontWeight.w400
                         : FontWeight.w600,
                     color: Theme.of(context).colorScheme.onSurface,

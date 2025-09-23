@@ -48,8 +48,6 @@ class MessageBubble extends StatelessWidget {
     return Column(
       children: [
         _buildMessageWidget(),
-
-        // Privacy statement - only show at the end of the last AI message
         if (showPrivacyStatement)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

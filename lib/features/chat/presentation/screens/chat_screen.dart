@@ -27,8 +27,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-      // Clear the input field when the chat screen is opened
-      _inputController.clear();
+    // Clear the input field when the chat screen is opened
+    _inputController.clear();
     _inputController.addListener(() {
       setState(() {});
     });
@@ -76,11 +76,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final messages = ref.watch(chatControllerProvider);
-    final chatRepository = ref.watch(chatRepositoryProvider);
-    final isStreaming = chatRepository.isStreaming;
-
-    // Auto-scroll only when user sends a new message, not during/after streaming
-    // This is handled in _handleSendMessage() instead
+    final chatState = ref.watch(chatRepositoryProvider); // Watch ChatState instead
+    final isStreaming = chatState.isStreaming;
 
     Future<void> _handleSendMessage() async {
       final text = _inputController.text.trim();

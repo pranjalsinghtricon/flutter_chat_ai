@@ -6,26 +6,29 @@ import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 import 'package:elysia/utiltities/consts/error_messages.dart';
 
-final chatRepositoryProvider = Provider<ChatRepository>((ref) => ChatRepository());
+// Update the provider to use StateNotifierProvider
+final chatRepositoryProvider = StateNotifierProvider<ChatRepository, ChatState>((ref) => ChatRepository());
 
 /// Holds the in-memory messages for the *currently open* session.
 final chatControllerProvider = StateNotifierProvider<ChatController, List<Message>>(
-      (ref) => ChatController(ref.read(chatRepositoryProvider)),
+      (ref) => ChatController(ref),
 );
 
 /// Holds the list of chat histories (sessions).
 final chatHistoryProvider = StateNotifierProvider<ChatHistoryController, ChatSections>(
-      (ref) => ChatHistoryController(ref.read(chatRepositoryProvider)),
+      (ref) => ChatHistoryController(ref.read(chatRepositoryProvider.notifier)),
 );
 
 class ChatController extends StateNotifier<List<Message>> {
   bool forceNewChat = false;
-  final ChatRepository _repo;
+  final Ref _ref;
   String? _currentSessionId;
 
   String? get currentSessionId => _currentSessionId;
 
-  ChatController(this._repo) : super([]);
+  ChatController(this._ref) : super([]);
+
+  ChatRepository get _repo => _ref.read(chatRepositoryProvider.notifier);
 
   Future<String> startNewChat({String initialTitle = 'New Conversation'}) async {
     _currentSessionId = const Uuid().v4();
@@ -91,8 +94,12 @@ class ChatController extends StateNotifier<List<Message>> {
 
     bool chatAddedToToday = false;
 
-    // Stream response from API
-    _repo.sendPromptStream(prompt: text, sessionId: _currentSessionId!).listen((chunk) async {
+    // Stream response from API - pass the message ID
+    _repo.sendPromptStream(
+      prompt: text,
+      sessionId: _currentSessionId!,
+      messageId: botId,  // Pass the bot message ID
+    ).listen((chunk) async {
       // If chunk contains an exception, show generic error message
       if (chunk.startsWith('[Exception:')) {
         final errorMsg = Message(

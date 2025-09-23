@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Add this import
 import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
 import 'package:elysia/utiltities/core/storage.dart';
@@ -50,13 +51,25 @@ class SamplePrompt {
   }
 }
 
-class ChatRepository {
+// Make ChatRepository a StateNotifier to make isStreaming reactive
+class ChatRepository extends StateNotifier<ChatState> {
   final TokenStorage _tokenStorage = TokenStorage();
   final ApiClient _apiClient = ApiClient();
   final JWTDecoder _jwtDecoder = JWTDecoder();
 
-  /// ✅ Streaming state flag
-  bool isStreaming = false;
+  ChatRepository() : super(const ChatState());
+
+  // Getters for backward compatibility
+  bool get isStreaming => state.isStreaming;
+  String? get streamingMessageId => state.streamingMessageId;
+
+  // Private method to update streaming state
+  void _setStreaming(bool streaming, {String? messageId}) {
+    state = state.copyWith(
+      isStreaming: streaming,
+      streamingMessageId: messageId,
+    );
+  }
 
   /// === Fetch chat list grouped by sections ===
   Future<ChatSections> fetchChatsFromApi() async {
@@ -172,6 +185,7 @@ class ChatRepository {
   Stream<String> sendPromptStream({
     required String prompt,
     required String sessionId,
+    String? messageId, // Add messageId parameter
   }) async* {
     try {
       final url = APIEndpoints.chatStreamCompletion;
@@ -206,8 +220,8 @@ class ChatRepository {
       // 🚀 Log request body
       developer.log("📤 Sending request body: ${jsonEncode(body)}", name: "ChatRepository");
 
-      /// ✅ Mark streaming started
-      isStreaming = true;
+      /// ✅ Mark streaming started with message ID
+      _setStreaming(true, messageId: messageId);
       String fullResponse = "";
 
       try {
@@ -251,13 +265,34 @@ class ChatRepository {
           await Future.delayed(const Duration(milliseconds: 40));
         }
       } finally {
-        isStreaming = false;
+        _setStreaming(false, messageId: null);
         developer.log("🏁 Streaming ended. FULL RESPONSE: $fullResponse", name: "ChatRepository");
       }
     } catch (e) {
-      isStreaming = false;
+      _setStreaming(false, messageId: null);
       developer.log("💥 Exception in sendPromptStream: $e", name: "ChatRepository", error: e);
       yield '[Exception: $e]';
     }
+  }
+}
+
+// Add ChatState class
+class ChatState {
+  final bool isStreaming;
+  final String? streamingMessageId;
+
+  const ChatState({
+    this.isStreaming = false,
+    this.streamingMessageId,
+  });
+
+  ChatState copyWith({
+    bool? isStreaming,
+    String? streamingMessageId,
+  }) {
+    return ChatState(
+      isStreaming: isStreaming ?? this.isStreaming,
+      streamingMessageId: streamingMessageId,
+    );
   }
 }
