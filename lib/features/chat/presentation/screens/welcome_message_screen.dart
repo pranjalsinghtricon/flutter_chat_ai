@@ -70,25 +70,33 @@ class WelcomeMessageScreen extends ConsumerWidget {
     //     ],
     //   ),
     // );
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.6, // Give it explicit height
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Hi $userFullName,",
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Text(
+              "Hi $userFullName,",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           const SizedBox(height: 12),
-          const Text(
-            "How can I assist you today?",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: const Text(
+              "How can I assist you today?",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
             ),
           ),
           // const SizedBox(height: 16),
@@ -126,6 +134,52 @@ class WelcomeMessageScreen extends ConsumerWidget {
     );
   }
 }
+
+// Alternative solution - modify your ChatScreen's ListView section:
+/*
+In your ChatScreen, replace this section:
+
+Expanded(
+  child: ListView(
+    controller: _scrollController,
+    padding: const EdgeInsets.all(8.0),
+    children: [
+      if (messages.isEmpty && !widget.isPrivate)
+        WelcomeMessageScreen(),
+      // ... rest of your children
+    ],
+  ),
+),
+
+With this:
+
+Expanded(
+  child: messages.isEmpty && !widget.isPrivate
+      ? WelcomeMessageScreen() // Show welcome screen directly without ListView
+      : ListView(
+          controller: _scrollController,
+          padding: const EdgeInsets.all(8.0),
+          children: [
+            if (messages.isEmpty && widget.isPrivate)
+              PrivateChatScreen(),
+            if (messages.isNotEmpty)
+              ...messages.asMap().entries.map(
+                    (entry) {
+                  final index = entry.key;
+                  final msg = entry.value;
+                  final isLast = index == messages.length - 1;
+
+                  return MessageBubble(
+                    message: msg,
+                    isLast: isLast,
+                    showPrivacyStatement: isLast && !isStreaming && !msg.isUser,
+                  );
+                },
+              ),
+          ],
+        ),
+),
+*/
 
 class _SuggestedPrompt extends ConsumerWidget {
   final String text;

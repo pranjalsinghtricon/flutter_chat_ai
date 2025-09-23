@@ -1,3 +1,4 @@
+import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -18,32 +19,32 @@ class CustomMarkdownRenderer extends StatelessWidget {
         p: TextStyle(
           fontSize: 16,
           height: 1.4,
-        ).copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
+        ).copyWith(color: ColorConst.primaryBlack),
 
         // Headers
         h1: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           height: 1.2,
-        ).copyWith(color: Theme.of(context).textTheme.headlineLarge?.color),
+        ).copyWith(color: ColorConst.primaryBlack),
 
         h2: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           height: 1.3,
-        ).copyWith(color: Theme.of(context).textTheme.headlineMedium?.color),
+        ).copyWith(color: ColorConst.primaryBlack),
 
         h3: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           height: 1.3,
-        ).copyWith(color: Theme.of(context).textTheme.headlineSmall?.color),
+        ).copyWith(color: ColorConst.primaryBlack),
 
         h4: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
           height: 1.3,
-        ).copyWith(color: Theme.of(context).textTheme.titleMedium?.color),
+        ).copyWith(color: ColorConst.primaryBlack),
 
         // Code styling
         code: TextStyle(

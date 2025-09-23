@@ -1,3 +1,4 @@
+import 'package:elysia/common_ui_components/buttons/custom_card_icon_button.dart';
 import 'package:elysia/common_ui_components/cards/simple-brain-loader.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
@@ -116,32 +117,41 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
-        // Show feedback buttons only when streaming is completely done
         if (shouldShowFeedbackButtons)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                CustomIconButton(
-                  svgAsset: AssetConsts.iconCopy,
-                  toolTip: 'Copy',
+                CustomCardIconButton(
                   onPressed: _copyToClipboard,
+                  icon: Icons.content_copy_outlined,
+                  tooltip: 'Copy',
                 ),
-                const SizedBox(width: 8),
-                CustomIconButton(
-                  svgAsset: AssetConsts.iconLike,
-                  toolTip: 'Like',
+                CustomCardIconButton(
                   onPressed: _toggleFeedback,
+                  icon: Icons.thumb_up_outlined,
+                  tooltip: 'Like',
                 ),
-                const SizedBox(width: 8),
-                CustomIconButton(
-                  svgAsset: AssetConsts.iconDislike,
-                  toolTip: 'Dislike',
+                CustomCardIconButton(
                   onPressed: _toggleFeedback,
+                  icon: Icons.thumb_down_outlined,
+                  tooltip: 'Dislike',
+                ),
+                CustomCardIconButton(
+                  onPressed: () {/* Info action */},
+                  icon: Icons.info_outline,
+                  tooltip: 'Info',
+                ),
+                CustomCardIconButton(
+                  onPressed: () {/* Sound action */},
+                  icon: Icons.volume_up_outlined,
+                  tooltip: 'Read aloud',
                 ),
               ],
             ),
           ),
+
 
         // Centered disclaimer message - only show when feedback buttons are shown
         // if (shouldShowFeedbackButtons)
