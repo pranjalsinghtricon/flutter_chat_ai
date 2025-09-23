@@ -31,7 +31,7 @@ platform :ios do
       path: "Runner.xcodeproj",
       use_automatic_signing: true,
       api_key: api_key,
-      team_id: "128102481"   
+      team_id: "128102481",   
       targets: ["Runner"]
     )
      
