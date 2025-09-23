@@ -30,7 +30,7 @@ platform :ios do
     update_code_signing_settings(
       path: "Runner.xcodeproj",
       use_automatic_signing: true,
-      team_id: "128102481",   
+      team_id: "UCH89QLGDN",   
       targets: ["Runner"]
     )
      
