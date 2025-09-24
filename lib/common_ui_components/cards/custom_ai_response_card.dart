@@ -228,14 +228,16 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
                   tooltip: 'Copy',
                 ),
                 CustomCardIconButton(
-                  onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_up'),
+                  // onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_up'),
+                  onPressed: (){},
                   icon: _selectedFeedback == 'thumbs_up'
                       ? Icons.thumb_up
                       : Icons.thumb_up_outlined,
                   tooltip: 'Like',
                 ),
                 CustomCardIconButton(
-                  onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_down'),
+                  // onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_down'),
+                  onPressed: (){},
                   icon: _selectedFeedback == 'thumbs_down'
                       ? Icons.thumb_down
                       : Icons.thumb_down_outlined,
