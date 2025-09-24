@@ -54,6 +54,7 @@ class SamplePrompt {
 // Make ChatRepository a StateNotifier to make isStreaming reactive
 class ChatRepository extends StateNotifier<ChatState> {
   final TokenStorage _tokenStorage = TokenStorage();
+  final UserPreferencesStorage _userPreferencesStorage = UserPreferencesStorage();
   final ApiClient _apiClient = ApiClient();
   final JWTDecoder _jwtDecoder = JWTDecoder();
 
@@ -195,6 +196,8 @@ class ChatRepository extends StateNotifier<ChatState> {
     String? messageId, // Add messageId parameter
   }) async* {
     try {
+      final response_language = await _userPreferencesStorage.getPreferredLanguage();
+
       final url = APIEndpoints.chatStreamCompletion;
       final body = {
         "appId": "e3a5c706-7a5e-4550-bbb0-db535b1eb381",
@@ -218,8 +221,8 @@ class ChatRepository extends StateNotifier<ChatState> {
         "include_search": true,
         "include_metadata": true,
         "intermediate_steps": true,
-        "response_language": "English (US)",
-        "default_response_language": "English (US)",
+        "response_language": response_language ?? "English (US)",
+        "default_response_language": response_language ?? "English (US)",
         "default_name_of_model": "gpt-4o",
         "name_of_model": "gpt-4o"
       };

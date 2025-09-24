@@ -13,7 +13,6 @@ class AssetConsts {
   static const _iconsPath = 'assets/icons';
   static const iconArchive = '$_iconsPath/icon-archive.svg';
   static const iconAiImages = '$_iconsPath/icon-ai-image.svg';
-  static const iconChangeModel = '$_iconsPath/icon-change-model.svg';
   static const iconChatOptions = '$_iconsPath/icon-chat-options.svg';
   static const iconCareerCoach = '$_iconsPath/career-coach.svg';
   static const iconCopy = '$_iconsPath/icon-copy.svg';
@@ -34,4 +33,9 @@ class AssetConsts {
   static const iconSampleChat = '$_iconsPath/icon-sample-chat.svg';
   static const iconSend = '$_iconsPath/icon-send.svg';
   static const iconShield = '$_iconsPath/icon-shield.svg';
+  static const iconAttachFile = '$_iconsPath/icon-attach-file.svg';
+  static const iconAddSources = '$_iconsPath/icon-add-sources.svg';
+  static const iconSavePrompt = '$_iconsPath/icon-save-prompt.svg';
+  static const iconChangeModel = '$_iconsPath/icon-change-model.svg';
+  static const iconChangeLanguage = '$_iconsPath/icon-change-language.svg';
 }

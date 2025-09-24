@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_language_change_dialog.dart';
@@ -16,6 +18,7 @@ import '../../../../common_ui_components/dropdowns/custom_icon_dropdown.dart';
 import '../../../../main.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../common_ui_components/dialog/bottom_drawer_options.dart';
+import 'package:elysia/utiltities/core/storage.dart';
 
 class ChatInputField extends ConsumerStatefulWidget {
   final TextEditingController controller;
@@ -32,8 +35,18 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   String _fileStatus = 'none';
   final ImagePicker _picker = ImagePicker();
 
+  final UserPreferencesStorage _userPreferencesStorage = UserPreferencesStorage();
+
+  // Speech to text
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _lastRecognizedText = '';
+
+  String? _selectedLanguage;
+
   void _send() {
     final text = widget.controller.text.trim();
+    _lastRecognizedText = '';
     if (text.isNotEmpty || _attachedFile != null) {
       // ref.read(chatControllerProvider.notifier).sendMessage(text);
       if (widget.onSend != null) widget.onSend!();
@@ -143,6 +156,62 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         );
     }
     return SizedBox(width: 24, height: 24, child: Center(child: icon));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _speech = stt.SpeechToText();
+    _initLanguage();
+  }
+
+  Future<void> _initLanguage() async {
+    final lang = await _userPreferencesStorage.getPreferredLanguage();
+    setState(() {
+      _selectedLanguage = lang;
+    });
+  }
+
+  void _startListening() async {
+    bool available = await _speech.initialize(
+      onStatus: (status) {
+        if (status == 'done' || status == 'notListening') {
+          setState(() {
+            _isListening = false;
+          });
+        }
+      },
+      onError: (error) {
+        setState(() {
+          _isListening = false;
+        });
+      },
+    );
+    if (available) {
+      setState(() {
+        _isListening = true;
+      });
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _lastRecognizedText = result.recognizedWords;
+            widget.controller.text = _lastRecognizedText;
+            // Move cursor to end of text
+            widget.controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: widget.controller.text.length),
+            );
+          });
+        },
+      );
+    }
+  }
+
+  void _stopListening() {
+    _speech.stop();
+    setState(() {
+      _isListening = false;
+      widget.controller.clear(); // Clear input when mic stops
+    });
   }
 
   @override
@@ -389,6 +458,28 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
+                    // Mic icon
+                    Container(
+                      width: 40,
+                      height: 40,
+                      margin: const EdgeInsets.only(right: 8),
+                      child: IconButton(
+                        icon: Icon(
+                          _isListening ? Icons.mic : Icons.mic_none,
+                          color: _isListening ? Colors.red : Colors.black,
+                        ),
+                        tooltip: _isListening
+                            ? 'Stop (${_selectedLanguage})'
+                            : 'Speak (${_selectedLanguage})',
+                        onPressed: () {
+                          if (_isListening) {
+                            _stopListening();
+                          } else {
+                            _startListening();
+                          }
+                        },
+                      ),
+                    ),
                     Container(
                       width: 40,
                       height: 40,
@@ -429,25 +520,116 @@ void openBottomDrawer(BuildContext context) {
     ),
     backgroundColor: Colors.white,
     builder: (context) {
-      return BottomDrawerOptions(
-        options: [
-          BottomDrawerOption(
-            icon: Icons.camera_alt_outlined,
-            label: 'Camera',
-            onTap: () => _state?.captureImageFromCamera(),
-          ),
-          BottomDrawerOption(
-            icon: Icons.photo_outlined,
-            label: 'Photos',
-            onTap: () => _state?._pickImageFromGallery(),
-          ),
-          BottomDrawerOption(
-            icon: Icons.attach_file,
-            label: 'Attach Files',
-            onTap: () => _state?.pickFile(),
-          ),
-          // Add more options here if needed
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Top row with two large buttons
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF3F3F3),
+                      foregroundColor: ColorConst.primaryBlack,
+                      minimumSize: const Size(0, 90),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide.none,
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _state?.pickFile();
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          AssetConsts.iconAttachFile,
+                          width: 36,
+                          height: 36,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Attach Files',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: const Color(0xFFF3F3F3),
+                      foregroundColor: ColorConst.primaryBlack,
+                      minimumSize: const Size(0, 90),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide.none,
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      // TODO: Implement Add Sources action
+                      Navigator.pop(context);
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          AssetConsts.iconAddSources,
+                          width: 36,
+                          height: 36,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Add Sources',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(color: ColorConst.greyDivider),
+            // List of options
+            ListTile(
+              leading: SvgPicture.asset(AssetConsts.iconSavePrompt),
+              title: const Text('Saved Prompts',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: ColorConst.primaryBlack)),
+              onTap: () {
+                // TODO: Implement Saved Prompts action
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: SvgPicture.asset(AssetConsts.iconChangeModel),
+              title: const Text('Change Model',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: ColorConst.primaryBlack)),
+              onTap: () {
+                Navigator.pop(context);
+                showModelChangeDialog(context);
+              },
+            ),
+            ListTile(
+              leading: SvgPicture.asset(AssetConsts.iconChangeLanguage),
+              title: const Text('Change Language',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400, color: ColorConst.primaryBlack)),
+              onTap: () {
+                Navigator.pop(context);
+                showLanguageChangeDialog(context);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       );
     },
   );
