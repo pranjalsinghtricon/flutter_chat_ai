@@ -47,12 +47,20 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
     final confirmed = await showModalBottomSheet<bool>(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,6 +72,7 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
               const SizedBox(height: 8),
               TextField(
                 controller: _renameController,
+                autofocus: true,
                 decoration: InputDecoration(
                   hintText: "Enter name",
                   contentPadding: const EdgeInsets.symmetric(
@@ -74,6 +83,12 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
+                onSubmitted: (value) {
+                  // Allow submission via keyboard
+                  if (value.trim().isNotEmpty) {
+                    Navigator.pop(context, true);
+                  }
+                },
               ),
               const SizedBox(height: 24),
               Row(
@@ -106,10 +121,6 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                     onPressed: () => Navigator.pop(context, true),
                     child: const Text("Rename"),
                   ),
-                  // FilledButton(
-                  //   onPressed: () => Navigator.pop(context, true),
-                  //   child: const Text("Rename"),
-                  // ),
                 ],
               ),
             ],
