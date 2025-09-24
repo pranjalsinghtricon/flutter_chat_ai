@@ -19,6 +19,7 @@ class GlobalAppBar extends ConsumerWidget {
     return AppBar(
       elevation: 0,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       title: SizedBox(
         width: double.infinity,
