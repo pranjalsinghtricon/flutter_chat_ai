@@ -150,16 +150,19 @@ class GlobalAppDrawer extends ConsumerWidget {
 
                   InkWell(
                     onTap: () async {
-                      // Reset chat view to ensure a fresh instance
+                      // Reset chat view and start new chat in one go
                       ref.read(chatControllerProvider.notifier).resetChatViewOnly();
-                      final sessionId = await ref
-                          .read(chatControllerProvider.notifier)
-                          .startNewChat();
-                      await ref
-                          .read(chatControllerProvider.notifier)
-                          .loadSession(sessionId);
+                      await ref.read(chatControllerProvider.notifier).startNewChat();
+
+                      // final sessionId = await ref
+                      //     .read(chatControllerProvider.notifier)
+                      //     .startNewChat();
+                      // await ref
+                      //     .read(chatControllerProvider.notifier)
+                      //     .loadSession(sessionId);
+                      
+                      // Pop drawer and navigate immediately without loading session
                       Navigator.pop(context);
-                      // Always create a new instance of ChatScreen
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
