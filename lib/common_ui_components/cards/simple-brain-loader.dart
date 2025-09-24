@@ -1,6 +1,6 @@
+import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:elysia/utiltities/consts/asset_consts.dart';
 
 class SimpleBrainLoader extends StatefulWidget {
   final double size;
@@ -18,20 +18,13 @@ class SimpleBrainLoader extends StatefulWidget {
 
 class _SimpleBrainLoaderState extends State<SimpleBrainLoader>
     with TickerProviderStateMixin {
-  late AnimationController _brainController;
   late AnimationController _circleController;
 
   @override
   void initState() {
     super.initState();
 
-    // Controller for the brain rotation
-    _brainController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat();
-
-    // Controller for the circle rotation (faster)
+    // Controller for the circle rotation only
     _circleController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -40,7 +33,6 @@ class _SimpleBrainLoaderState extends State<SimpleBrainLoader>
 
   @override
   void dispose() {
-    _brainController.dispose();
     _circleController.dispose();
     super.dispose();
   }
@@ -48,19 +40,16 @@ class _SimpleBrainLoaderState extends State<SimpleBrainLoader>
   @override
   Widget build(BuildContext context) {
     if (!widget.showCircle) {
-      // If no circle needed, just return the rotating brain
-      return RotationTransition(
-        turns: _brainController,
-        child: SvgPicture.asset(
-          AssetConsts.elysiaBrainLoaderSvg,
-          width: widget.size,
-          height: widget.size,
-        ),
+      // If no circle needed, just return the static brain icon
+      return SvgPicture.asset(
+        AssetConsts.elysiaBrainLoaderSvg,
+        width: widget.size,
+        height: widget.size,
       );
     }
 
     return SizedBox(
-      width: widget.size + 8, // Add some padding for the circle
+      width: widget.size + 8,
       height: widget.size + 8,
       child: Stack(
         alignment: Alignment.center,
@@ -79,15 +68,12 @@ class _SimpleBrainLoaderState extends State<SimpleBrainLoader>
               ),
             ),
           ),
-          // Rotating brain in the center
-          RotationTransition(
-            turns: _brainController,
-            child: SvgPicture.asset(
-              AssetConsts.elysiaBrainLoaderSvg,
-              width: widget.size,
-              height: widget.size,
-            ),
-          ),
+          // Static brain icon in the center
+                SvgPicture.asset(
+    AssetConsts.elysiaBrainLoaderSvg,
+    width: widget.size,
+    height: widget.size,
+    ),
         ],
       ),
     );
@@ -113,17 +99,11 @@ class SimpleBrainLoaderWithCustomCircle extends StatefulWidget {
 
 class _SimpleBrainLoaderWithCustomCircleState extends State<SimpleBrainLoaderWithCustomCircle>
     with TickerProviderStateMixin {
-  late AnimationController _brainController;
   late AnimationController _circleController;
 
   @override
   void initState() {
     super.initState();
-
-    _brainController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat();
 
     _circleController = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -133,7 +113,6 @@ class _SimpleBrainLoaderWithCustomCircleState extends State<SimpleBrainLoaderWit
 
   @override
   void dispose() {
-    _brainController.dispose();
     _circleController.dispose();
     super.dispose();
   }
@@ -160,14 +139,11 @@ class _SimpleBrainLoaderWithCustomCircleState extends State<SimpleBrainLoaderWit
               );
             },
           ),
-          // Rotating brain
-          RotationTransition(
-            turns: _brainController,
-            child: SvgPicture.asset(
-              AssetConsts.elysiaBrainLoaderSvg,
-              width: widget.size,
-              height: widget.size,
-            ),
+          // Static brain icon
+          SvgPicture.asset(
+            AssetConsts.elysiaBrainLoaderSvg,
+            width: widget.size,
+            height: widget.size,
           ),
         ],
       ),
