@@ -2,6 +2,7 @@ import 'package:elysia/common_ui_components/buttons/custom_card_icon_button.dart
 import 'package:elysia/common_ui_components/cards/simple-brain-loader.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
+import 'package:elysia/features/chat/data/repositories/feedback_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:elysia/common_ui_components/buttons/custom_icon_button.dart';
@@ -14,7 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CustomAiResponseCard extends ConsumerStatefulWidget {
   final Message message;
-  final bool isStreaming; // This parameter can be removed now
+  final bool isStreaming;
   final ValueChanged<Message>? onMessageUpdated;
 
   const CustomAiResponseCard({
@@ -29,14 +30,18 @@ class CustomAiResponseCard extends ConsumerStatefulWidget {
 }
 
 class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
+  final FeedbackRepository _feedbackRepository = FeedbackRepository();
+
+  bool _showFeedback = false;
+  String? _selectedFeedback; // "thumbs_up" or "thumbs_down"
+  bool _isSubmittingFeedback = false;
+
   Future<void> _launchUrl() async {
     final url = Uri.parse(
       'https://login.microsoftonline.com/2567d566-604c-408a-8a60-55d0dc9d9d6b/oauth2/authorize?...',
     );
     await launchUrl(url, mode: LaunchMode.externalApplication);
   }
-
-  bool _showFeedback = false;
 
   void _toggleFeedback() {
     setState(() {
@@ -54,7 +59,104 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     );
   }
 
-// In your CustomAiResponseCard build method, replace the shouldShowFeedbackButtons logic with this:
+  Future<void> _handleFeedback(String feedbackType) async {
+    if (widget.message.runId == null || widget.message.runId!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Unable to submit feedback: Missing run ID"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmittingFeedback = true;
+      _selectedFeedback = feedbackType;
+      _showFeedback = true;
+    });
+
+    try {
+      // Submit initial feedback (like/dislike)
+      await _feedbackRepository.submitFeedback(
+        runId: widget.message.runId!,
+        key: feedbackType,
+        score: true,
+        value: 1,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("${feedbackType == 'thumbs_up' ? 'Like' : 'Dislike'} submitted successfully"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      print( "$e ==================  outside click like or dislike"  );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to submit feedback: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmittingFeedback = false;
+      });
+    }
+  }
+
+  Future<void> _submitFeedbackComment(String comment) async {
+    if (widget.message.runId == null ||
+        widget.message.runId!.isEmpty ||
+        _selectedFeedback == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Unable to submit comment: Missing required data"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmittingFeedback = true;
+    });
+
+    try {
+      await _feedbackRepository.submitFeedbackComment(
+        runId: widget.message.runId!,
+        key: _selectedFeedback!,
+        score: true,
+        value: 1,
+        comment: comment,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Feedback comment submitted successfully"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      setState(() {
+        _showFeedback = false;
+        _selectedFeedback = null;
+      });
+    } catch (e) {
+      print("Feedback comment repository error: $e ========== == == == == = ========");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed to submit comment: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isSubmittingFeedback = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +170,6 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     final shouldShowFeedbackButtons = !isThisMessageStreaming &&
         widget.message.content.isNotEmpty &&
         !widget.message.isUser;
-
-    debugPrint("📡 ===== Message ID: ${widget.message.id} =====");
-    debugPrint("📡 ===== isCurrentlyStreaming: $isCurrentlyStreaming =====");
-    debugPrint("📡 ===== isThisMessageStreaming: $isThisMessageStreaming =====");
-    debugPrint("📡 ===== shouldShowFeedbackButtons: $shouldShowFeedbackButtons =====");
-    debugPrint("📡 ===== streamingMessageId: ${chatState.streamingMessageId} =====");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +215,7 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
             child: CustomMarkdownRenderer(data: widget.message.content),
           ),
 
-        // FIXED: Now feedback buttons will show for all completed messages, even when streaming a new one
+        // Feedback buttons
         if (shouldShowFeedbackButtons)
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -132,13 +228,17 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
                   tooltip: 'Copy',
                 ),
                 CustomCardIconButton(
-                  onPressed: _toggleFeedback,
-                  icon: Icons.thumb_up_outlined,
+                  onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_up'),
+                  icon: _selectedFeedback == 'thumbs_up'
+                      ? Icons.thumb_up
+                      : Icons.thumb_up_outlined,
                   tooltip: 'Like',
                 ),
                 CustomCardIconButton(
-                  onPressed: _toggleFeedback,
-                  icon: Icons.thumb_down_outlined,
+                  onPressed: _isSubmittingFeedback ? () {} : () => _handleFeedback('thumbs_down'),
+                  icon: _selectedFeedback == 'thumbs_down'
+                      ? Icons.thumb_down
+                      : Icons.thumb_down_outlined,
                   tooltip: 'Dislike',
                 ),
                 CustomCardIconButton(
@@ -163,8 +263,11 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
               onClose: () {
                 setState(() {
                   _showFeedback = false;
+                  _selectedFeedback = null;
                 });
               },
+              onSubmit: _submitFeedbackComment,
+              isLoading: _isSubmittingFeedback,
             ),
           ),
       ],

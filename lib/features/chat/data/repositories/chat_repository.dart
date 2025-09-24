@@ -110,7 +110,7 @@ class ChatRepository extends StateNotifier<ChatState> {
     }
   }
 
-  /// === Fetch messages for a given session ===
+  /// === Fetch messages for a given session (UPDATED TO EXTRACT RUN_ID) ===
   Future<List<Message>> getMessages(String sessionId) async {
     try {
       final url = '${APIEndpoints.chatSessionMessages}/$sessionId';
@@ -119,6 +119,7 @@ class ChatRepository extends StateNotifier<ChatState> {
         final body = response.data is String ? jsonDecode(response.data) : response.data;
         final List<Message> result = [];
         final dataList = body['data'] as List? ?? [];
+
         for (final session in dataList) {
           final historyList = session['history'] as List? ?? [];
           for (final history in historyList) {
@@ -126,9 +127,14 @@ class ChatRepository extends StateNotifier<ChatState> {
             final outputList = history['output'] as List? ?? [];
             final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
             final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
+
+            // 🔥 EXTRACT RUN_ID FROM HISTORY
+            final runId = history['run_id'] as String?;
+
             final createdAt = history['createdAt'] != null
                 ? DateTime.tryParse(history['createdAt'].toString()) ?? DateTime.now()
                 : DateTime.now();
+
             // User message
             if (inputText.isNotEmpty) {
               result.add(Message(
@@ -139,10 +145,11 @@ class ChatRepository extends StateNotifier<ChatState> {
                 content: inputText,
                 isUser: true,
                 createdAt: createdAt,
+                runId: runId, // Add run_id to user message
               ));
             }
 
-            // AI message
+            // AI message with run_id
             if (outputText.isNotEmpty) {
               result.add(Message(
                 id: outputList.isNotEmpty && outputList[0]['id'] != null
@@ -152,16 +159,16 @@ class ChatRepository extends StateNotifier<ChatState> {
                 content: outputText,
                 isUser: false,
                 createdAt: createdAt,
+                runId: runId, // 🔥 CRITICAL: Add run_id to AI message
               ));
             }
           }
         }
 
+        developer.log("✅ Loaded ${result.length} messages with run_ids for session: $sessionId", name: "ChatRepository");
         return result;
       } else if (response.statusCode == 404) {
         // ✅ No messages found yet → return empty list instead of crashing
-        developer.log("ℹ No messages yet for session $sessionId",
-            name: "ChatRepository");
         developer.log("ℹ️ No messages yet for session $sessionId", name: "ChatRepository");
         return [];
       } else {
@@ -272,6 +279,120 @@ class ChatRepository extends StateNotifier<ChatState> {
       _setStreaming(false, messageId: null);
       developer.log("💥 Exception in sendPromptStream: $e", name: "ChatRepository", error: e);
       yield '[Exception: $e]';
+    }
+  }
+
+  // 🔥 UPDATED METHOD TO PROPERLY EXTRACT RUN_ID FROM METADATA
+  Stream<Map<String, dynamic>> sendPromptStreamWithRunId({
+    required String prompt,
+    required String sessionId,
+    String? messageId,
+  }) async* {
+    try {
+      final url = APIEndpoints.chatStreamCompletion;
+      final body = {
+        "appId": "e3a5c706-7a5e-4550-bbb0-db535b1eb381",
+        "query": prompt,
+        "model": "azure",
+        "tokens": 8192,
+        "creativity": "Factual",
+        "personality": "Professional",
+        "role": "Assistant",
+        "writing_style": "Descriptive",
+        "domain_expertise": "General",
+        "chat_session": sessionId,
+        "private_chat": false,
+        "system_prompt": "",
+        "concepts": [],
+        "entities": [],
+        "business_units": [],
+        "products": [],
+        "content_domains": [],
+        "showSourceList": false,
+        "include_search": true,
+        "include_metadata": true,
+        "intermediate_steps": true,
+        "response_language": "English (US)",
+        "default_response_language": "English (US)",
+        "default_name_of_model": "gpt-4o",
+        "name_of_model": "gpt-4o"
+      };
+
+      developer.log("📤 Sending request body: ${jsonEncode(body)}", name: "ChatRepository");
+
+      _setStreaming(true, messageId: messageId);
+      String? extractedRunId;
+
+      try {
+        final response = await _apiClient.dio.post(
+          url,
+          data: jsonEncode(body),
+          options: Options(responseType: ResponseType.stream),
+        );
+
+        developer.log("✅ Streaming started", name: "ChatRepository");
+
+        final stream = response.data.stream.cast<List<int>>().transform(utf8.decoder).transform(const LineSplitter());
+        await for (final line in stream) {
+          if (line.trim().isEmpty) continue;
+
+          developer.log("📥 RAW LINE: $line", name: "ChatRepository");
+
+          try {
+            final Map<String, dynamic> decoded = jsonDecode(line) as Map<String, dynamic>;
+
+            if (decoded['type'] == 'answer') {
+              final chunk = decoded['answer'] as String?;
+              if (chunk != null) {
+                developer.log("✂️ ANSWER CHUNK: $chunk", name: "ChatRepository");
+                yield {
+                  'type': 'answer',
+                  'chunk': chunk,
+                  'run_id': extractedRunId,
+                };
+              }
+            } else if (decoded['type'] == 'metadata') {
+              developer.log("📊 METADATA: ${decoded['metadata']}", name: "ChatRepository");
+
+              // 🔥 EXTRACT RUN_ID FROM METADATA
+              final metadata = decoded['metadata'] as Map<String, dynamic>;
+              if (metadata.containsKey('run_id') && extractedRunId == null) {
+                extractedRunId = metadata['run_id'] as String?;
+                developer.log("🆔 Extracted run_id from metadata: $extractedRunId", name: "ChatRepository");
+
+                // Yield run_id as soon as we get it
+                if (extractedRunId != null) {
+                  yield {
+                    'type': 'run_id',
+                    'run_id': extractedRunId,
+                  };
+                }
+              }
+
+              yield {
+                'type': 'metadata',
+                'metadata': metadata,
+                'run_id': extractedRunId,
+              };
+            }
+          } catch (err) {
+            developer.log("⚠️ Failed to decode line: $line", name: "ChatRepository", error: err);
+            continue;
+          }
+
+          await Future.delayed(const Duration(milliseconds: 40));
+        }
+      } finally {
+        _setStreaming(false, messageId: null);
+        developer.log("🏁 Streaming ended with run_id: $extractedRunId", name: "ChatRepository");
+      }
+    } catch (e) {
+      _setStreaming(false, messageId: null);
+      developer.log("💥 Exception in sendPromptStreamWithRunId: $e", name: "ChatRepository", error: e);
+      yield {
+        'type': 'error',
+        'error': e.toString(),
+      };
     }
   }
 }

@@ -5,6 +5,7 @@ import '../data/models/chat_model.dart';
 import '../data/models/message_model.dart';
 import '../data/repositories/chat_repository.dart';
 import 'package:elysia/utiltities/consts/error_messages.dart';
+import 'dart:developer' as developer;
 
 // Update the provider to use StateNotifierProvider
 final chatRepositoryProvider = StateNotifierProvider<ChatRepository, ChatState>((ref) => ChatRepository());
@@ -34,15 +35,24 @@ class ChatController extends StateNotifier<List<Message>> {
     _currentSessionId = const Uuid().v4();
     forceNewChat = true;
     state = [];
+    developer.log("🚀 Started new chat with session: $_currentSessionId", name: "ChatController");
     return _currentSessionId!;
   }
 
   Future<void> loadSession(String sessionId) async {
     _currentSessionId = sessionId;
+    developer.log("📂 Loading session: $sessionId", name: "ChatController");
     try {
       final messages = await _repo.getMessages(sessionId);
       state = messages;
+
+      // Log run_id status for debugging
+      final aiMessages = messages.where((m) => !m.isUser).toList();
+      final messagesWithRunId = aiMessages.where((m) => m.runId != null).length;
+      developer.log("📊 Loaded ${messages.length} messages (${aiMessages.length} AI responses, $messagesWithRunId with run_id)", name: "ChatController");
+
     } catch (e) {
+      developer.log("❌ Failed to load session $sessionId: $e", name: "ChatController", error: e);
       // If session loading fails, start fresh
       state = [];
     }
@@ -61,6 +71,7 @@ class ChatController extends StateNotifier<List<Message>> {
     forceNewChat = false;
   }
 
+  // 🔥 ENHANCED sendMessage WITH IMPROVED RUN_ID HANDLING
   Future<void> sendMessage(String content, WidgetRef ref) async {
     final text = content.trim();
     if (text.isEmpty) return;
@@ -69,12 +80,15 @@ class ChatController extends StateNotifier<List<Message>> {
     _currentSessionId ??= await startNewChat(initialTitle: _titleFrom(text));
     forceNewChat = false;
 
+    developer.log("💬 Sending message to session: $_currentSessionId", name: "ChatController");
+
     final userMsg = Message(
       id: const Uuid().v4(),
       sessionId: _currentSessionId!,
       content: text,
       isUser: true,
       createdAt: DateTime.now(),
+      runId: null, // User messages don't have run_id
     );
 
     state = [...state, userMsg];
@@ -87,27 +101,34 @@ class ChatController extends StateNotifier<List<Message>> {
       content: '',
       isUser: false,
       createdAt: DateTime.now(),
+      runId: null, // Will be set when we receive it
     );
 
     state = [...state, botMsg];
     await _repo.addMessage(botMsg);
 
     bool chatAddedToToday = false;
+    String? currentRunId;
 
-    // Stream response from API - pass the message ID
-    _repo.sendPromptStream(
+    developer.log("🚀 Starting stream for message: $botId", name: "ChatController");
+
+    // Use the new streaming method that returns run_id
+    _repo.sendPromptStreamWithRunId(
       prompt: text,
       sessionId: _currentSessionId!,
-      messageId: botId,  // Pass the bot message ID
-    ).listen((chunk) async {
-      // If chunk contains an exception, show generic error message
-      if (chunk.startsWith('[Exception:')) {
+      messageId: botId,
+    ).listen((data) async {
+      final type = data['type'] as String;
+
+      if (type == 'error') {
+        developer.log("❌ Stream error: ${data['error']}", name: "ChatController");
         final errorMsg = Message(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           sessionId: _currentSessionId!,
           content: ErrorMessages.SOMETHING_WENT_WRONG,
           isUser: false,
           createdAt: DateTime.now(),
+          runId: currentRunId, // Preserve run_id even for errors
         );
         final copy = [...state];
         final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
@@ -120,45 +141,88 @@ class ChatController extends StateNotifier<List<Message>> {
         return;
       }
 
-      // Check for metadata chunk
-      if (chunk.startsWith('[METADATA]')) {
-        final metadataJson = chunk.substring(10);
-        final metadata = jsonDecode(metadataJson);
-        final title = metadata['title'];
-        if (title != null && title.toString().trim().isNotEmpty) {
-          ref.read(chatHistoryProvider.notifier).updateTitle(_currentSessionId!, title);
+      if (type == 'run_id') {
+        currentRunId = data['run_id'] as String?;
+        developer.log("🆔 Received run_id: $currentRunId for message: $botId", name: "ChatController");
+
+        // 🔥 IMMEDIATELY UPDATE BOT MESSAGE WITH RUN_ID
+        botMsg = botMsg.copyWith(runId: currentRunId);
+        final copy = [...state];
+        final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+        if (lastIndex != -1) {
+          copy[lastIndex] = botMsg;
+          state = copy;
+          developer.log("✅ Updated message $botId with run_id: $currentRunId", name: "ChatController");
         }
         return;
       }
 
-      botMsg = botMsg.copyWith(content: botMsg.content + chunk);
-      final copy = [...state];
-      final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
-      if (lastIndex != -1) {
-        copy[lastIndex] = botMsg;
-        state = copy;
+      if (type == 'answer') {
+        final chunk = data['chunk'] as String;
+
+        // Always preserve the run_id when updating content
+        botMsg = botMsg.copyWith(
+          content: botMsg.content + chunk,
+          runId: currentRunId ?? botMsg.runId, // Preserve existing run_id
+        );
+
+        final copy = [...state];
+        final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+        if (lastIndex != -1) {
+          copy[lastIndex] = botMsg;
+          state = copy;
+        }
+
+        await _repo.replaceMessages(_currentSessionId!, state);
+
+        // Add new chat to today only after first non-empty chunk
+        if (isNewChat && !chatAddedToToday && chunk.trim().isNotEmpty) {
+          chatAddedToToday = true;
+          final chatHistory = ChatHistory(
+            sessionId: _currentSessionId!,
+            title: 'New Chat',
+            updatedOn: DateTime.now(),
+            isArchived: false,
+          );
+
+          final notifier = ref.read(chatHistoryProvider.notifier);
+          notifier.state = ChatSections(
+            today: [chatHistory, ...notifier.state.today],
+            yesterday: notifier.state.yesterday,
+            last7: notifier.state.last7,
+            last30: notifier.state.last30,
+            archived: notifier.state.archived,
+          );
+        }
+        return;
       }
 
-      await _repo.replaceMessages(_currentSessionId!, state);
+      if (type == 'metadata') {
+        final metadata = data['metadata'] as Map<String, dynamic>;
+        final title = metadata['title'];
+        if (title != null && title.toString().trim().isNotEmpty) {
+          ref.read(chatHistoryProvider.notifier).updateTitle(_currentSessionId!, title);
+        }
 
-      // Add new chat to today only after first non-empty, non-metadata chunk
-      if (isNewChat && !chatAddedToToday && !chunk.startsWith('[METADATA]') && chunk.trim().isNotEmpty) {
-        chatAddedToToday = true;
-        final chatHistory = ChatHistory(
-          sessionId: _currentSessionId!,
-          title: 'New Chat',
-          updatedOn: DateTime.now(),
-          isArchived: false,
-        );
+        developer.log("📊 Received metadata for run_id: $currentRunId", name: "ChatController");
+        return;
+      }
+    }, onError: (error) {
+      developer.log("💥 Stream error: $error", name: "ChatController", error: error);
+    }, onDone: () {
+      developer.log("🏁 Stream completed for message: $botId with run_id: $currentRunId", name: "ChatController");
 
-        final notifier = ref.read(chatHistoryProvider.notifier);
-        notifier.state = ChatSections(
-          today: [chatHistory, ...notifier.state.today],
-          yesterday: notifier.state.yesterday,
-          last7: notifier.state.last7,
-          last30: notifier.state.last30,
-          archived: notifier.state.archived,
-        );
+      // Final validation
+      final finalMessage = state.firstWhere((m) => m.id == botId, orElse: () => botMsg);
+      if (finalMessage.runId == null && currentRunId != null) {
+        developer.log("⚠️ Final message missing run_id, applying: $currentRunId", name: "ChatController");
+        // Update the final message with run_id if it's missing
+        final copy = [...state];
+        final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+        if (lastIndex != -1) {
+          copy[lastIndex] = finalMessage.copyWith(runId: currentRunId);
+          state = copy;
+        }
       }
     });
   }
@@ -179,20 +243,12 @@ class ChatHistoryController extends StateNotifier<ChatSections> {
   Future<void> loadChats() async {
     try {
       state = await _repo.fetchChatsFromApi();
+      developer.log("✅ Loaded chat sections", name: "ChatHistoryController");
     } catch (e) {
+      developer.log("❌ Failed to load chats: $e", name: "ChatHistoryController", error: e);
       state = ChatSections.empty();
     }
   }
-
-  // Method to clear all chat history (for sign out)
-  // void clearAllHistory() {
-  //   state = ChatSections.empty();
-  // }
-  //
-  // // Method to refresh chat history
-  // Future<void> refreshChats() async {
-  //   await loadChats();
-  // }
 
   void updateArchiveStatus(String sessionId) {
     ChatHistory? chatToArchive;
