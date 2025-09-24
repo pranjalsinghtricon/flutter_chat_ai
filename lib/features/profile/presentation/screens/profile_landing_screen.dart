@@ -61,8 +61,11 @@ class ProfileLandingScreen extends ConsumerWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text("Log out"),
+            leading: const Icon(
+              Icons.logout,
+              color: Colors.red,
+            ),
+            title: const Text("Log out", style: TextStyle(color: Colors.red),),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
               developer.log('🔴 Log out pressed', name: 'ProfilePage');
