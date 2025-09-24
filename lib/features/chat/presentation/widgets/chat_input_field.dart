@@ -97,7 +97,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
     }
   }
 
-
   /// Capture new photo with camera
   // Future<void> captureImageFromCamera() async {
   //   final pickedFile = await _picker.pickImage(source: ImageSource.camera);
