@@ -5,6 +5,8 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:elysia/utiltities/core/storage.dart'; // TokenStorage
 import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
+import 'package:elysia/features/chat/data/repositories/language_repository.dart'; // LanguageRepository
+import 'package:elysia/features/chat/data/repositories/user_preferences_reposistory.dart'; // UserPreferencesRepository
 import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 
 class AuthService {
@@ -115,6 +117,14 @@ class AuthService {
         // ✅ NEW: Fetch sample prompts after profile
         await fetchSamplePrompts();
 
+        final languageRepo = LanguageRepository();
+        final userPrefRepo = UserPreferencesRepository();
+
+        // Fetch user preferences (settings)
+        await userPrefRepo.fetchUserPreferencesFromApi();
+
+        // Fetch supported languages
+        await languageRepo.fetchLanguagesFromApi();
         developer.log('✅ Sign-in successful -> ${jsonEncode(_userInfo)}', name: 'AuthService');
         return _userInfo;
       }

@@ -9,4 +9,5 @@ class ColorConst {
   static const primaryWhite = Color(0xFFFFFFFF);
   static const primaryChatQueryResponse = Color(0xFFE4EFF3);
   static const errorChatResponse = Color(0xFFA4A4A4);
+  static const greyDivider = Color(0xFFDADADA);
 }

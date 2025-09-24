@@ -1,31 +1,29 @@
+
 import 'dart:convert';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
-import '../models/chat_model.dart';
+import 'package:elysia/features/auth/service/interceptor.dart';
+import 'package:elysia/utiltities/core/storage.dart';
+import 'package:elysia/utiltities/consts/api_endpoints.dart';
 
 class LanguageRepository {
-  static const String boxName = "languages";
+  final ApiClient _apiClient = ApiClient();
 
+  /// Fetch languages from the new API using the interceptor
   Future<List<String>> fetchLanguagesFromApi() async {
-    final response = await http.get(Uri.parse("http://demo0405258.mockable.io/languages"));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body)["data"];
-      final languages = List<String>.from(data);
-
-      final box = await Hive.openBox<String>(boxName);
-      await box.clear();
-      await box.addAll(languages);
-
-      return languages;
-    } else {
-      throw Exception("Failed to load languages");
+    try {
+      final url = APIEndpoints.getLanguages;
+      final response = await _apiClient.dio.get(url);
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final languages = (data["data"] ?? data) as List;
+        final UserPreferencesStorage _userPreferencesStorage = UserPreferencesStorage();
+        final langList = languages.map((e) => e.toString()).toList();
+        await _userPreferencesStorage.saveSupportedLanguages(langList);
+        return langList;
+      } else {
+        return <String>[];
+      }
+    } catch (e) {
+      return <String>[];
     }
   }
-
-  Future<List<String>> getLocalLanguages() async {
-    final box = await Hive.openBox<String>(boxName);
-    return box.values.toList();
-  }
-
-
 }

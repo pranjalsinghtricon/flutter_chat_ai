@@ -35,12 +35,16 @@
         <string>$(FLUTTER_BUILD_NUMBER)</string>
         <key>LSRequiresIPhoneOS</key>
         <true/>
-        <key>NSCameraUsageDescription</key>
-        <string>We need access to your camera to allow you to take photos and upload them.</string>
-        <key>NSPhotoLibraryAddUsageDescription</key>
-        <string>We need access to save images to your photo library.</string>
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>We need access to your photo library so you can upload images.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to allow you to take photos and upload them.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>We need access to save images to your photo library.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to your photo library so you can upload images.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to your microphone for voice input in chat.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>We need speech recognition to convert your voice to text in chat.</string>
         <key>UIApplicationSupportsIndirectInputEvents</key>
         <true/>
         <key>UILaunchStoryboardName</key>
