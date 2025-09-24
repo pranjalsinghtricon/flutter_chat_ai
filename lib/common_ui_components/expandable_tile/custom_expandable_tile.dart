@@ -77,7 +77,7 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
               ),
               const SizedBox(height: 24),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FilledButton(
                     style: FilledButton.styleFrom(
@@ -96,8 +96,6 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                       style: TextStyle(color: ColorConst.primaryBlack),
                     ),
                   ),
-                  const SizedBox(width: 8),
-
                   FilledButton(
                     style: FilledButton.styleFrom(
                       backgroundColor: ColorConst.primaryColor,
@@ -152,10 +150,10 @@ class _CustomExpandableTileState extends ConsumerState<CustomExpandableTile> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              const Text("Are you sure, you want to delete the chat history?"),
+              const Text("Are you sure, you want to delete this chat?"),
               const SizedBox(height: 24),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FilledButton(
                     style: FilledButton.styleFrom(
