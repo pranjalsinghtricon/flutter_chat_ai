@@ -29,69 +29,77 @@ class GlobalAppBar extends ConsumerWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        return IconButton(
+                          icon: const Icon(Icons.menu),
+                          color: Theme.of(context).colorScheme.onSurface,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                        );
+                      },
+                    ),
+                    CustomSvgIconButton(
+                      assetPath: AssetConsts.elysiaNamedLogo,
+                      size: 25,
+                      backgroundColor: Colors.transparent,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                            const MainLayout(child: ChatScreen()),
+                          ),
+                        );
+                      },
+                    ),
+                  ]
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Builder(
-                    builder: (context) {
-                      return IconButton(
-                        icon: const Icon(Icons.menu),
-                        color: Theme.of(context).colorScheme.onSurface,
-                        padding: EdgeInsets.zero,
-                        constraints:
-                        const BoxConstraints(),
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      );
-                    },
-                  ),
+                  // Private chat icon button (moved outside dropdown)
                   CustomSvgIconButton(
-                    assetPath: AssetConsts.elysiaNamedLogo,
-                    size: 25,
+                    assetPath: AssetConsts.iconPrivateChat,
+                    size: 20,
                     backgroundColor: Colors.transparent,
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                          const MainLayout(child: ChatScreen()),
+                          builder: (context) => const MainLayout(
+                            child: ChatScreen(isPrivate: true),
+                          ),
                         ),
                       );
                     },
                   ),
-                ]
+                  const SizedBox(width: 8), // Add spacing between icons
+                  // Settings dropdown (with private chat item removed)
+                  CustomIconDropdown(
+                    icon: Icons.settings_outlined,
+                    assetSize: 22,
+                    items: [
+                      CustomDropdownItem(
+                        assetPath: AssetConsts.iconPaperclip,
+                        assetSize: 20,
+                        label: 'Attach photo',
+                        onSelected: () {},
+                      ),
+                      // Add other dropdown items here if needed
+                    ],
+                  ),
+                ],
               ),
             ),
-            // Align(
-            //   alignment: Alignment.centerRight,
-            //   child: CustomIconDropdown(
-            //     icon: Icons.settings_outlined,
-            //     assetSize: 22,
-            //     items: [
-            //       CustomDropdownItem(
-            //         assetPath: AssetConsts.iconPrivateChat,
-            //         assetSize: 20,
-            //         label: 'Private chat',
-            //         onSelected: () {
-            //           Navigator.push(
-            //             context,
-            //             MaterialPageRoute(
-            //               builder: (context) => const MainLayout(
-            //                 child: ChatScreen(isPrivate: true),
-            //               ),
-            //             ),
-            //           );
-            //         },
-            //       ),
-            //       CustomDropdownItem(
-            //         assetPath: AssetConsts.iconPaperclip,
-            //         assetSize: 20,
-            //         label: 'Attach photo',
-            //         onSelected: () {},
-            //       )
-            //     ],
-            //   ),
-            // ),
           ],
         ),
       ),

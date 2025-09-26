@@ -27,6 +27,9 @@ class Message extends HiveObject {
   @HiveField(7)
   final String? readAloudLanguage;
 
+  @HiveField(8)
+  final bool isPrivate;
+
   Message({
     required this.id,
     required this.sessionId,
@@ -34,8 +37,9 @@ class Message extends HiveObject {
     required this.isUser,
     required this.createdAt,
     this.isGenerating = false,
-    this.runId, // Add this parameter
+    this.runId,
     this.readAloudLanguage,
+    this.isPrivate = false,
   });
 
   Message copyWith({
@@ -47,6 +51,7 @@ class Message extends HiveObject {
     bool? isGenerating,
     String? runId,
     String? readAloudLanguage,
+    bool? isPrivate,
   }) {
     return Message(
       id: id ?? this.id,
@@ -57,6 +62,7 @@ class Message extends HiveObject {
       isGenerating: isGenerating ?? this.isGenerating,
       runId: runId ?? this.runId,
       readAloudLanguage: readAloudLanguage ?? this.readAloudLanguage,
+      isPrivate: isPrivate ?? this.isPrivate,
     );
   }
 
@@ -87,6 +93,7 @@ class Message extends HiveObject {
       'isGenerating': isGenerating,
       'runId': runId, 
       'readAloudLanguage': readAloudLanguage,
+      'private_chat': isPrivate,
     };
   }
 }

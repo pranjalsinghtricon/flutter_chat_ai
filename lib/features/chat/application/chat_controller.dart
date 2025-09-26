@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../data/models/chat_model.dart';
@@ -84,6 +85,7 @@ class ChatController extends StateNotifier<List<Message>> {
 
     developer.log("💬 Sending message to session: $_currentSessionId", name: "ChatController");
 
+    final isPrivate = ref.read(privateChatProvider);
     final userMsg = Message(
       id: const Uuid().v4(),
       sessionId: _currentSessionId!,
@@ -92,6 +94,7 @@ class ChatController extends StateNotifier<List<Message>> {
       createdAt: DateTime.now(),
       runId: null, // User messages don't have run_id
       readAloudLanguage: null, // User messages don't have readAloudLanguage
+      isPrivate: isPrivate,
     );
 
     state = [...state, userMsg];
@@ -104,8 +107,9 @@ class ChatController extends StateNotifier<List<Message>> {
       content: '',
       isUser: false,
       createdAt: DateTime.now(),
-      runId: null, // Will be set when we receive it
       readAloudLanguage: null, // Will be set from metadata later
+      runId: null,
+      isPrivate: isPrivate,
     );
 
     state = [...state, botMsg];

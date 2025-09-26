@@ -1,5 +1,7 @@
 import 'package:elysia/features/chat/presentation/widgets/app_shortcut.dart';
 import 'package:elysia/features/chat/presentation/widgets/custom_horizontal_scrollanble_card.dart';
+import 'package:elysia/features/chat/presentation/widgets/private_chat_indicator.dart';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/presentation/screens/private_chat.dart';
@@ -107,6 +109,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       controller: _scrollController,
                       padding: const EdgeInsets.all(8.0),
                       children: [
+                        // const PrivateChatIndicator(),
                         if (messages.isEmpty && !widget.isPrivate)
                           WelcomeMessageScreen(),
                         if (messages.isEmpty && widget.isPrivate)
