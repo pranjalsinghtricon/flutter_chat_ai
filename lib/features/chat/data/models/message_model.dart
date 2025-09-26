@@ -22,7 +22,10 @@ class Message extends HiveObject {
   final bool isGenerating;
 
   @HiveField(6)
-  final String? runId; // Add this field for feedback API
+  final String? runId;
+
+  @HiveField(7)
+  final bool isPrivate;
 
   Message({
     required this.id,
@@ -31,7 +34,8 @@ class Message extends HiveObject {
     required this.isUser,
     required this.createdAt,
     this.isGenerating = false,
-    this.runId, // Add this parameter
+    this.runId,
+    this.isPrivate = false,
   });
 
   Message copyWith({
@@ -42,6 +46,7 @@ class Message extends HiveObject {
     DateTime? createdAt,
     bool? isGenerating,
     String? runId,
+    bool? isPrivate,
   }) {
     return Message(
       id: id ?? this.id,
@@ -51,6 +56,7 @@ class Message extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       isGenerating: isGenerating ?? this.isGenerating,
       runId: runId ?? this.runId,
+      isPrivate: isPrivate ?? this.isPrivate,
     );
   }
 
@@ -78,7 +84,8 @@ class Message extends HiveObject {
       'isUser': isUser,
       'createdAt': createdAt.toIso8601String(),
       'isGenerating': isGenerating,
-      'runId': runId, // Add this line
+      'runId': runId,
+      'private_chat': isPrivate,
     };
   }
 }

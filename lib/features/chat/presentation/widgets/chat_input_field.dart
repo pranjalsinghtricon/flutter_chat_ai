@@ -4,7 +4,9 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/presentation/screens/chat_screen.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_language_change_dialog.dart';
+import 'package:elysia/features/chat/presentation/widgets/private_chat_tile.dart';
 import 'package:elysia/features/chat/presentation/widgets/show_model_change_dialog.dart';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/gestures.dart';
@@ -430,6 +432,51 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                 onPressed: () => openBottomDrawer(context),
                 splashRadius: 20,
               ),
+              // child: Row(
+              //   mainAxisSize: MainAxisSize.min,
+              //   children: [
+              //     Consumer(
+              //       builder: (context, ref, _) {
+              //         final isPrivate = ref.watch(privateChatProvider);
+              //         return IconButton(
+              //           icon: Icon(
+              //             isPrivate ? Icons.lock : Icons.lock_open,
+              //             color: isPrivate ? ColorConst.primaryColor : Colors.grey,
+              //           ),
+              //           onPressed: () {
+              //             final notifier = ref.read(privateChatProvider.notifier);
+              //             notifier.state = !notifier.state;
+              //
+              //             // Smooth transition to private chat mode
+              //             if (notifier.state) {
+              //               Navigator.pushReplacement(
+              //                 context,
+              //                 PageRouteBuilder(
+              //                   pageBuilder: (context, animation, secondaryAnimation) =>
+              //                     const MainLayout(child: ChatScreen()),
+              //                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              //                     return FadeTransition(
+              //                       opacity: animation,
+              //                       child: child,
+              //                     );
+              //                   },
+              //                   transitionDuration: const Duration(milliseconds: 300),
+              //                 ),
+              //               );
+              //             }
+              //           },
+              //           splashRadius: 20,
+              //           tooltip: 'Toggle Private Chat',
+              //         );
+              //       },
+              //     ),
+              //     IconButton(
+              //       icon: const Icon(Icons.add, color: Colors.grey),
+              //       onPressed: () => openBottomDrawer(context),
+              //       splashRadius: 20,
+              //     ),
+              //   ],
+              // ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -520,7 +567,7 @@ void openBottomDrawer(BuildContext context) {
     ),
     backgroundColor: Colors.white,
     builder: (context) {
-      return Padding(
+    return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -599,7 +646,9 @@ void openBottomDrawer(BuildContext context) {
             ),
             const SizedBox(height: 16),
             const Divider(color: ColorConst.greyDivider),
-            // List of options
+            // Private Chat option
+            // buildPrivateChatTile(context),
+            // List of other options
             ListTile(
               leading: SvgPicture.asset(AssetConsts.iconSavePrompt),
               title: const Text('Saved Prompts',

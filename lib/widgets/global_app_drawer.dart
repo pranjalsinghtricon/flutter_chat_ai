@@ -160,14 +160,22 @@ class GlobalAppDrawer extends ConsumerWidget {
                       // await ref
                       //     .read(chatControllerProvider.notifier)
                       //     .loadSession(sessionId);
-                      
-                      // Pop drawer and navigate immediately without loading session
+
+                      // Pop drawer and navigate with fade transition
                       Navigator.pop(context);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
+                        PageRouteBuilder(
                           settings: const RouteSettings(name: '/chat'),
-                          builder: (_) => const MainLayout(child: ChatScreen()),
+                          pageBuilder: (context, animation, secondaryAnimation) => 
+                            const MainLayout(child: ChatScreen()),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                          transitionDuration: const Duration(milliseconds: 300),
                         ),
                       );
                     },
