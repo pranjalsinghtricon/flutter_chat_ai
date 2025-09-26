@@ -24,8 +24,10 @@ class ChatController extends StateNotifier<List<Message>> {
   bool forceNewChat = false;
   final Ref _ref;
   String? _currentSessionId;
+  String? _readAloudLanguage;
 
   String? get currentSessionId => _currentSessionId;
+  String? get readAloudLanguage => _readAloudLanguage;
 
   ChatController(this._ref) : super([]);
 
@@ -89,6 +91,7 @@ class ChatController extends StateNotifier<List<Message>> {
       isUser: true,
       createdAt: DateTime.now(),
       runId: null, // User messages don't have run_id
+      readAloudLanguage: null, // User messages don't have readAloudLanguage
     );
 
     state = [...state, userMsg];
@@ -102,6 +105,7 @@ class ChatController extends StateNotifier<List<Message>> {
       isUser: false,
       createdAt: DateTime.now(),
       runId: null, // Will be set when we receive it
+      readAloudLanguage: null, // Will be set from metadata later
     );
 
     state = [...state, botMsg];
@@ -200,8 +204,21 @@ class ChatController extends StateNotifier<List<Message>> {
       if (type == 'metadata') {
         final metadata = data['metadata'] as Map<String, dynamic>;
         final title = metadata['title'];
+        final readAloudLanguage = metadata['response_language'];
+
         if (title != null && title.toString().trim().isNotEmpty) {
           ref.read(chatHistoryProvider.notifier).updateTitle(_currentSessionId!, title);
+        }
+
+        if (readAloudLanguage != null) {
+          _readAloudLanguage = readAloudLanguage;
+          botMsg = botMsg.copyWith(readAloudLanguage: readAloudLanguage);
+          final copy = [...state];
+          final lastIndex = copy.lastIndexWhere((m) => m.id == botId);
+          if (lastIndex != -1) {
+            copy[lastIndex] = botMsg;
+            state = copy;
+          }
         }
 
         developer.log("📊 Received metadata for run_id: $currentRunId", name: "ChatController");

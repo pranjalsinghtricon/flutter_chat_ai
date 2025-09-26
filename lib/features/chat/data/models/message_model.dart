@@ -23,6 +23,9 @@ class Message extends HiveObject {
 
   @HiveField(6)
   final String? runId; // Add this field for feedback API
+    
+  @HiveField(7)
+  final String? readAloudLanguage;
 
   Message({
     required this.id,
@@ -32,6 +35,7 @@ class Message extends HiveObject {
     required this.createdAt,
     this.isGenerating = false,
     this.runId, // Add this parameter
+    this.readAloudLanguage,
   });
 
   Message copyWith({
@@ -42,6 +46,7 @@ class Message extends HiveObject {
     DateTime? createdAt,
     bool? isGenerating,
     String? runId,
+    String? readAloudLanguage,
   }) {
     return Message(
       id: id ?? this.id,
@@ -51,6 +56,7 @@ class Message extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       isGenerating: isGenerating ?? this.isGenerating,
       runId: runId ?? this.runId,
+      readAloudLanguage: readAloudLanguage ?? this.readAloudLanguage,
     );
   }
 
@@ -66,6 +72,7 @@ class Message extends HiveObject {
           : DateTime.now(),
       isGenerating: json['isGenerating'] as bool? ?? false,
       runId: json['runId'] as String?, // Add this line
+      readAloudLanguage: json['readAloudLanguage'] as String?,
     );
   }
 
@@ -78,7 +85,8 @@ class Message extends HiveObject {
       'isUser': isUser,
       'createdAt': createdAt.toIso8601String(),
       'isGenerating': isGenerating,
-      'runId': runId, // Add this line
+      'runId': runId, 
+      'readAloudLanguage': readAloudLanguage,
     };
   }
 }

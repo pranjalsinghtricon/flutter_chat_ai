@@ -126,6 +126,7 @@ class ChatRepository extends StateNotifier<ChatState> {
           for (final history in historyList) {
             final inputList = history['input'] as List? ?? [];
             final outputList = history['output'] as List? ?? [];
+            final readAloudLanguage = history['response_language'] as String?;
             final inputText = inputList.isNotEmpty ? (inputList[0]['text'] ?? "") : "";
             final outputText = outputList.isNotEmpty ? (outputList[0]['text'] ?? "") : "";
 
@@ -139,28 +140,26 @@ class ChatRepository extends StateNotifier<ChatState> {
             // User message
             if (inputText.isNotEmpty) {
               result.add(Message(
-                id: inputList.isNotEmpty && inputList[0]['id'] != null
-                    ? inputList[0]['id'] as String
-                    : '',
+                id: '',
                 sessionId: sessionId,
                 content: inputText,
                 isUser: true,
                 createdAt: createdAt,
-                runId: runId, // Add run_id to user message
+                runId: runId, 
+                readAloudLanguage: readAloudLanguage,
               ));
             }
 
             // AI message with run_id
             if (outputText.isNotEmpty) {
               result.add(Message(
-                id: outputList.isNotEmpty && outputList[0]['id'] != null
-                    ? outputList[0]['id'] as String
-                    : '',
+                id: '',
                 sessionId: sessionId,
                 content: outputText,
                 isUser: false,
                 createdAt: createdAt,
-                runId: runId, // 🔥 CRITICAL: Add run_id to AI message
+                runId: runId,
+                readAloudLanguage: readAloudLanguage,
               ));
             }
           }
@@ -292,6 +291,7 @@ class ChatRepository extends StateNotifier<ChatState> {
     String? messageId,
   }) async* {
     try {
+      final response_language = await _userPreferencesStorage.getPreferredLanguage();
       final url = APIEndpoints.chatStreamCompletion;
       final body = {
         "appId": "e3a5c706-7a5e-4550-bbb0-db535b1eb381",
@@ -315,8 +315,8 @@ class ChatRepository extends StateNotifier<ChatState> {
         "include_search": true,
         "include_metadata": true,
         "intermediate_steps": true,
-        "response_language": "English (US)",
-        "default_response_language": "English (US)",
+        "response_language": response_language ?? "English (US)",
+        "default_response_language": response_language ?? "English (US)",
         "default_name_of_model": "gpt-4o",
         "name_of_model": "gpt-4o"
       };

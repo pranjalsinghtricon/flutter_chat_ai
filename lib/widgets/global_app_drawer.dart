@@ -232,7 +232,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                   // ),
                   if (chats?.today.isNotEmpty ?? false)
                     CustomExpandableTile(
-                      title: "Today's",
+                      title: "Today",
                       items: chats!.today,
                       onTapItem: openChat,
                     ),
