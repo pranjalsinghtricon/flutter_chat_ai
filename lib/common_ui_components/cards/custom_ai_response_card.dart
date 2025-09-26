@@ -4,7 +4,7 @@ import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
 import 'package:elysia/features/chat/data/repositories/feedback_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+
 import 'package:elysia/providers/audio_playback_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:elysia/common_ui_components/buttons/custom_icon_button.dart';
