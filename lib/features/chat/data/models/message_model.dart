@@ -22,9 +22,12 @@ class Message extends HiveObject {
   final bool isGenerating;
 
   @HiveField(6)
-  final String? runId;
-
+  final String? runId; // Add this field for feedback API
+    
   @HiveField(7)
+  final String? readAloudLanguage;
+
+  @HiveField(8)
   final bool isPrivate;
 
   Message({
@@ -35,6 +38,7 @@ class Message extends HiveObject {
     required this.createdAt,
     this.isGenerating = false,
     this.runId,
+    this.readAloudLanguage,
     this.isPrivate = false,
   });
 
@@ -46,6 +50,7 @@ class Message extends HiveObject {
     DateTime? createdAt,
     bool? isGenerating,
     String? runId,
+    String? readAloudLanguage,
     bool? isPrivate,
   }) {
     return Message(
@@ -56,6 +61,7 @@ class Message extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       isGenerating: isGenerating ?? this.isGenerating,
       runId: runId ?? this.runId,
+      readAloudLanguage: readAloudLanguage ?? this.readAloudLanguage,
       isPrivate: isPrivate ?? this.isPrivate,
     );
   }
@@ -72,6 +78,7 @@ class Message extends HiveObject {
           : DateTime.now(),
       isGenerating: json['isGenerating'] as bool? ?? false,
       runId: json['runId'] as String?, // Add this line
+      readAloudLanguage: json['readAloudLanguage'] as String?,
     );
   }
 
@@ -84,7 +91,8 @@ class Message extends HiveObject {
       'isUser': isUser,
       'createdAt': createdAt.toIso8601String(),
       'isGenerating': isGenerating,
-      'runId': runId,
+      'runId': runId, 
+      'readAloudLanguage': readAloudLanguage,
       'private_chat': isPrivate,
     };
   }

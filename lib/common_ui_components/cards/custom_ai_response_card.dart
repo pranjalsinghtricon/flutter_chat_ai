@@ -4,6 +4,8 @@ import 'package:elysia/features/chat/application/chat_controller.dart';
 import 'package:elysia/features/chat/data/models/message_model.dart';
 import 'package:elysia/features/chat/data/repositories/feedback_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:elysia/providers/audio_playback_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:elysia/common_ui_components/buttons/custom_icon_button.dart';
 import 'package:elysia/common_ui_components/markdown/custom_markdown_renderer.dart';
@@ -12,6 +14,7 @@ import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:elysia/utiltities/core/storage.dart';
 
 class CustomAiResponseCard extends ConsumerStatefulWidget {
   final Message message;
@@ -158,12 +161,50 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
     }
   }
 
+  Future<void> _handleReadAloud(String text) async {
+    final audioNotifier = ref.read(audioPlaybackProvider.notifier);
+    final lang = widget.message.readAloudLanguage.toString();
+    final languageToLocale = {
+      'English (UK)': 'en-GB',
+      'English (US)': 'en-US',
+      'Portuguese': 'pt-PT',
+      'Simplified Chinese': 'zh-CN',
+      'Spanish': 'es-ES',
+      'Turkish': 'tr-TR',
+      'Arabic': 'ar-SA',
+      'Japanese': 'ja-JP',
+      'German': 'de-DE',
+      'French': 'fr-FR',
+      'Dutch': 'nl-NL',
+    };
+    final locale = languageToLocale[lang].toString();
+    final voices = await audioNotifier.state.tts.getVoices;
+    final filtered = voices.where((voice) =>
+      (voice['gender']?.toLowerCase() == 'female') &&
+      (voice['locale']?.toLowerCase() == locale.toLowerCase())
+    ).toList();
+    final selectedVoice = filtered.isNotEmpty ? {
+      "name": filtered.first['name'],
+      "locale": filtered.first['locale'],
+    } : null;
+
+    final messageId = widget.message.runId ?? widget.message.id;
+    final audioState = ref.read(audioPlaybackProvider);
+    if (audioState.isPlaying && audioState.messageId == messageId) {
+      await audioNotifier.stop();
+      return;
+    }
+    await audioNotifier.play(messageId, text, locale, selectedVoice);
+    // Force rebuild so background color updates immediately
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatState = ref.watch(chatRepositoryProvider);
 
     final isThisMessageStreaming = chatState.isStreaming &&
-        chatState.streamingMessageId == widget.message.id;
+        chatState.streamingMessageId == widget.message.runId;
 
     final isCurrentlyStreaming = isThisMessageStreaming && widget.message.content.isEmpty;
 
@@ -171,6 +212,9 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
         widget.message.content.isNotEmpty &&
         !widget.message.isUser;
 
+    final audioState = ref.watch(audioPlaybackProvider);
+    final messageId = widget.message.runId ?? widget.message.id;
+    final isThisAudioPlaying = audioState.isPlaying && audioState.messageId == messageId;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -248,10 +292,23 @@ class _CustomAiResponseCardState extends ConsumerState<CustomAiResponseCard> {
                   icon: Icons.info_outline,
                   tooltip: 'Info',
                 ),
-                CustomCardIconButton(
-                  onPressed: () {/* Sound action */},
-                  icon: Icons.volume_up_outlined,
-                  tooltip: 'Read aloud',
+                Consumer(
+                  builder: (context, ref, _) {
+                    final audioState = ref.watch(audioPlaybackProvider);
+                    final messageId = widget.message.runId ?? widget.message.id;
+                    final isThisAudioPlaying = audioState.isPlaying && audioState.messageId == messageId;
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: isThisAudioPlaying ? Colors.blue.withOpacity(0.2) : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: CustomCardIconButton(
+                        onPressed: () => _handleReadAloud(widget.message.content),
+                        icon: Icons.volume_up_outlined,
+                        tooltip: isThisAudioPlaying ? 'Stop audio' : 'Read aloud',
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
