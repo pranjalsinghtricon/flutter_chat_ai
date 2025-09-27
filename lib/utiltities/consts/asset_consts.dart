@@ -38,4 +38,6 @@ class AssetConsts {
   static const iconSavePrompt = '$_iconsPath/icon-save-prompt.svg';
   static const iconChangeModel = '$_iconsPath/icon-change-model.svg';
   static const iconChangeLanguage = '$_iconsPath/icon-change-language.svg';
+  static const iconMicListener = '$_iconsPath/icon-mic-listener.svg';
+  static const iconMic= '$_iconsPath/icon-mic.svg';
 }
