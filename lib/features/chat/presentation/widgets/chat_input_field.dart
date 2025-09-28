@@ -49,7 +49,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   void _send() {
     final text = widget.controller.text.trim();
     _lastRecognizedText = '';
-    _stopListening(); // Ensure mic is turned off when sending
     if (text.isNotEmpty || _attachedFile != null) {
       // ref.read(chatControllerProvider.notifier).sendMessage(text);
       if (widget.onSend != null) widget.onSend!();
@@ -205,7 +204,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
             );
           });
         },
-        localeId: _selectedLanguage,
       );
     }
   }
