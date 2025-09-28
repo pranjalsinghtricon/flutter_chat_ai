@@ -76,18 +76,29 @@ class GlobalAppBar extends ConsumerWidget {
                         size: 20,
                         backgroundColor: Colors.transparent,
                         iconColor: isPrivate ? const Color(0xFF00A76F) : null,
-                        onPressed: () {
+                        onPressed: () async {
+                          // Toggle private chat state
                           final notifier = ref.read(privateChatProvider.notifier);
                           notifier.state = !notifier.state;
                           
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MainLayout(
-                                child: ChatScreen(isPrivate: !isPrivate),
+                          // Reset chat controller state to clear current chat
+                          final chatController = ref.read(chatControllerProvider.notifier);
+                          chatController.resetChatViewOnly();
+                          
+                          // Start a fresh chat session
+                          await chatController.startNewChat();
+                          
+                          // Navigate to a fresh chat screen
+                          if (context.mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MainLayout(
+                                  child: ChatScreen(isPrivate: !isPrivate),
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         },
                       );
                     },
