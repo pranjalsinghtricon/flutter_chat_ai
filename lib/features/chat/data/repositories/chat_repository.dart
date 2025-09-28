@@ -327,7 +327,10 @@ class ChatRepository extends StateNotifier<ChatState> {
         "name_of_model": "gpt-4o"
       };
       
-      developer.log("📤 Sending request body: ${jsonEncode(body)}", name: "ChatRepository");
+      // 🚀 Log request body with detailed information
+      developer.log("📤 Sending request body:", name: "ChatRepository");
+      developer.log("Private Chat Mode: $isPrivate", name: "ChatRepository");
+      developer.log("Full Payload: ${JsonEncoder.withIndent('  ').convert(body)}", name: "ChatRepository");
 
       _setStreaming(true, messageId: messageId);
       String? extractedRunId;
