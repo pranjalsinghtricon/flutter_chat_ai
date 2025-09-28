@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Add this import
 import 'package:elysia/features/auth/service/interceptor.dart'; // ApiClient
 import 'package:elysia/utiltities/consts/api_endpoints.dart'; // APIEndpoints
@@ -57,8 +58,9 @@ class ChatRepository extends StateNotifier<ChatState> {
   final UserPreferencesStorage _userPreferencesStorage = UserPreferencesStorage();
   final ApiClient _apiClient = ApiClient();
   final JWTDecoder _jwtDecoder = JWTDecoder();
+  final Ref _ref;
 
-  ChatRepository() : super(const ChatState());
+  ChatRepository(this._ref) : super(const ChatState());
 
   // Getters for backward compatibility
   bool get isStreaming => state.isStreaming;
@@ -196,6 +198,7 @@ class ChatRepository extends StateNotifier<ChatState> {
   }) async* {
     try {
       final response_language = await _userPreferencesStorage.getPreferredLanguage();
+      final isPrivate = _ref.read(privateChatProvider);
 
       final url = APIEndpoints.chatStreamCompletion;
       final body = {
@@ -209,7 +212,7 @@ class ChatRepository extends StateNotifier<ChatState> {
         "writing_style": "Descriptive",
         "domain_expertise": "General",
         "chat_session": sessionId,
-        "private_chat": false,
+        "private_chat": isPrivate,
         "system_prompt": "",
         "concepts": [],
         "entities": [],
@@ -290,6 +293,7 @@ class ChatRepository extends StateNotifier<ChatState> {
     required String sessionId,
     String? messageId,
   }) async* {
+    final isPrivate = _ref.read(privateChatProvider);
     try {
       final response_language = await _userPreferencesStorage.getPreferredLanguage();
       final url = APIEndpoints.chatStreamCompletion;
@@ -304,7 +308,7 @@ class ChatRepository extends StateNotifier<ChatState> {
         "writing_style": "Descriptive",
         "domain_expertise": "General",
         "chat_session": sessionId,
-        "private_chat": false,
+        "private_chat": isPrivate,
         "system_prompt": "",
         "concepts": [],
         "entities": [],
@@ -320,7 +324,7 @@ class ChatRepository extends StateNotifier<ChatState> {
         "default_name_of_model": "gpt-4o",
         "name_of_model": "gpt-4o"
       };
-
+      
       developer.log("📤 Sending request body: ${jsonEncode(body)}", name: "ChatRepository");
 
       _setStreaming(true, messageId: messageId);

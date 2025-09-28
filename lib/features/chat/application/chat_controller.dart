@@ -9,7 +9,7 @@ import 'package:elysia/utiltities/consts/error_messages.dart';
 import 'dart:developer' as developer;
 
 // Update the provider to use StateNotifierProvider
-final chatRepositoryProvider = StateNotifierProvider<ChatRepository, ChatState>((ref) => ChatRepository());
+final chatRepositoryProvider = StateNotifierProvider<ChatRepository, ChatState>((ref) => ChatRepository(ref));
 
 /// Holds the in-memory messages for the *currently open* session.
 final chatControllerProvider = StateNotifierProvider<ChatController, List<Message>>(

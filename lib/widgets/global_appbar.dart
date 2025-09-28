@@ -1,4 +1,5 @@
 import 'package:elysia/common_ui_components/dropdowns/custom_icon_dropdown.dart';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:elysia/utiltities/consts/asset_consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,19 +67,28 @@ class GlobalAppBar extends ConsumerWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Private chat icon button (moved outside dropdown)
-                  CustomSvgIconButton(
-                    assetPath: AssetConsts.iconPrivateChat,
-                    size: 20,
-                    backgroundColor: Colors.transparent,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MainLayout(
-                            child: ChatScreen(isPrivate: true),
-                          ),
-                        ),
+                  // Private chat toggle button
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final isPrivate = ref.watch(privateChatProvider);
+                      return CustomSvgIconButton(
+                        assetPath: AssetConsts.iconPrivateChat,
+                        size: 20,
+                        backgroundColor: Colors.transparent,
+                        iconColor: isPrivate ? const Color(0xFF00A76F) : null,
+                        onPressed: () {
+                          final notifier = ref.read(privateChatProvider.notifier);
+                          notifier.state = !notifier.state;
+                          
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainLayout(
+                                child: ChatScreen(isPrivate: !isPrivate),
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

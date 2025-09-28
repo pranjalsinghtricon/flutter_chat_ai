@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'package:elysia/providers/auth_service_provider.dart';
+import 'package:elysia/providers/private_chat_provider.dart';
 import 'package:elysia/utiltities/consts/color_constants.dart';
 import 'package:elysia/features/auth/presentation/login.dart';
 import 'package:elysia/features/profile/presentation/screens/profile_landing_screen.dart';
@@ -154,12 +155,8 @@ class GlobalAppDrawer extends ConsumerWidget {
                       ref.read(chatControllerProvider.notifier).resetChatViewOnly();
                       await ref.read(chatControllerProvider.notifier).startNewChat();
 
-                      // final sessionId = await ref
-                      //     .read(chatControllerProvider.notifier)
-                      //     .startNewChat();
-                      // await ref
-                      //     .read(chatControllerProvider.notifier)
-                      //     .loadSession(sessionId);
+                      // Get current private chat state
+                      final isPrivate = ref.read(privateChatProvider);
 
                       // Pop drawer and navigate with fade transition
                       Navigator.pop(context);
@@ -168,7 +165,7 @@ class GlobalAppDrawer extends ConsumerWidget {
                         PageRouteBuilder(
                           settings: const RouteSettings(name: '/chat'),
                           pageBuilder: (context, animation, secondaryAnimation) => 
-                            const MainLayout(child: ChatScreen()),
+                            MainLayout(child: ChatScreen(isPrivate: isPrivate)),
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
                               opacity: animation,
