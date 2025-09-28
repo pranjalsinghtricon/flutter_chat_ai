@@ -5,28 +5,29 @@ class PrivateChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.6, // Give it explicit height
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center, // Center vertically
         children: const [
           Text(
             "Private Chat",
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.w600,
               color: Color(0xFF008080),
             ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 16),
           Text(
-            "While in Private Chat no chat history will be recorded,\n"
-                "and any prompts and responses used within the chat\n"
-                "will not be recorded",
+            "Private Chat does not store history. All\n"
+                "prompts and responses during the\n"
+                "session stay unrecorded.",
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 13,
-              height: 1.4,
-              color: Colors.black54,
+              fontSize: 16,
+              height: 1.5,
+              color: Colors.black87,
             ),
           ),
         ],
