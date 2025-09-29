@@ -42,11 +42,15 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   // Speech to text
   late stt.SpeechToText _speech;
   bool _isListening = false;
+  bool _ignoreSpeechResult = false;
   String _lastRecognizedText = '';
 
   String? _selectedLanguage;
 
   void _send() {
+    // Stop listening before clearing input
+    _ignoreSpeechResult = true;
+    _stopListening();
     final text = widget.controller.text.trim();
     _lastRecognizedText = '';
     if (text.isNotEmpty || _attachedFile != null) {
@@ -57,6 +61,8 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         _attachedFile = null;
         _fileStatus = 'none';
       });
+    } else {
+      setState(() {}); // Ensure rebuild even if nothing is sent
     }
   }
 
@@ -68,7 +74,6 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
         _attachedFile = file;
         _fileStatus = 'uploading';
       });
-      // handle file upload status...
     }
   }
 
@@ -175,44 +180,49 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
   }
 
   void _startListening() async {
-    bool available = await _speech.initialize(
-      onStatus: (status) {
-        if (status == 'done' || status == 'notListening') {
+    await _initLanguage();
+        // Clear input field when mic is clicked
+        widget.controller.clear();
+        bool available = await _speech.initialize(
+          onStatus: (status) {
+            if (status == 'done' || status == 'notListening') {
+              setState(() {
+                _isListening = false;
+              });
+            }
+          },
+          onError: (error) {
+            setState(() {
+              _isListening = false;
+            });
+          },
+        );
+        if (available) {
           setState(() {
-            _isListening = false;
+            _isListening = true;
+            _ignoreSpeechResult = false;
           });
+          _speech.listen(
+            onResult: (result) {
+              if (_ignoreSpeechResult) return;
+              setState(() {
+                _lastRecognizedText = result.recognizedWords;
+                widget.controller.text = _lastRecognizedText;
+                // Move cursor to end of text
+                widget.controller.selection = TextSelection.fromPosition(
+                  TextPosition(offset: widget.controller.text.length),
+                );
+              });
+            },
+            localeId: _selectedLanguage,
+          );
         }
-      },
-      onError: (error) {
-        setState(() {
-          _isListening = false;
-        });
-      },
-    );
-    if (available) {
-      setState(() {
-        _isListening = true;
-      });
-      _speech.listen(
-        onResult: (result) {
-          setState(() {
-            _lastRecognizedText = result.recognizedWords;
-            widget.controller.text = _lastRecognizedText;
-            // Move cursor to end of text
-            widget.controller.selection = TextSelection.fromPosition(
-              TextPosition(offset: widget.controller.text.length),
-            );
-          });
-        },
-      );
-    }
   }
 
   void _stopListening() {
     _speech.stop();
     setState(() {
       _isListening = false;
-      widget.controller.clear(); // Clear input when mic stops
     });
   }
 
@@ -513,7 +523,7 @@ class _ChatInputFieldState extends ConsumerState<ChatInputField> {
                       child: IconButton(
                         icon: Icon(
                           _isListening ? Icons.mic : Icons.mic_none,
-                          color: _isListening ? Colors.red : Colors.black,
+                          color: _isListening ? Colors.blue : Colors.black,
                         ),
                         tooltip: _isListening
                             ? 'Stop (${_selectedLanguage})'
@@ -622,7 +632,6 @@ void openBottomDrawer(BuildContext context) {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      // TODO: Implement Add Sources action
                       Navigator.pop(context);
                     },
                     child: Column(
